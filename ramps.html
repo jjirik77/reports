@@ -181,7 +181,7 @@
             main section,
             main section:not(.active) { /* <-- This selector is now more specific */
                 display: block !important;
-                /* page-break-before: always; -- REMOVED this rule to prevent content clipping */
+                page-break-before: always; /* Each section on a new page */
                 box-shadow: none !important;
                 border: none !important;
                 background-color: #ffffff !important;
@@ -189,23 +189,28 @@
                 margin-top: 0 !important; /* <-- Prevents blank pages */
             }
 
-            /* This rule is no longer needed as page-break is removed */
-            /*
             main section:first-of-type {
-                page-break-before: auto;
+                page-break-before: auto; /* Don't break before the first one */
                 margin-top: 0;
             }
-            */
+
+            /* --- THIS IS THE FIX --- */
+            /* Force all fade-in content to be visible */
+            .fade-in {
+                opacity: 1 !important;
+                transform: translateY(0) !important;
+            }
+            /* --- END OF FIX --- */
 
             .content-card {
                 box-shadow: none !important;
                 border: none !important;
                 padding: 0 !important;
             }
-
-            /* Add space between stacked sections */
+            
+            /* Add space between stacked cards INSIDE a section (if multiple) */
             .content-card + .content-card {
-                margin-top: 2rem !important;
+                 margin-top: 2rem !important;
             }
 
             /* Report-like headings */
@@ -215,14 +220,17 @@
                 border-bottom: 2px solid #000;
                 padding-bottom: 8px;
                 margin-top: 0;
+                page-break-after: avoid; /* Prevent breaking after a heading */
             }
             .content-card h3 {
                 font-size: 16pt;
                 color: #000000;
+                page-break-after: avoid;
             }
             .content-card h4 {
                 font-size: 14pt;
                 color: #000000;
+                page-break-after: avoid;
             }
             
             p, li, td, th {
@@ -231,13 +239,20 @@
                 color: #000000;
             }
 
+            /* Prevent lists from breaking apart */
+            ul, ol, p {
+                page-break-inside: avoid;
+            }
+
             table {
                 font-size: 11pt;
                 width: 100%;
                 border-collapse: collapse;
+                page-break-inside: auto; /* Allow tables to span pages */
             }
             tr {
                 border-bottom: 1px solid #cccccc;
+                page-break-inside: avoid; /* Keep rows together */
             }
             td, th {
                 padding: 8px 4px;
