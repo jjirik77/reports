@@ -304,10 +304,6 @@
                                 <option>Semi-Annual Report</option>
                                 <option>Final Report</option>
                             </select>
-                            <a id="download-json-btn" href="#" class="bg-slate-600 text-white font-medium py-2 px-4 rounded-md flex items-center space-x-2 hover:bg-slate-700 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                <span>Download Data (JSON)</span>
-                            </a>
                             <button id="print-pdf-btn" class="bg-blue-600 text-white font-medium py-2 px-4 rounded-md flex items-center space-x-2 hover:bg-blue-700 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
                                 <span>Print PDF</span>
@@ -468,485 +464,7 @@
         document.addEventListener('DOMContentLoaded', () => {
 
             // --- GLOBAL DATA STORE ---
-            // FIX: Embed the JSON data directly to avoid fetch errors in secure environments
-            const reportData = {
-              "projectDetails": [
-                {
-                  "label": "Project Title",
-                  "value": "Cyber Illinois: RAMPS Cybersecurity Education and Workforce Development"
-                },
-                {
-                  "label": "Federal Award Number",
-                  "value": "70NANB24H316"
-                },
-                {
-                  "label": "Recipient Organization",
-                  "value": "Moraine Valley Community College"
-                },
-                {
-                  "label": "Principal Investigator",
-                  "value": "Dr. John Sands"
-                },
-                {
-                  "label": "Project Period",
-                  "value": "October 1, 2024-September 30, 2026"
-                },
-                {
-                  "label": "Report Date",
-                  "value": "October 2025"
-                }
-              ],
-              "overview": {
-                "executiveSummary": [
-                  "Cyber-Illinois.org represents a transformative regional initiative designed to cultivate a robust cybersecurity ecosystem throughout Illinois. Led by local business leaders and the distinguished Center for Systems Security and Information Assurance (CSSIA) staff at Moraine Valley Community College, this project unites the Chicago area business community with Illinois' Centers of Academic Excellence in Cyber Defense (CAE-CD) designated institutions.",
-                  "The initiative addresses a critical need: developing diverse cybersecurity talent pipelines that span from K-12 through higher education. By engaging regional school districts and establishing sustainable cybersecurity programs of study, the project creates articulation agreements connecting K-12 students with community colleges and universities. This comprehensive approach ensures that cybersecurity career pathways are promoted early and sustained throughout students' educational journeys.",
-                  "The primary objectives focus on developing and enhancing cybersecurity education programs while creating clear career pathways responsive to Illinois' dynamic workforce needs. This community-driven network analyzes regional cybersecurity workforce demands, ensuring educational programs align with industry standards and integrate seamlessly across educational levels. By bridging academia, industry, and government, Cyber Illinois establishes a sustainable model for addressing the state's cybersecurity workforce challenges."
-                ]
-              },
-              "leadershipTeam": {
-                "introduction": "The Cyber Illinois RAMPS initiative draws upon deep expertise in cybersecurity education, workforce development, and industry partnerships. Each team member contributes specialized knowledge essential to achieving the project's ambitious goals.",
-                "members": [
-                  {
-                    "name": "Dr. John Sands",
-                    "title": "Principal Investigator",
-                    "bio": "Dr. Sands brings over 35 years of national cybersecurity education and career pathway experience to the project. As leader of the NCAE Educational Pathways National Center and former director of the Center for System Security and Information Assurance (CSSIA), he has extensive experience identifying and addressing cybersecurity workforce needs in collaboration with local communities. In his PI role, Dr. Sands collaborates with federal partners to determine baseline cybersecurity education and training requirements for strengthening critical infrastructure security across power, water, seaport, and other government-identified sectors."
-                  },
-                  {
-                    "name": "Jiri Jirik",
-                    "title": "Co-Principal Investigator (Project Manager)",
-                    "bio": "Jiri serves as project manager, leveraging his vast experience in developing and delivering training focused on industry credentials including CISA, CISM, and CISSP. He provides both in-person and hybrid training opportunities by adapting resources created for the Education Pathway National Center (EPNC), enabling Illinois workforce members to pursue industry cybersecurity certifications with accessible, high-quality instruction."
-                  },
-                  {
-                    "name": "Stanley Kostka",
-                    "title": "Co-Principal Investigator (RAMPS Community Director)",
-                    "bio": "Stan brings valuable experience from managing the Midwest NCAE Hub, which encompassed over 110 institutions. As an ISACA CISA certification holder, he coordinates community events and manages communications across the expanding RAMPS network. His expertise in building collaborative academic communities ensures effective engagement and sustained participation among diverse stakeholders."
-                  },
-                  {
-                    "name": "Dr. Kristine Christensen",
-                    "title": "Cybersecurity Career Pathways",
-                    "bio": "Dr. Christensen, Professor, Computer Information Systems and Director of Faculty Development. Kristine will lead the development of the Cybersecurity Career Awareness Toolkit working closely with Industry Partners, Government Agencies, and the CAE Community."
-                  },
-                  {
-                    "name": "Michael Gonzalez",
-                    "title": "Graphic Artist/Publications/Social Media Coordinator",
-                    "bio": "Michael works with the RAMPS community to produce high-quality artifacts for promotion and project documentation. His involvement in multiple NSF and NSA grants, including the CSSIA and EPNC projects, ensures professional communication materials that effectively showcase project impact and engage diverse audiences."
-                  }
-                ]
-              },
-              "projectGoals": {
-                "introduction": "The Cyber Illinois RAMPS initiative operates according to five interconnected goals that comprehensively address cybersecurity workforce development needs. Each goal includes specific objectives and measurable metrics ensuring accountability and continuous improvement.",
-                "goals": [
-                  {
-                    "title": "Goal 1: Promote the Discovery of Cybersecurity Careers and Multiple Pathways",
-                    "objectives": [
-                      {
-                        "id": "1a",
-                        "text": "Establish a local advisory team to collect and analyze cybersecurity-related workforce needs.",
-                        "metric": "Document membership, attendance, and contributions to RAMPS community data collection efforts."
-                      },
-                      {
-                        "id": "1b",
-                        "text": "Identify representatives from major economic sectors including healthcare, manufacturing, energy, transportation, finance, retail, education, and government.",
-                        "metric": "Analyze RAMPS community representation across each industry sector."
-                      }
-                    ]
-                  },
-                  {
-                    "title": "Goal 2: Transform Learning to Build and Sustain a Diverse and Skilled Workforce",
-                    "objectives": [
-                      {
-                        "id": "2a",
-                        "text": "Host two events annually to review current academic cybersecurity curriculum, instructional materials, and programs of study.",
-                        "metric": "Document attendance and activities at each event."
-                      },
-                      {
-                        "id": "2b",
-                        "text": "Develop instruments to collect and provide feedback to academic institutions regarding workforce needs and diversity expansion.",
-                        "metric": "Review data collection instruments for accuracy, relevance, and impact."
-                      },
-                      {
-                        "id": "2c",
-                        "text": "Analyze community feedback for updating and expanding local academic programs.",
-                        "metric": "Generate a report summarizing the use of community feedback in updating and expanding cybersecurity academic programs."
-                      }
-                    ]
-                  },
-                  {
-                    "title": "Goal 3: Modernize the Talent Management Process to Address Cybersecurity Skills Gaps",
-                    "objectives": [
-                      {
-                        "id": "3a",
-                        "text": "Utilize cybersecurity workforce summary reports to publish talent gap analysis.",
-                        "metric": "Document summary report results."
-                      },
-                      {
-                        "id": "3b",
-                        "text": "Analyze cybersecurity talent gap results to identify industry credentials, workforce competencies, and required knowledge and skills.",
-                        "metric": "Publish cybersecurity talent gap analysis results."
-                      },
-                      {
-                        "id": "3c",
-                        "text": "Use cybersecurity talent gap analysis to make academic updates and program expansion recommendations.",
-                        "metric": "Document changes and impact of cybersecurity academic programs based on talent gap analysis results."
-                      }
-                    ]
-                  },
-                  {
-                    "title": "Goal 4: Expand Use of the Workforce Framework for Cybersecurity (NICE Framework)",
-                    "objectives": [
-                      {
-                        "id": "4a",
-                        "text": "Perform an applicability study comparing the local workforce to the Workforce Framework for Cybersecurity.",
-                        "metric": "Document alignment and potential gaps between local workforce applicability study and the NICE Framework."
-                      },
-                      {
-                        "id": "4b",
-                        "text": "Leverage the NCAE-C cybersecurity workforce competencies database.",
-                        "metric": "Document proper utilization of the NCAE-C cybersecurity workforce competencies database."
-                      },
-                      {
-                        "id": "4c",
-                        "text": "Partner with local academic institutions and employers to develop and promote cybersecurity credentials aligned with workforce needs.",
-                        "metric": "Document academic credentials and industry certifications targeted by stakeholders."
-                      }
-                    ]
-                  },
-                  {
-                    "title": "Goal 5: Drive Research on Effective Practices for Cybersecurity Workforce Development",
-                    "objectives": [
-                      {
-                        "id": "5a",
-                        "text": "Develop and deliver cybersecurity awareness campaigns to strengthen Illinois' cybersecurity posture.",
-                        "metric": "Document the number of participants completing awareness training."
-                      },
-                      {
-                        "id": "5b",
-                        "text": "Partner with academia to develop and implement new credentials meeting local workforce needs.",
-                        "metric": "Document the number of new academic lessons, courses, certifications, and degrees."
-                      },
-                      {
-                        "id": "5c",
-                        "text": "Partner with local stakeholders to promote industry certifications aligned with local workforce needs.",
-                        "metric": "Document the number of participants and employees earning industry certifications."
-                      }
-                    ]
-                  }
-                ]
-              },
-              "year1Accomplishments": {
-                "summary": {
-                  "introduction": "The Cyber Illinois RAMPS initiative successfully completed its foundational first year by establishing a robust, collaborative ecosystem addressing the regional cybersecurity workforce pipeline. The Center planned and implemented four strategic events that brought together academic institutions, industry leaders, government partners, and community stakeholders.",
-                  "events": [
-                    {
-                      "title": "Inaugural RAMPS Committee Summit (March 21, 2025)",
-                      "description": "The project launched with a comprehensive summit that united Midwest NCAE-CD institutions alongside key industry leaders, as well as government partners. This pivotal event formally launched the IllinoisCyber.org resource hub and established a formal advisory team that set the strategic roadmap for the project. Participants engaged in professional development focused on emerging technologies and initiated critical alignment between education programs and industry-recognized credentials."
-                    },
-                    {
-                      "title": "Career Counselors and Academic Advisors Training",
-                      "description": "The RAMPS team developed and delivered specialized training designed for key stakeholders who guide students into cybersecurity careers. The comprehensive toolkit and activities educated counselors and advisors about the cybersecurity workforce landscape and available academic programs throughout the region, enabling them to provide informed guidance to students exploring cybersecurity pathways."
-                    },
-                    {
-                      "title": "Cybersecurity Awareness Month Event (October 3, 2025)",
-                      "description": "During National Cybersecurity Awareness Month, the team hosted a significant engagement event drawing over 70 students and 20 K-12 teachers from across the region. Participants engaged in an interactive 'cybersecurity sticker heist' activity that demonstrated security concepts through hands-on learning. The event also attracted eight business leaders, government officials, and local leaders, and featured an AI workshop addressing emerging technologies' impact on cybersecurity. This multi-generational gathering successfully bridged K-12, higher education, and industry communities."
-                    },
-                    {
-                      "title": "Women in Technology Dinner",
-                      "description": "This established college event expanded to incorporate RAMPS objectives by connecting women working in cybersecurity with industry speakers. The dinner fostered networking opportunities and mentorship connections while promoting diversity and inclusion in the cybersecurity workforce, directly supporting the initiative's commitment to building a diverse talent pipeline."
-                    }
-                  ]
-                },
-                "kpis": [
-                  {
-                    "id": "kpi-students",
-                    "title": "Student Engagement (Events)",
-                    "target": 70,
-                    "growth": "+70",
-                    "description": "Students at Cyber Awareness Month event.",
-                    "modalTitle": "Student Engagement (Events)",
-                    "modalData": [
-                      { "year": "Oct 2024", "value": 0 },
-                      { "year": "Oct 2025", "value": 70 }
-                    ]
-                  },
-                  {
-                    "id": "kpi-teachers",
-                    "title": "K-12 Teacher Engagement",
-                    "target": 20,
-                    "growth": "+20",
-                    "description": "K-12 teachers engaged at Year 1 events.",
-                    "modalTitle": "K-12 Teacher Engagement",
-                    "modalData": [
-                      { "year": "Oct 2024", "value": 0 },
-                      { "year": "Oct 2025", "value": 20 }
-                    ]
-                  },
-                  {
-                    "id": "kpi-courses",
-                    "title": "New Courses/Workshops",
-                    "target": 5,
-                    "growth": "+5",
-                    "description": "Faculty workshops & new courses created.",
-                    "modalTitle": "New Courses/Workshops",
-                    "modalData": [
-                      { "year": "Oct 2024", "value": 0 },
-                      { "year": "Oct 2025", "value": 5 }
-                    ]
-                  },
-                  {
-                    "id": "kpi-certs",
-                    "title": "Industry Cert Alignments",
-                    "target": 5,
-                    "growth": "+4",
-                    "description": "Via NCYTE (CISSP, CISA, etc) & Azure.",
-                    "modalTitle": "Industry Cert Alignments",
-                    "modalData": [
-                      { "year": "Oct 2024", "value": 1 },
-                      { "year": "Oct 2025", "value": 5 }
-                    ]
-                  }
-                ],
-                "charts": {
-                  "sectorEngagement": [
-                    { "sector": "Healthcare", "participants": 12 },
-                    { "sector": "Manufacturing", "participants": 10 },
-                    { "sector": "Transportation", "participants": 8 },
-                    { "sector": "Finance", "participants": 15 },
-                    { "sector": "Education", "participants": 18 }
-                  ],
-                  "certificationFocus": [
-                    {
-                      "name": "CISSP",
-                      "label": "High Demand",
-                      "width": "90%"
-                    },
-                    {
-                      "name": "CISA / CISM",
-                      "label": "High Demand",
-                      "width": "85%"
-                    },
-                    {
-                      "name": "Certified Ethical Hacker (CEH)",
-                      "label": "Medium Demand",
-                      "width": "70%"
-                    },
-                    {
-                      "name": "AI Threat Management",
-                      "label": "Emerging Need",
-                      "width": "60%"
-                    },
-                    {
-                      "name": "Automotive Security",
-                      "label": "Emerging Need",
-                      "width": "50%"
-                    }
-                  ]
-                },
-                "byGoal": [
-                  {
-                    "title": "Goal 1: Promote the Discovery of Cybersecurity Careers and Multiple Pathways",
-                    "accomplishments": [
-                      "<strong>Advisory Team Establishment (Objective 1a):</strong> The project successfully launched a formal advisory group during the inaugural Summit, comprising leaders from finance, healthcare, transportation, and technology sectors. This diverse team provides strategic guidance and conducts ongoing workforce demand assessments, ensuring the initiative remains responsive to evolving industry needs.",
-                      "<strong>Key Sector Engagement (Objective 1b):</strong> The inaugural Summit achieved comprehensive industry representation, successfully engaging participants from healthcare, manufacturing, transportation, finance, and education sectors. This broad participation fulfills the project's commitment to understanding cybersecurity workforce needs across Illinois' diverse economic landscape.",
-                      "<strong>Career Counselors and Academic Advisors Training (Objective 1b):</strong> The specialized training session equipped career counselors and academic advisors with essential knowledge about cybersecurity career opportunities, regional academic programs, and workforce trends. This investment in advisor education multiplies project impact by enabling informed career guidance for hundreds of students annually."
-                    ]
-                  },
-                  {
-                    "title": "Goal 2: Transform Learning to Build and Sustain a Diverse and Skilled Workforce",
-                    "accomplishments": [
-                      "<strong>Inaugural Convening (Objective 2a):</strong> The first annual event, hosted on March 21, 2025, brought together Midwest CAE institutions and industry partners. Participants reviewed curricula, shared labor market data, and developed an actionable strategic plan for aligning educational programs with workforce demands.",
-                      "<strong>Community Engagement Highlight (Objective 2b):</strong> The Women in Technology Mentoring Dinner provided an ideal venue for introducing the RAMPS initiative to diverse community organizations committed to equity in cybersecurity education. Initial connections were established with Illinois WiCyS, Genesys Works, and ADMI, laying groundwork for sustained partnerships that will expand access to cybersecurity careers for underrepresented populations.",
-                      "<strong>Talent Gap Analysis Application (Objective 3c):</strong> Business leaders and team members conducted comprehensive reviews of local cybersecurity workforce trends. These analyses directly informed the development of three new faculty development workshops and the creation of two new college courses, which were submitted to the state higher learning office curriculum committee for approval. This rapid translation of workforce data into educational program enhancements demonstrates the project's agility and responsiveness."
-                    ]
-                  },
-                  {
-                    "title": "Goal 3: Modernize the Talent Management Process to Address Cybersecurity Skills Gaps",
-                    "accomplishments": [
-                      "<strong>Talent Gap Analysis Report Development (Objective 3a):</strong> The team leveraged comprehensive talent gap analysis to identify emerging AI skills requirements. This analysis drove the development of new exercises and workshop materials addressing artificial intelligence's intersection with cybersecurity, ensuring educational programs remain current with rapidly evolving technology landscapes.",
-                      "<strong>Credential Development Partnership (Objective 3b):</strong> Collaboration with Credly resulted in planning for new AI-related credentials. Additionally, the team created two new courses specifically aligned to ISACA CISA and CISM certifications, directly addressing industry identified credential needs and providing students with clear pathways to professional recognition.",
-                      "<strong>New Course Approval (Objective 3c):</strong> Moraine Valley Community College received approval for a new Cloud Technology course aligned with Microsoft Azure certifications. This achievement demonstrates successful integration of industry feedback into formal academic programming, providing students with credentials recognized and valued by employers."
-                    ]
-                  },
-                  {
-                    "title": "Goal 4: Expand Use of the Workforce Framework for Cybersecurity",
-                    "accomplishments": [
-                      "<strong>Alignment to Microsoft Azure Certification (Objective 4c):</strong> The project team partnered with local academic institutions and employers to develop and promote cybersecurity credentials aligned with workforce needs, specifically targeting Microsoft Azure certifications. This alignment ensures that graduates possess skills directly applicable to employer requirements and mapped to NICE Framework work roles."
-                    ]
-                  },
-                  {
-                    "title": "Goal 5: Drive Research on Effective Practices for Cybersecurity Workforce Development",
-                    "accomplishments": [
-                      "<strong>Faculty Professional Development (Objective 5b):</strong> The team successfully developed and delivered critical professional development workshops preparing educators for evolving cybersecurity threats and emerging technologies. These training initiatives ensure that Illinois' cybersecurity faculty remain at the forefront of their field, capable of delivering cutting-edge instruction to students."
-                    ]
-                  }
-                ]
-              },
-              "specialHighlights": {
-                "training": {
-                  "introduction": "Throughout Year One, the Cyber Illinois RAMPS project prioritized equipping faculty, contractors, and academic support staff with cutting-edge knowledge and skills. Three major training initiatives were either accomplished or planned, addressing critical workforce development needs.",
-                  "initiatives": [
-                    {
-                      "title": "1. AI Training for Faculty and Staff (Accomplished)",
-                      "subtitle": "Event: Implications of Artificial Intelligence for Educators: Empowering Educators to Leverage AI in Teaching and Learning",
-                      "description": "This comprehensive, hands-on workshop was delivered to faculty, staff, counselors, and academic advisors. The training specifically prepared educators to integrate AI into their teaching methodologies, curriculum development, and administrative tasks—a critical capability as artificial intelligence transforms both cybersecurity threats and defensive capabilities.",
-                      "detailsTitle": "Key Topics Covered:",
-                      "details": [
-                        "AI applications in decision-making and data analysis.",
-                        "Interactive classroom activities incorporating AI tools.",
-                        "Ethical considerations including misinformation, deepfakes, and privacy concerns.",
-                        "Designing adaptive assessments using AI capabilities.",
-                        "Embedding AI literacy throughout curricula for future workforce success."
-                      ],
-                      "conclusion": "This training directly leveraged the Principal Investigator's dual expertise in cybersecurity and artificial intelligence, ensuring that content remained both technically rigorous and pedagogically sound."
-                    },
-                    {
-                      "title": "2. Cybersecurity Maturity Model Certification (CMMC) Training (Planned)",
-                      "subtitle": "Status: Key deliverable scheduled for Year Two",
-                      "description": "The dedicated CMMC training event will leverage the project team's national expertise in training faculty members and business leaders on CMMC requirements and NIST 800-171 alignment. This specialized workshop will be developed specifically for faculty and local Department of Defense (DoD) contractors and sub-contractors, addressing critical needs within the regional defense industrial base.",
-                      "detailsTitle": "Goals:",
-                      "details": [
-                        "Prepare academic partners to integrate CMMC material into curricula.",
-                        "Assist regional businesses in meeting essential compliance requirements.",
-                        "Strengthen the security posture of defense contractors throughout Illinois."
-                      ]
-                    },
-                    {
-                      "title": "3. Training for Career Counselors and Academic Advisors (Planned)",
-                      "subtitle": "Status: Dedicated workshop scheduled for Year Two",
-                      "description": "While counselors and advisors participated in the AI training, a separate, specialized workshop entitled 'Opportunities in Cybersecurity' will be developed and delivered. This targeted training will equip career counselors and academic advisors with the latest labor market data, detailed career pathway information, and comprehensive understanding of industry-recognized credentials.",
-                      "detailsTitle": "Goals:",
-                      "details": [
-                        "Enable effective guidance of diverse K-12 and post-secondary students into cybersecurity careers.",
-                        "Ensure advisors understand current workforce demands and available pathways.",
-                        "Support the project's commitment to diversity by helping advisors identify opportunities for underrepresented populations."
-                      ]
-                    }
-                  ]
-                },
-                "partnership": {
-                  "introduction": "The Illinois RAMPS project established a strategic partnership with the National Cybersecurity Training & Education Center (NCYTE) that significantly amplifies project impact while ensuring long-term sustainability. This collaboration leverages NCYTE's established infrastructure and national NSF funding (Grant #2054724) to deliver highly relevant online training supporting the RAMPS grant's core goal of transforming learning to build a diverse and skilled workforce.",
-                  "sections": [
-                    {
-                      "title": "Industry Certification and Core Competency Training",
-                      "description": "The partnership provides faculty with essential training in major industry-recognized credentials, ensuring academic curricula remain aligned with current workforce demands. Multi-day workshops focus on three of the most sought-after certifications:",
-                      "list": [
-                        "<strong>(ISC)² Certified Information Systems Security Professional (CISSP):</strong> This foundational training enables faculty to teach students how to design, implement, and manage best-in-class cybersecurity programs. The comprehensive curriculum covers all eight CISSP domains, preparing students for this globally recognized certification.",
-                        "<strong>ISACA Certified Information Systems Auditor (CISA) and Certified Information Security Manager (CISM):</strong> These specialized workshops provide training in audit, control, security, and governance, specifically targeting professionals transitioning from technical roles to management positions. Faculty trained in these credentials can develop courses preparing students for senior cybersecurity roles. This focus on core, high-level credentials ensures that graduates from Illinois CAE-CD institutions enter the workforce immediately competitive for advanced positions, addressing the state's need for experienced cybersecurity professionals."
-                      ]
-                    },
-                    {
-                      "title": "Practical and Offensive Security Skills",
-                      "description": "To ensure faculty can teach practical, hands-on skills relevant to modern threats, the NCYTE collaboration included workshops focused on offensive security and emerging technologies:",
-                      "list": [
-                        "<strong>EC-Council Certified Ethical Hacker (CEH):</strong> This immersive workshop places participants in the hacker mindset, covering topics like SQL injection, spear phishing, and buffer overflows through live demonstrations and hands-on lab exercises. Faculty completing this training can develop practical courses teaching students to think like attackers, a critical skill for modern cybersecurity defenders.",
-                        "<strong>Automotive Security and Car Hacking Workshop:</strong> This specialized training addressed the exponentially increasing attack surface of modern, autonomous vehicles. Available to faculty from various departments including Automotive Technology and Computer Science, the workshop equipped educators to incorporate content on V2X technologies and vehicle control systems into existing courses. This cross-disciplinary approach recognizes that cybersecurity increasingly intersects with traditional technical fields."
-                      ]
-                    },
-                    {
-                      "title": "Addressing the Impact of Artificial Intelligence",
-                      "description": "Recognizing that Artificial Intelligence represents both a powerful tool and a critical threat vector, the partnership scheduled two distinct workshops dedicated to this emerging field, aligning perfectly with the RAMPS project's emphasis on evolving threats.",
-                      "list": [
-                        "<strong>Implications of Artificial Intelligence for Educators:</strong> This workshop, highlighted as a major Year One accomplishment, specifically targeted university, community college, and high school faculty, staff, counselors, and academic advisors. The training focused on practical integration of AI for personalized student learning, curriculum design, adaptive assessments, and teaching ethical AI use in the classroom. By preparing educators to leverage AI effectively, the project ensures that Illinois students graduate with essential AI literacy alongside cybersecurity expertise.",
-                        "<strong>AI Threat Management Workshop:</strong> Complementing the faculty-focused AI training, this workshop equipped cybersecurity professionals with advanced skills to combat AI-driven threats. Participants engaged in hands-on lab exercises learning to use data science and AI methodologies for proactive threat detection, vulnerability assessment, penetration testing, and intelligence gathering. Crucially, content extended beyond technical skills to cover AI ethics, governance, risk management, and compliance, ensuring attendees developed holistic expertise needed to build secure AI environments and conduct Privacy Impact Assessments."
-                      ]
-                    },
-                    {
-                      "title": "The Role of NCYTE in Project Sustainability",
-                      "description": [
-                        "The NCYTE partnership is vital to the Illinois RAMPS project's long-term sustainability model. By leveraging NCYTE's existing National Science Foundation grant funding and curriculum development expertise, the RAMPS project minimizes direct cost burdens while maximizing training quality and reach. This approach institutionalizes project impact by connecting the Illinois community directly to a nationally recognized pipeline for faculty development.",
-                        "This strategic resource sharing allows the Cyber Illinois team to focus RAMPS grant funds on regional stakeholder engagement, workforce analysis, and implementing specific academic program changes based on collected data. Rather than developing training materials from scratch, the project accesses proven, high-quality content that has already undergone rigorous development and validation."
-                      ]
-                    }
-                  ]
-                }
-              },
-              "year2Plan": {
-                "introduction": "Year Two will focus on execution, comprehensive data analysis, and deployment of specialized training initiatives. Building upon the strong foundation established in Year One, the project will deepen its impact across all five goals.",
-                "plans": [
-                  {
-                    "title": "Talent Gap Analysis Completion",
-                    "description": "The team will finalize comprehensive workforce summary reports (Objective 3a) and publish detailed analysis of the cybersecurity talent gap throughout Illinois. This analysis will identify critical industry credentials, essential workforce competencies, and specific knowledge and skills in highest demand (Objective 3b). The findings will guide academic program development and ensure training investments target the most pressing workforce needs."
-                  },
-                  {
-                    "title": "Specialized Training Deployment",
-                    "description": "Two major training initiatives planned in the original proposal will be developed and delivered:",
-                    "sublist": [
-                      "<strong>CMMC Training:</strong> This specialized workshop will serve faculty and Department of Defense contractors throughout Illinois, addressing critical compliance needs within the defense industrial base.",
-                      "<strong>\"Opportunities in Cybersecurity\" Workshop:</strong> This dedicated training for career counselors and academic advisors will equip them to effectively guide diverse students into cybersecurity careers using current labor market data and comprehensive pathway information."
-                    ],
-                    "note": "Both initiatives fulfill Cost Share commitments while directly supporting project goals around workforce development and career pathway creation."
-                  },
-                  {
-                    "title": "Program Updates and Academic Revisions",
-                    "description": "Community feedback gathered from the inaugural convening, combined with talent gap analysis results, will generate a formal report detailing specific recommendations for academic program revisions and expansions across participating CAE institutions (Objectives 2c, 3c). This evidence-based approach ensures that curriculum changes address documented workforce needs while maintaining academic rigor."
-                  },
-                  {
-                    "title": "Sustainability and Community Building",
-                    "description": "Efforts will continue building the Community of Practice by connecting participants with national organizations and resources, including the NICE Community and the CLARK Repository. By linking Illinois stakeholders to these national networks, the project ensures that the community remains informed about best practices and innovations in cybersecurity education long after grant funding concludes."
-                  }
-                ]
-              },
-              "challenges": {
-                "changes": {
-                  "title": "Changes in Approach",
-                  "description": "No significant changes in the overall project approach or scope have been made during Year One. The project proceeded according to the approved work plan, with all major activities completed on schedule."
-                },
-                "delays": {
-                  "title": "Actual or Anticipated Problems or Delays",
-                  "description": [
-                    "None to report. The project is currently on schedule with all major foundational Year One milestones successfully accomplished. The strong engagement from academic partners, industry leaders, and government stakeholders suggests continued momentum heading into Year Two.",
-                    "The collaborative nature of the initiative and the established partnerships with organizations like NCYTE position the project well for sustained success. The advisory team's active participation and the enthusiastic response from faculty to professional development opportunities indicate strong buy-in across all stakeholder groups."
-                  ]
-                }
-              },
-              "conclusion": {
-                "paragraphs": [
-                  "The Cyber Illinois RAMPS initiative's first year established a robust foundation for transforming cybersecurity workforce development throughout Illinois. By successfully launching the IllinoisCyber.org resource hub, convening diverse stakeholders, and delivering high-quality professional development, the project demonstrated its capacity to unite academia, industry, and government around shared workforce development goals.",
-                  "The strategic partnership with NCYTE multiplies project impact by providing access to nationally recognized training resources, while the formal advisory team ensures that educational programs remain responsive to evolving workforce needs. As the initiative enters Year Two, the focus shifts to deepening impact through specialized training, comprehensive data analysis, and evidence-based academic program enhancements.",
-                  "The success of Year One activities—from the 70+ students engaged at the Cybersecurity Awareness Month event to the 15 CAE institutions participating in the inaugural convening—demonstrates strong community support for the initiative. This momentum, combined with the rigorous evaluation framework guiding continuous improvement, positions Cyber Illinois to achieve its ambitious goals of building diverse, sustainable cybersecurity career pathways that serve Illinois' workforce needs for years to come."
-                ]
-              },
-              "charts": {
-                "advisorChart": [
-                  {
-                    "category": "Cybersecurity Careers",
-                    "pre": -35.2,
-                    "post": 25.4
-                  },
-                  {
-                    "category": "Academic Pathways",
-                    "pre": -42,
-                    "post": 38.8
-                  },
-                  {
-                    "category": "Industry Credentials",
-                    "pre": -50.5,
-                    "post": 40.1
-                  }
-                ],
-                "sectorEngagement": [
-                  {
-                    "sector": "Healthcare",
-                    "participants": 12
-                  },
-                  {
-                    "sector": "Manufacturing",
-                    "participants": 10
-                  },
-                  {
-                    "sector": "Transportation",
-                    "participants": 8
-                  },
-                  {
-                    "sector": "Finance",
-                    "participants": 15
-                  },
-                  {
-                    "sector": "Education",
-                    "participants": 18
-                  }
-                ]
-              }
-            };
+            let reportData = {};
             let activeChartDrawers = {}; // Object to store chart drawing functions
 
             // --- SELECTORS ---
@@ -959,8 +477,7 @@
             const chartTooltip = document.getElementById('chart-tooltip');
             const printBtn = document.getElementById('print-pdf-btn');
             const reportSelect = document.getElementById('report-select');
-            const downloadJsonBtn = document.getElementById('download-json-btn');
-
+            
             // --- DATA POPULATION FUNCTIONS ---
 
             function populateProjectDetails(details) {
@@ -981,7 +498,6 @@
             }
 
             function populateTeam(team) {
-                if (!team) return; // Add safety check
                 document.getElementById('team-intro').textContent = team.introduction;
                 const container = document.getElementById('team-members-list');
                 container.innerHTML = team.members.map(member => `
@@ -991,7 +507,6 @@
             }
 
             function populateGoals(goals) {
-                if (!goals) return; // Add safety check
                 document.getElementById('goals-intro').textContent = goals.introduction;
                 const container = document.getElementById('project-goals-list');
                 container.innerHTML = goals.goals.map(goal => `
@@ -1008,7 +523,6 @@
             }
 
             function populateYear1Summary(summary) {
-                if (!summary) return; // Add safety check
                 document.getElementById('y1-summary-intro').textContent = summary.introduction;
                 const container = document.getElementById('y1-summary-events');
                 container.innerHTML = summary.events.map(event => `
@@ -1018,7 +532,6 @@
             }
 
             function populateKPIs(kpis) {
-                if (!kpis) return; // Add safety check
                 const container = document.getElementById('kpi-grid');
                 container.innerHTML = kpis.map((kpi, i) => `
                     <div id="${kpi.id}" class="kpi-card bg-white p-6 rounded-xl shadow-sm border border-slate-200 card-hover cursor-pointer fade-in fade-in-delay-${i}" 
@@ -1039,7 +552,6 @@
             }
 
             function populateGrowthChart(chartData) {
-                if (!chartData) return; // Add safety check
                 const container = document.getElementById('growth-chart-container');
                 container.innerHTML = chartData.map(bar => `
                     <div class="growth-bar">
@@ -1055,7 +567,6 @@
             }
 
             function populateAccomplishmentsByGoal(goals) {
-                if (!goals) return; // Add safety check
                 const container = document.getElementById('accomplishments-by-goal-list');
                 container.innerHTML = goals.map(goal => `
                     <h3>${goal.title}</h3>
@@ -1066,7 +577,6 @@
             }
 
             function populateHighlightsTraining(training) {
-                if (!training) return; // Add safety check
                 document.getElementById('training-intro').textContent = training.introduction;
                 const container = document.getElementById('training-initiatives-list');
                 container.innerHTML = training.initiatives.map(item => `
@@ -1079,7 +589,6 @@
             }
 
             function populateHighlightsPartnership(partnership) {
-                if (!partnership) return; // Add safety check
                 document.getElementById('partnership-intro').textContent = partnership.introduction;
                 const container = document.getElementById('partnership-sections-list');
                 container.innerHTML = partnership.sections.map(section => `
@@ -1093,7 +602,6 @@
             }
 
             function populateYear2Plan(plan) {
-                if (!plan) return; // Add safety check
                 document.getElementById('y2-plan-intro').textContent = plan.introduction;
                 const container = document.getElementById('y2-plan-list');
                 container.innerHTML = plan.plans.map(item => `
@@ -1105,7 +613,6 @@
             }
 
             function populateChallenges(challenges) {
-                if (!challenges) return; // Add safety check
                 const container = document.getElementById('changes-challenges-content');
                 container.innerHTML = `
                     <h3>${challenges.changes.title}</h3>
@@ -1116,7 +623,6 @@
             }
 
             function populateConclusion(conclusion) {
-                if (!conclusion) return; // Add safety check
                 const container = document.getElementById('conclusion-content');
                 container.innerHTML = conclusion.paragraphs.map(p => `
                     <p class="text-lg text-slate-700 leading-relaxed">${p}</p>
@@ -1151,11 +657,6 @@
                 activeChartDrawers['goals'] = () => {
                     // createAdvisorChart(reportData.charts.advisorChart || []);
                 };
-
-                // Set up JSON download button
-                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reportData, null, 2));
-                downloadJsonBtn.setAttribute("href", dataStr);
-                downloadJsonBtn.setAttribute("download", "report_data.json");
 
                 // Trigger animations for the initially active section
                 triggerSectionAnimations(document.querySelector('section.active'));
@@ -1494,20 +995,25 @@
             }
             
             // --- INITIALIZE APPLICATION ---
-            function initializeApp() {
+            async function initializeApp() {
                 try {
-                    // Data is now embedded in 'reportData' variable, no fetch needed.
+                    // Fetch data from the JSON file
+                    const response = await fetch('ramps_report_data.json'); // <-- Updated to ramps_report_data.json
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    reportData = await response.json();
                     
                     // Once data is loaded, populate the dashboard
                     populateDashboard();
 
                 } catch (error) {
-                    console.error("Could not populate dashboard from local data:", error);
+                    console.error("Could not load report data:", error);
                     document.getElementById('overview').innerHTML = 
                         `<div class="bg-white p-8 rounded-xl shadow-sm border border-red-300">
                             <h2 class="text-2xl font-bold text-red-700 mb-4">Error Loading Report</h2>
-                            <p class="text-lg text-red-600">Could not populate dashboard from local data.</p>
-                            <p class="text-sm text-slate-500 mt-4">There might be an issue with the embedded reportData object.</p>
+                            <p class="text-lg text-red-600">Could not fetch data from <code>ramps_report_data.json</code>.</p>
+                            <p class="text-sm text-slate-500 mt-4">Please ensure the file exists and is in the same directory as the HTML file.</p>
                             <pre class="bg-slate-100 p-4 rounded-md text-sm mt-2">${error}</pre>
                         </div>`;
                 }
@@ -1520,4 +1026,5 @@
 
 </body>
 </html>
+
 
