@@ -153,7 +153,8 @@
             }
 
             /* Show all sections and stack them */
-            main section {
+            main section,
+            main section:not(.active) { /* <-- This selector is now more specific */
                 display: block !important;
                 page-break-before: always; /* Each section on a new page */
                 box-shadow: none !important;
@@ -1252,6 +1253,7 @@
 
 </body>
 </html>
+
 
 
 
