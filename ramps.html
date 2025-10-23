@@ -121,7 +121,7 @@
                 height: auto !important;
                 overflow: visible !important;
                 background-color: #ffffff !important;
-                position: static !important; /* ADDED */
+                position: static !important;
             }
             
             body,
@@ -130,7 +130,7 @@
                 min-height: auto !important;
                 height: auto !important;
                 overflow: visible !important;
-                position: static !important; /* ADDED */
+                position: static !important;
             }
 
             body {
@@ -153,14 +153,14 @@
                 min-height: auto !important; /* Reset height */
                 margin-left: 0 !important;
                 width: 100% !important;
-                position: static !important; /* ADDED */
+                position: static !important;
             }
 
             main > div {
                 display: block !important; /* Disable flex */
                 padding: 1in !important; /* Standard 1-inch margins */
                 margin: 0 !important;
-                position: static !important; /* ADDED */
+                position: static !important;
             }
 
             header {
@@ -181,7 +181,7 @@
             main section,
             main section:not(.active) { /* <-- This selector is now more specific */
                 display: block !important;
-                page-break-before: always; /* Each section on a new page */
+                /* page-break-before: always; -- REMOVED this rule to prevent content clipping */
                 box-shadow: none !important;
                 border: none !important;
                 background-color: #ffffff !important;
@@ -189,15 +189,23 @@
                 margin-top: 0 !important; /* <-- Prevents blank pages */
             }
 
+            /* This rule is no longer needed as page-break is removed */
+            /*
             main section:first-of-type {
-                page-break-before: auto; /* Don't break before the first one */
+                page-break-before: auto;
                 margin-top: 0;
             }
+            */
 
             .content-card {
                 box-shadow: none !important;
                 border: none !important;
                 padding: 0 !important;
+            }
+
+            /* Add space between stacked sections */
+            .content-card + .content-card {
+                margin-top: 2rem !important;
             }
 
             /* Report-like headings */
@@ -944,98 +952,6 @@
                     .join("rect")
                     .attr("class", "bar-post")
                     .attr("y", d => y(d.category))
-                    .attr("x", x(0))
-                    .attr("width", 0) // Start at 0
-                    .attr("height", y.bandwidth())
-                    .attr("fill", "#6ee7b7") // green-300
-                    .transition().duration(1000).delay(200)
-                    .attr("width", d => x(d.post) - x(0));
-            }
-            
-            // 3. Sector Engagement Bar Chart (Replaced US Map)
-            function drawSectorChart(data) {
-                const container = d3.select("#sector-chart-container");
-                if (!container.node() || !data || data.length === 0) return;
-                
-                container.selectAll("*").remove();
-
-                const margin = { top: 20, right: 20, bottom: 100, left: 50 };
-                const width = container.node().getBoundingClientRect().width - margin.left - margin.right;
-                const height = container.node().getBoundingClientRect().height - margin.top - margin.bottom;
-
-                const svg = container.append("svg")
-                    .attr("width", width + margin.left + margin.right)
-                    .attr("height", height + margin.top + margin.bottom)
-                    .append("g")
-                    .attr("transform", `translate(${margin.left},${margin.top})`);
-
-                const x = d3.scaleBand()
-                    .domain(data.map(d => d.sector))
-                    .range([0, width])
-                    .padding(0.3);
-
-                const y = d3.scaleLinear()
-                    .domain([0, d3.max(data, d => d.participants) * 1.1])
-                    .range([height, 0]);
-
-                // X-Axis
-                svg.append("g")
-                    .attr("transform", `translate(0,${height})`)
-                    .call(d3.axisBottom(x))
-                    .selectAll("text")
-                    .attr("transform", "translate(-10,0)rotate(-45)")
-                    .style("text-anchor", "end");
-
-                // Y-Axis
-                svg.append("g")
-                    .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format("~s")));
-
-                // Bars
-                svg.selectAll(".bar")
-                    .data(data)
-                    .enter().append("rect")
-                    .attr("class", "bar")
-                    .attr("x", d => x(d.sector))
-                    .attr("y", height)
-                    .attr("width", x.bandwidth())
-                    .attr("height", 0)
-                    .attr("fill", "#3b82f6") // blue-600
-                    .attr("rx", 3)
-                    .on("mouseover", (event, d) => {
-                        chartTooltip.style("opacity", 1)
-                            .html(`<strong>${d.sector}</strong><br>${d.participants} Participants`);
-                    })
-                    .on("mousemove", (event) => {
-                        chartTooltip.style("left", (event.pageX + 15) + "px")
-                                  .style("top", (event.pageY - 28) + "px");
-                    })
-                    .on("mouseout", () => {
-                        chartTooltip.style("opacity", 0);
-                    })
-                    .transition()
-                    .duration(1000)
-                    .delay((d, i) => i * 100)
-                    .attr("y", d => y(d.participants))
-                    .attr("height", d => height - y(d.participants));
-            }
-            
-            // --- INITIALIZE APPLICATION ---
-            async function initializeApp() {
-                try {
-                    // Fetch data from the JSON file, appending a timestamp to prevent caching
-                    const response = await fetch('ramps_report_data.json?' + new Date().getTime()); 
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    reportData = await response.json();
-                    
-                    // Once data is loaded, populate the dashboard
-                    populateDashboard();
-
-                } catch (error) {
-                    console.error("Could not load report data:", error);
-                    document.getElementById('overview').innerHTML = 
-                        `<div class="bg-white p-8 rounded-xl shadow-sm border border-red-300">
-                            <h2 class="text-2xl font-bold text-red-700 mb-4">Error Loading Report</h2>
-                            <p class_... (784 lines left)
+                    .attr("x",. (1102 lines left)
+"
 
