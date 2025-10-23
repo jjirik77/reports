@@ -116,7 +116,14 @@
         /* Print-specific styles */
         @media print {
             /* Reset layout constraints */
-            body, 
+            html, body {
+                display: block !important;
+                height: auto !important;
+                overflow: visible !important;
+                background-color: #ffffff !important;
+            }
+            
+            body,
             body > div.flex { /* Target the main flex container */
                 display: block !important;
                 min-height: auto !important;
@@ -126,7 +133,6 @@
 
             body {
                 font-family: 'Times New Roman', serif; /* Classic report font */
-                background-color: #ffffff !important;
                 -webkit-print-color-adjust: exact; /* Ensures colors print */
                 print-color-adjust: exact;
             }
@@ -139,6 +145,7 @@
 
             main {
                 display: block !important; /* Force block layout */
+                flex: none !important; /* Disable flex */
                 overflow: visible !important; /* Show all content */
                 height: auto !important; /* Reset height */
                 min-height: auto !important; /* Reset height */
@@ -147,6 +154,7 @@
             }
 
             main > div {
+                display: block !important; /* Disable flex */
                 padding: 1in !important; /* Standard 1-inch margins */
                 margin: 0 !important;
             }
@@ -174,7 +182,7 @@
                 border: none !important;
                 background-color: #ffffff !important;
                 padding: 0 !important;
-                margin-top: 0 !important; /* <-- ADDED THIS to prevent blank pages */
+                margin-top: 0 !important; /* <-- Prevents blank pages */
             }
 
             main section:first-of-type {
@@ -432,7 +440,7 @@
                         <h2 class="text-2xl font-bold mb-4">Special Highlights: Strategic Partnership (NCYTE)</h2>
                         <p id="partnership-intro" class="text-lg text-slate-700 leading-relaxed">
                             Loading partnership highlights...
-                        </p>
+                        </g>
                         <div id="partnership-sections-list">
                             <!-- Partnership sections will be injected here by JS -->
                         </div>
