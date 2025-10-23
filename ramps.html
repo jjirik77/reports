@@ -115,6 +115,15 @@
 
         /* Print-specific styles */
         @media print {
+            /* Reset layout constraints */
+            body, 
+            body > div.flex { /* Target the main flex container */
+                display: block !important;
+                min-height: auto !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+
             body {
                 font-family: 'Times New Roman', serif; /* Classic report font */
                 background-color: #ffffff !important;
@@ -129,6 +138,10 @@
             }
 
             main {
+                display: block !important; /* Force block layout */
+                overflow: visible !important; /* Show all content */
+                height: auto !important; /* Reset height */
+                min-height: auto !important; /* Reset height */
                 margin-left: 0 !important;
                 width: 100% !important;
             }
@@ -997,8 +1010,8 @@
             // --- INITIALIZE APPLICATION ---
             async function initializeApp() {
                 try {
-                    // Fetch data from the JSON file
-                    const response = await fetch('ramps_report_data.json'); // <-- Updated to ramps_report_data.json
+                    // Fetch data from the JSON file, appending a timestamp to prevent caching
+                    const response = await fetch('ramps_report_data.json?' + new Date().getTime()); 
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
@@ -1026,5 +1039,4 @@
 
 </body>
 </html>
-
 
