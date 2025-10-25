@@ -150,10 +150,15 @@ different academic disciplines come together to explore common themes, issues, a
     ]
   },
   "impact": {
-    "impactMetrics": [
-      "Increased student retention in AI-integrated courses by 15% compared to non-integrated sections.",
-      "90% of participating faculty reported increased confidence in teaching AI-related topics.",
-      "Developed resources have been adopted by 3 non-partner community colleges."
+   "impact": {
+    "partnerStates": {
+      "Florida": "Partner",
+      "Washington": "Partner",
+      "New York": "Partner",
+      "Texas": "Partner",
+      "Michigan": "Prospective",
+      "Colorado": "Prospective",
+      "Virginia": "Prospective"
     ],
     "broaderImpact": [
       "This project contributes to the national need for an AI-literate workforce by upskilling faculty at the community college level.",
