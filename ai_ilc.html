@@ -72,9 +72,8 @@
         #map-container {
             position: relative;
             width: 100%;
-            height: 100%; /* Changed from aspect ratio */
-            /* Added small padding to give a tiny margin around the map within its card */
-            padding: 4px; /* p-1 */
+            height: 100%; /* Ensure it fills parent */
+            /* Removed padding p-1 */
             box-sizing: border-box; /* Ensures padding is included in width/height */
         }
         #map-svg {
@@ -313,12 +312,12 @@
 
                 <!-- New Map & Growth Chart Layout --><div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
                     
-                    <!-- Map Card (Smaller) --><div class="card card-hover fade-in fade-in-delay-1 bg-white rounded-xl border border-slate-200 shadow-sm lg:col-span-3 flex flex-col">
-                        <!-- Moved the title here, outside map-container --><h3 class="text-lg font-bold p-6 pb-2 text-slate-800 flex items-center space-x-2">
+                    <!-- Map Card --><div class="card card-hover fade-in fade-in-delay-1 bg-white rounded-xl border border-slate-200 shadow-sm lg:col-span-3 flex flex-col p-6"> <!-- Added p-6 back -->
+                        <!-- Title outside map-container but inside card padding --><h3 class="text-lg font-bold pb-2 text-slate-800 flex items-center space-x-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                             <span>National Program Reach</span>
                         </h3>
-                        <!-- Adjusted map-container to have small padding and flex-1 --><div id="map-container" class="relative flex-1 min-h-[200px] p-1"> 
+                        <!-- Removed padding from here --><div id="map-container" class="relative flex-1 min-h-[200px]"> 
                             <svg id="map-svg" class="absolute top-0 left-0 w-full h-full"></svg>
                         </div>
                     </div>
@@ -1140,7 +1139,8 @@
                     }
                     
                     // --- UPDATED ---
-                    // No padding in fitSize to allow the map to truly fill the SVG
+                    // Reverted to fitSize, removed padding calculations here.
+                    // Let the outer container's padding handle spacing.
                     const projection = d3.geoAlbersUsa()
                         .fitSize([mapWidth, mapHeight], states); 
                     // --- END UPDATED ---
