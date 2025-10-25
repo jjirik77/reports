@@ -26,9 +26,12 @@
         .card-hover {
             transition: all 0.3s ease-in-out;
         }
+        /* UPDATED hover effect per critique */
         .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Mimics shadow-xl */
+            /* Uses shadow-md from Tailwind */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); 
+            /* Highlights with your primary blue color */
+            border-color: #2563eb; /* border-blue-600 */
         }
 
         /* Animation Classes */
@@ -89,9 +92,9 @@
             stroke-width: 0.5px;
             transition: fill 0.2s ease-in-out;
         }
-        .state-partner { fill: #3b82f6; } /* blue-500 */
-        .state-prospective { fill: #f59e0b; } /* amber-500 */
-        .state-default { fill: #d1d5db; } /* gray-300 */
+        .state-Partner { fill: #3b82f6; } /* blue-500 */
+        .state-Prospective { fill: #f59e0b; } /* amber-500 */
+        .state-Default { fill: #d1d5db; } /* gray-300 */
         .state:hover {
             fill: #6366f1; /* indigo-500 */
             cursor: pointer;
@@ -181,10 +184,11 @@
         
         <!-- Left Navigation Sidebar -->
         <nav id="main-nav" class="w-full md:fixed md:top-0 md:left-0 md:h-full md:w-64 bg-slate-900 text-slate-200 flex-shrink-0 z-20">
-            <!-- Spacer to align with content card -->
-            <div class="hidden md:block h-24"></div>
+            <!-- DYNAMIC SPACER: This div's height is set by JavaScript to align with the content -->
+            <div id="nav-spacer" class="hidden md:block"></div>
             
-            <div class="p-4 space-y-2">
+            <!-- This container's ID is used for the height calculation -->
+            <div id="nav-inner-container" class="p-4 space-y-2">
                 <button data-target="overview" class="nav-btn active w-full flex items-center space-x-3 p-3 rounded-lg font-medium transition-colors duration-200 hover:bg-slate-700">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                     <span>Overview</span>
@@ -224,6 +228,7 @@
             <header class="mb-8 pb-4 border-b border-slate-200">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                     <div>
+                        <!-- Main title now uses text-3xl font-bold as a *base* but will be overridden by JS -->
                         <h1 id="main-title" class="text-3xl font-bold text-slate-900">[Project Name]</h1>
                         <h2 id="report-subtitle" class="text-lg text-slate-600 font-medium mt-1">Current Report</h2>
                     </div>
@@ -248,18 +253,26 @@
             <!-- ===== Overview Section ===== -->
             <section id="overview" class="active space-y-6">
                 <div class="card card-hover fade-in bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 class="text-xl font-semibold mb-4 text-slate-800">Project Details</h3>
+                    <!-- JS will populate this card's content -->
+                    <div id="project-details-content">
+                        <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            <span>Project Details</span>
+                        </h3>
+                    </div>
                     <div class="overflow-x-auto">
                         <table id="project-details-table" class="min-w-full divide-y divide-slate-200">
                             <tbody class="bg-white divide-y divide-slate-200">
-                                <!-- JS will populate this -->
                                 <tr><td class="p-3 text-sm text-slate-500">Loading details...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
                 <div class="card card-hover fade-in fade-in-delay-1 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 class="text-xl font-semibold mb-4 text-slate-800">Executive Summary</h3>
+                    <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                        <span>Executive Summary</span>
+                    </h3>
                     <div id="exec-summary-content" class="prose prose-slate max-w-none text-slate-600 space-y-4">
                         <p>Loading summary...</p>
                     </div>
@@ -269,7 +282,10 @@
             <!-- ===== Team Section ===== -->
             <section id="team" class="space-y-6">
                 <div class="card card-hover fade-in bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 class="text-xl font-semibold mb-4 text-slate-800">Project Leadership Team</h3>
+                    <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        <span>Project Leadership Team</span>
+                    </h3>
                     <p id="team-intro" class="text-slate-600 mb-6 prose prose-slate max-w-none">Loading team intro...</p>
                     <div id="team-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                          <p class="text-slate-500">Loading team members...</p>
@@ -279,12 +295,8 @@
 
             <!-- ===== Goals Section ===== -->
             <section id="goals" class="space-y-6">
-                <div class="card card-hover fade-in bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 class="text-xl font-semibold mb-4 text-slate-800">Project Goals & Objectives</h3>
-                    <div id="goals-list" class="space-y-6">
-                        <p class="text-slate-500">Loading goals...</p>
-                    </div>
-                </div>
+                <!-- This section will be populated by JS -->
+                <p class="text-slate-500">Loading goals...</p>
             </section>
 
             <!-- ===== Key Metrics Section ===== -->
@@ -303,7 +315,10 @@
                     </div>
                     
                     <div class="card card-hover fade-in fade-in-delay-3 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                        <h3 class="text-xl font-semibold mb-4 text-slate-800">Accomplishments</h3>
+                        <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <span>Accomplishments</span>
+                        </h3>
                         <div id="accomplishments-content" class="prose prose-slate max-w-none text-slate-600 space-y-4">
                             <p>Loading accomplishments...</p>
                         </div>
@@ -315,7 +330,10 @@
             <section id="impact" class="space-y-6">
                 <!-- Map Card -->
                 <div class="card card-hover fade-in bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 class="text-xl font-semibold mb-4 text-slate-800">National Program Reach</h3>
+                    <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>National Program Reach</span>
+                    </h3>
                     <div id="map-container">
                         <svg id="map-svg"></svg>
                     </div>
@@ -324,13 +342,19 @@
                 <!-- Metrics & Impact Grid -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="card card-hover fade-in fade-in-delay-1 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                        <h3 class="text-xl font-semibold mb-4 text-slate-800">Key Impact Metrics</h3>
+                        <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
+                            <span>Key Impact Metrics</span>
+                        </h3>
                         <div id="impact-metrics-content" class="prose prose-slate max-w-none text-slate-600">
                             <p>Loading impact metrics...</p>
                         </div>
                     </div>
                     <div class="card card-hover fade-in fade-in-delay-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                        <h3 class="text-xl font-semibold mb-4 text-slate-800">Broader Impact</h3>
+                        <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
+                            <span>Broader Impact</span>
+                        </h3>
                         <div id="broader-impact-content" class="prose prose-slate max-w-none text-slate-600 space-y-4">
                             <p>Loading broader impact...</p>
                         </div>
@@ -341,7 +365,10 @@
             <!-- ===== Community Testimonials Section ===== -->
             <section id="testimonials" class="space-y-6">
                 <div class="card card-hover fade-in bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 class="text-xl font-semibold mb-4 text-slate-800">Community Testimonials</h3>
+                    <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                        <span>Community Testimonials</span>
+                    </h3>
                     <div id="testimonials-content" class="space-y-6">
                         <p class="text-slate-500">Loading testimonials...</p>
                     </div>
@@ -378,18 +405,23 @@
         document.addEventListener("DOMContentLoaded", initializeApp);
 
         // --- Global State ---
-        const API_URL = "./ai_ilc_data.json"; // Updated to the new filename
-        let projectData = {};
+        // UPDATED: Pointing to the new JSON file
+        const API_URL = "./ai_ilc_data.json"; 
+        let projectData = {}; // Will be populated by fetch
         let activeChartDrawers = {}; // Store functions to redraw charts on tab switch
         let intersectionObserver;
         const tooltip = d3.select("#chart-tooltip");
+        let resizeObserver; // For dynamic nav spacer
+
         
         /**
-         * Initializes the application: fetches data, sets up listeners and observers.
+         * Initializes the application: sets up listeners and observers, and populates data.
          */
         function initializeApp() {
+            // UPDATED: Re-introduced fetch logic
             const messageContainer = document.getElementById("message-container");
             messageContainer.textContent = "Loading dashboard data...";
+            messageContainer.classList.remove("hidden");
 
             // Fetch data with cache-busting
             fetch(`${API_URL}?_=${new Date().getTime()}`)
@@ -400,16 +432,30 @@
                     return response.json();
                 })
                 .then(data => {
-                    projectData = data;
+                    projectData = data; // Store fetched data globally
                     messageContainer.textContent = ""; // Clear loading message
-                    populateDashboard(data);
+                    messageContainer.classList.add("hidden");
+                    
+                    populateDashboard(projectData);
                     setupEventListeners();
                     setupObserver();
+                    
+                    // --- DYNAMIC ALIGNMENT LOGIC ---
+                    alignNavSpacer(); 
+                    
+                    const header = document.querySelector('main header');
+                    if (header) {
+                        resizeObserver = new ResizeObserver(alignNavSpacer);
+                        resizeObserver.observe(header); 
+                    }
+                    // --- END LOGIC ---
+
                     // Observe elements in the initially active section
                     observeVisibleFadeIns();
                 })
                 .catch(error => {
                     console.error("Failed to load project data:", error);
+                    messageContainer.classList.remove("hidden");
                     messageContainer.innerHTML = `
                         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg" role="alert">
                             <strong class="font-bold">Error:</strong>
@@ -417,6 +463,52 @@
                         </div>
                     `;
                 });
+        }
+        
+        /**
+         * NEW FUNCTION
+         * Dynamically aligns the nav spacer to match the content header height.
+         */
+        function alignNavSpacer() {
+            const header = document.querySelector('main header');
+            const main = document.querySelector('main');
+            const navSpacer = document.getElementById('nav-spacer');
+            const navInner = document.getElementById('nav-inner-container');
+
+            // Only run on desktop (md breakpoint: 768px)
+            if (window.innerWidth < 768 || !header || !main || !navSpacer || !navInner) {
+                if (navSpacer) navSpacer.style.height = '0px'; // Reset on mobile
+                return;
+            }
+            
+            try {
+                // Get computed styles to read padding/margin in pixels
+                const mainStyles = window.getComputedStyle(main);
+                const headerStyles = window.getComputedStyle(header);
+                const navInnerStyles = window.getComputedStyle(navInner);
+
+                // Get pixel values from styles
+                const mainPaddingTop = parseFloat(mainStyles.paddingTop) || 0;       // 40px from md:p-10
+                const headerHeight = header.offsetHeight || 0;                        // Dynamic height of header
+                const headerMarginBottom = parseFloat(headerStyles.marginBottom) || 0;  // 32px from mb-8
+                const navInnerPaddingTop = parseFloat(navInnerStyles.paddingTop) || 0;    // 16px from p-4
+                
+                // Total space on the content side, from top of <main> to top of first card <section>
+                // This is the target height.
+                const contentOffsetTop = mainPaddingTop + headerHeight + headerMarginBottom;
+                
+                // Calculate the height the spacer needs to be
+                // Spacer height = (Target Height) - (padding already above nav buttons)
+                const spacerHeight = contentOffsetTop - navInnerPaddingTop;
+
+                if (spacerHeight > 0) {
+                    navSpacer.style.height = `${spacerHeight}px`;
+                }
+            } catch(e) {
+                console.error("Error aligning nav spacer:", e);
+                // Fallback to a reasonable default if calculation fails
+                if (navSpacer) navSpacer.style.height = '224px'; // h-56
+            }
         }
 
         /**
@@ -606,7 +698,10 @@
             // Set main title from data
             const projectTitle = data.overview?.projectDetails?.find(d => d.label === "Title")?.value;
             if (projectTitle) {
-                document.getElementById("main-title").textContent = projectTitle;
+                const titleEl = document.getElementById("main-title");
+                titleEl.textContent = projectTitle;
+                // UPDATED: Apply typography suggestion
+                titleEl.classList.add('text-4xl', 'font-extrabold');
                 document.title = `${projectTitle} Dashboard`;
             }
 
@@ -641,6 +736,7 @@
 
         function populateOverview(data) {
             // Project Details Table
+            // Note: The H3 for Project Details is now static in the HTML, so we just populate the table.
             const tableBody = document.getElementById("project-details-table").querySelector("tbody");
             if (data.projectDetails) {
                 tableBody.innerHTML = data.projectDetails.map(item => `
@@ -654,6 +750,7 @@
             }
 
             // Executive Summary
+            // Note: The H3 for Exec Summary is now static in the HTML.
             const summaryContainer = document.getElementById("exec-summary-content");
             if (data.executiveSummary) {
                 summaryContainer.innerHTML = data.executiveSummary.map(p => `<p>${p}</p>`).join("");
@@ -663,6 +760,7 @@
         }
 
         function populateTeam(data) {
+            // Note: The H3 for Team is now static in the HTML.
             const intro = document.getElementById("team-intro");
             if (data.introduction) {
                 intro.textContent = data.introduction;
@@ -685,18 +783,26 @@
         }
 
         function populateGoals(data) {
-            const list = document.getElementById("goals-list");
+            const section = document.getElementById("goals"); // Target the whole section
             if (data.mainGoals && data.mainGoals.length > 0) {
-                list.innerHTML = data.mainGoals.map((item, i) => `
-                    <div class="fade-in p-4 bg-slate-50 rounded-lg" style="transition-delay: ${i*100}ms">
-                        <h4 class="font-semibold text-lg text-slate-800">${item.goal}</h4>
-                        <ul class="list-disc list-inside mt-2 pl-4 space-y-1 text-slate-600">
-                            ${item.objectives.map(obj => `<li>${obj}</li>`).join("")}
-                        </ul>
+                // Generate a full card for each goal
+                section.innerHTML = data.mainGoals.map((item, i) => `
+                    <div class="card card-hover fade-in bg-white p-6 rounded-xl border border-slate-200 shadow-sm" style="transition-delay: ${i*100}ms">
+                        <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            <span>${item.goal}</span>
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${item.objectives.map(obj => `
+                                <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 h-full">
+                                    <p class="text-slate-600 text-sm">${obj}</p>
+                                </div>
+                            `).join("")}
+                        </div>
                     </div>
                 `).join("");
             } else {
-                list.innerHTML = `<p class="text-slate-500">No goals listed.</p>`;
+                section.innerHTML = `<p class="text-slate-500">No goals listed.</p>`; // Update fallback text
             }
         }
 
@@ -723,6 +829,7 @@
             }
             
             // Accomplishments
+            // Note: The H3 for Accomplishments is now static in the HTML.
             const accomplishmentsContainer = document.getElementById("accomplishments-content");
             if (data.accomplishments) {
                  accomplishmentsContainer.innerHTML = `<ul class="list-disc list-inside space-y-2">` + 
@@ -733,6 +840,7 @@
         }
         
         function populateImpactDashboard(data) {
+            // Note: The H3s for this section are now static in the HTML.
             const metricsContainer = document.getElementById("impact-metrics-content");
             if (data.impactMetrics) {
                 metricsContainer.innerHTML = `<ul class="list-disc list-inside space-y-2">` + 
@@ -750,6 +858,7 @@
         }
         
         function populateTestimonials(data) {
+            // Note: The H3 for this section is now static in the HTML.
             const container = document.getElementById("testimonials-content");
             if (data.quotes && data.quotes.length > 0) {
                 container.innerHTML = data.quotes.map((item, i) => `
@@ -837,6 +946,9 @@
             svg.selectAll(".bar")
                 .data(data)
                 .join("rect")
+                // UPDATED: Added rounded corners
+                .attr("rx", 4) // Sets the x-radius for rounded corners
+                .attr("ry", 4) // Sets the y-radius for rounded corners
                 .attr("class", "bar")
                 .attr("fill", "#3b82f6") /* blue-500 */
                 .attr("x", d => x(d.category))
@@ -906,6 +1018,9 @@
             svg.selectAll(".bar")
                 .data(data)
                 .join("rect")
+                // UPDATED: Added rounded corners
+                .attr("rx", 4) // Sets the x-radius for rounded corners
+                .attr("ry", 4) // Sets the y-radius for rounded corners
                 .attr("class", "bar")
                 .attr("fill", "#10b981") /* emerald-500 */
                 .attr("x", d => x(d.label))
@@ -944,26 +1059,22 @@
                 return; // Already drawn
             }
 
-            // Define partner states
-            const partnerStates = {
-                "Florida": "Partner",
-                "Washington": "Partner",
-                "New York": "Partner",
-                "Texas": "Partner",
-                "Michigan": "Prospective", // From example image
-                "Colorado": "Prospective", // From example image
-                "Virginia": "Prospective"  // From example image
-            };
+            // Define partner states from project data
+            const partnerStates = projectData.impact?.partnerStates || {};
             
             function getStatus(stateName) {
-                return partnerStates[stateName] || "Default";
+                return partnerStates[stateName]; // Will be "Partner", "Prospective", or undefined
             }
             
             function getColorClass(stateName) {
                 const status = getStatus(stateName);
-                if (status === "Partner") return "state-partner";
-                if (status === "Prospective") return "state-prospective";
-                return "state-default";
+                if (status === "Partner") {
+                    return 'state-Partner';
+                }
+                if (status === "Prospective") {
+                    return 'state-Prospective';
+                }
+                return 'state-Default';
             }
             
             try {
@@ -975,7 +1086,6 @@
                 }
                 
                 const states = topojson.feature(us, us.objects.states);
-                const statemap = new Map(states.features.map(d => [d.id, d.properties.name]));
                 
                 const bounds = container.node().getBoundingClientRect();
                 const projection = d3.geoAlbersUsa().fitSize([bounds.width, bounds.height], states);
@@ -989,9 +1099,13 @@
                     .attr("d", path)
                     .on("mouseover", (event, d) => {
                         const stateName = d.properties.name;
-                        const status = getStatus(stateName);
+                        const status = getStatus(stateName); // "Partner", "Prospective", or undefined
+                        let tooltipHtml = `<strong>${stateName}</strong>`;
+                        if (status) { // Only show status if it exists
+                            tooltipHtml += `<br/>Status: ${status}`;
+                        }
                         tooltip.style("opacity", 1)
-                               .html(`<strong>${stateName}</strong><br/>Status: ${status}`);
+                               .html(tooltipHtml);
                     })
                     .on("mousemove", (event) => {
                          tooltip.style("left", (event.pageX + 10) + "px")
