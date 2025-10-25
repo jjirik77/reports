@@ -7,7 +7,7 @@
       },
       {
         "label": "Award #",
-        "value": "TBD-XXXXXX"
+        "value": "2500821"
       },
       {
         "label": "Principal Investigator (PI)",
@@ -19,11 +19,15 @@
       },
       {
         "label": "Period",
-        "value": "YYYY-MM-DD to YYYY-MM-DD"
+        "value": "10/01/2025 to 09/30/2028"
       }
     ],
-   "executiveSummary": [
-      "The evolution of technology has profoundly shaped modern education, particularly in Science, a unique strength and ability to adopt and then incorporate emerging technologies in the teaching and learning process. This project leverage the unique ability of community colleges to form Inter-disciplinary Learning Communities (ILCs). ILCs are collaborative educational environments where students and faculty from different academic disciplines come together to explore common themes, issues, and emerging technologies from multiple and different perspectives."
+    "executiveSummary": [
+      "The evolution of technology has profoundly shaped modern education, particularly in Science, Technology, Engineering, and Mathematics (STEM) programs. The Nation’s community colleges have a unique strength and ability to adopt and then incorporate emerging technologies in the teaching and learning process. Community colleges play a major role in developing the nations technical workforce.",
+      "This project leverage the unique ability of community colleges to form Inter-disciplinary Learning Communities (ILCs) as collaborative educational environments where students and faculty from different academic disciplines come together to explore common themes, issues, and emerging technologies from multiple and different perspectives.",
+      "This project integrates AI into the curriculum of STEM programs, focusing on two key aspects:",
+      "<strong>1. AI as a Tool for Problem - Solving and Innovation:</strong> Our team is developing curricula that teach students how to use AI tools to solve real-world problems in their chosen fields. By teaching students to use AI as a tool, our team empowers them to drive innovation in their chosen professions.",
+      "<strong>2. AI Literacy Across Disciplines:</strong> Our team ensures that AI education is not confined to specialized programs but is integrated into all STEM disciplines. This approach is creating a workforce where every individual, regardless of their field, has the skills to leverage AI's potential. This broad-based AI literacy will be critical for the future economy, where AI is expected to play a role in nearly every industry."
     ]
   },
   "team": {
@@ -54,35 +58,35 @@
   "goals": {
     "mainGoals": [
       {
-        "goal": "1. Establish a Collaborative Framework for Inter-Disciplinary AI Learning Communities",
+        "goal": "Establish a Collaborative Framework for Inter-Disciplinary AI Learning Communities",
         "objectives": [
-          "Objective 1.1: Form inter-disciplinary teams comprised of educators from Information Technology, Computer Science, Math, Manufacturing, Health Sciences, Business, Automotive Technologies, and other STEM programs within the first six months of the project.",
-          "Objective 1.2: Develop and document a standardized framework for inter-disciplinary collaboration, including meeting schedules, communication strategies, and decision-making processes, by the end of the first year.",
-          "Objective 1.3: Conduct quarterly evaluations of the inter-disciplinary teams' effectiveness, including feedback from participants, and refine the collaborative framework based on evaluations throughout the project duration."
+          "Form inter-disciplinary teams comprised of educators from Information Technology, Computer Science, Math, Manufacturing, Health Sciences, Business, Automotive Technologies, and other STEM programs within the first six months of the project.",
+          "Develop and document a standardized framework for inter-disciplinary collaboration, including meeting schedules, communication strategies, and decision-making processes, by the end of the first year.",
+          "Conduct quarterly evaluations of the inter-disciplinary teams' effectiveness, including feedback from participants, and refine the collaborative framework based on evaluations throughout the project duration."
         ]
       },
       {
-        "goal": "2. Integrate AI into Existing STEM Curricula",
+        "goal": "Integrate AI into Existing STEM Curricula",
         "objectives": [
-          "Objective 2.1: Identify at least six existing STEM courses that can incorporate AI tools and concepts and develop a plan for curriculum integration within the second year.",
-          "Objective 2.2: Create and pilot at least twelve new instructional modules or content pieces designed to embed AI knowledge, skills, and abilities into the identified courses by the end of the second year.",
-          "Objective 2.3: Measure the impact of AI integration on student learning outcomes through pre- and post- implementation assessments,"
+          "Identify at least six existing STEM courses that can incorporate AI tools and concepts and develop a plan for curriculum integration within the second year.",
+          "Create and pilot at least twelve new instructional modules or content pieces designed to embed AI knowledge, skills, and abilities into the identified courses by the end of the second year.",
+          "Measure the impact of AI integration on student learning outcomes through pre- and post- implementation assessments,"
         ]
       },
       {
-        "goal": "3. Develop and Deliver Faculty Development Workshops on AI in Education",
+        "goal": "Develop and Deliver Faculty Development Workshops on AI in Education",
         "objectives": [
-          "Objective 3.1: Design and deliver a series of at least four faculty development workshops per academic year on AI tools, applications, and teaching strategies.",
-          "Objective 3.2: Achieve a participation rate of 50% of faculty members in the workshops in the relevant disciplines within the first two years of the project.",
-          "Objective 3.3: Assess the workshops' effectiveness through participant surveys and follow-up interviews, with a goal of 90% of participants reporting increased confidence in integrating AI into their teaching practices."
+          "Design and deliver a series of at least four faculty development workshops per academic year on AI tools, applications, and teaching strategies.",
+          "Achieve a participation rate of 50% of faculty members in the workshops in the relevant disciplines within the first two years of the project.",
+          "Assess the workshops' effectiveness through participant surveys and follow-up interviews, with a goal of 90% of participants reporting increased confidence in integrating AI into their teaching practices."
         ]
       },
       {
-        "goal": "4. Disseminate Best Practices and Expand the Initiative Nationally",
+        "goal": "Disseminate Best Practices and Expand the Initiative Nationally",
         "objectives": [
-          "Objective 4.1: Create a comprehensive set of resources, including case studies, instructional materials, and policy recommendations, to be shared with other community colleges by the end of the third year.",
-          "Objective 4.2: Present the project's findings and best practices at a minimum of three national conferences or workshops within the final year of the project.",
-          "Objective 4.3: Establish partnerships with at least 2 additional community colleges to adopt the framework and best practices developed with a goal of initiating expansion efforts before the project’s conclusion."
+          "Create a comprehensive set of resources, including case studies, instructional materials, and policy recommendations, to be shared with other community colleges by the end of the third year.",
+          "Present the project's findings and best practices at a minimum of three national conferences or workshops within the final year of the project.",
+          "Establish partnerships with at least 2 additional community colleges to adopt the framework and best practices developed with a goal of initiating expansion efforts before the project’s conclusion."
         ]
       }
     ]
@@ -108,13 +112,13 @@
         "description": "Total unique faculty participants.",
         "modalData": [
           { "label": "Q1", "value": 30 },
-          { "label": "You", "value": 25 },
+          { "label": "Q2", "value": 25 },
           { "label": "Q3", "value": 30 },
           { "label": "Q4", "value": 35 }
         ]
       },
       {
-        "title": "Resources Created",
+        "title": "Modules Created",
         "value": 24,
         "growth": "+6",
         "description": "New instructional modules developed.",
@@ -144,45 +148,45 @@
     ],
     "accomplishments": [
       "Successfully established 8 inter-disciplinary learning communities across 5 partner institutions.",
-      "Launched the 'AI in STEM' faculty portal, a repository for all developed instructional modules, which has received over 2,000 unique visits.",
-      "Presented initial findings at the 'Innovations in EdTech' national conference, receiving the 'Best Practice' award."
+      "Launched the 'AI in STEM' faculty workshop series, training over 120 educators.",
+      "Pioneered 24 new AI instructional modules, now piloted in 15 courses."
     ]
   },
   "impact": {
-   "impact": {
     "partnerStates": {
       "Florida": "Partner",
       "Washington": "Partner",
       "New York": "Partner",
       "Texas": "Partner",
-      "Michigan": "Prospective",
-      "Colorado": "Prospective",
-      "Virginia": "Prospective"
+      "Illinois": "Prospective"
+    },
+    "impactMetrics": [
+      "500+ faculty members reached through workshops and webinars.",
+      "25+ new AI modules integrated into curricula across 8 institutions.",
+      "10,000+ students estimated to be impacted by new AI-infused courses within three years."
     ],
     "broaderImpact": [
-      "This project contributes to the national need for an AI-literate workforce by upskilling faculty at the community college level.",
-      "The developed collaborative framework serves as a model for other institutions seeking to break down departmental silos.",
-      "Findings are actively being disseminated to a national audience to promote broader adoption."
+      "The broader impact of this proposal extends to workforce development and economic competitiveness. As AI continues to reshape industries and job markets, it is essential that the future workforce is equipped with the skills necessary to thrive in an AI-driven economy. The documentation and dissemination of best practices, processes, and outcomes from this project have a far-reaching impact on the broader educational community.",
+      "The ILC helps develop a comprehensive set of resources, including case studies, instructional materials, and policy recommendations, that will be shared with community colleges across the nation. These resources are providing valuable guidance for institutions seeking to replicate or adapt the projects approach to AI education."
     ]
   },
   "testimonials": {
     "quotes": [
       {
-        "quote": "The AI workshops completely changed how I approach my curriculum. I now feel equipped to prepare my students for the modern workforce.",
+        "quote": "The AI workshops provided aclear roadmap for integrating complex topics into my existing curriculum. My students are more engaged than ever.",
         "author": "Dr. Jane Smith",
-        "title": "Professor, Information Technology"
+        "title": "Professor, Computer Science"
       },
       {
-        "quote": "Being part of the inter-disciplinary learning community has been invaluable. I've learned so much from my colleagues in other departments.",
-        "author": "Prof. Michael Chen",
-        "title": "Faculty, Manufacturing"
+        "quote": "As a manufacturing instructor, I never thought AI was relevant to my field. This program completely changed my perspective. Our students will now be ready for the smart factories of the future.",
+        "author": "Mark Johnson",
+        "title": "Faculty, Automotive & Manufacturing"
       },
       {
-        "quote": "As a student in a course using the new AI modules, I feel like I'm learning relevant, cutting-edge skills that will directly apply to my future career.",
-        "author": "Emily White",
-        "title": "Student, Computer Science"
+        "quote": "The inter-disciplinary collaboration has been fantastic. I'm now working with the Health Sciences department on a project using AI for medical imaging analysis.",
+        "author": "Prof. David Lee",
+        "title": "Instructor, IT & Data Analytics"
       }
     ]
   }
 }
-
