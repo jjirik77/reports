@@ -141,10 +141,10 @@
       }
     ],
     "mainChartData": [
-      { "category": "Goal 1", "value": 90 },
-      { "category": "Goal 2", "value": 75 },
-      { "category": "Goal 3", "value": 85 },
-      { "category": "Goal 4", "value": 50 }
+      { "category": "Communities", "value": 90 },
+      { "category": "Students", "value": 75 },
+      { "category": "Resources", "value": 85 },
+      { "category": "Else", "value": 50 }
     ],
     "accomplishments": [
       "Successfully established 8 inter-disciplinary learning communities across 5 partner institutions.",
