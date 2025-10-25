@@ -5,19 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>[Project Name] Dashboard</title>
     
-    <!-- Google Font: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Font: Inter --><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS CDN --><script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- D3.js v7 CDN -->
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <!-- D3 TopoJSON for map -->
-    <script src="https://d3js.org/topojson.v3.min.js"></script>
+    <!-- D3.js v7 CDN --><script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- D3 TopoJSON for map --><script src="https://d3js.org/topojson.v3.min.js"></script>
 
-    <!-- Custom Styles & Print Styles -->
-    <style>
+    <!-- Custom Styles & Print Styles --><style>
         body {
             font-family: 'Inter', sans-serif;
         }
@@ -187,13 +182,10 @@
 
     <div id="app-container" class="flex flex-col md:flex-row min-h-screen">
         
-        <!-- Left Navigation Sidebar -->
-        <nav id="main-nav" class="w-full md:fixed md:top-0 md:left-0 md:h-full md:w-64 bg-slate-900 text-slate-200 flex-shrink-0 z-20">
-            <!-- DYNAMIC SPACER: This div's height is set by JavaScript to align with the content -->
-            <div id="nav-spacer" class="hidden md:block"></div>
+        <!-- Left Navigation Sidebar --><nav id="main-nav" class="w-full md:fixed md:top-0 md:left-0 md:h-full md:w-64 bg-slate-900 text-slate-200 flex-shrink-0 z-20">
+            <!-- DYNAMIC SPACER: This div's height is set by JavaScript to align with the content --><div id="nav-spacer" class="hidden md:block"></div>
             
-            <!-- This container's ID is used for the height calculation -->
-            <div id="nav-inner-container" class="p-4 space-y-2">
+            <!-- This container's ID is used for the height calculation --><div id="nav-inner-container" class="p-4 space-y-2">
                 <button data-target="overview" class="nav-btn active w-full flex items-center space-x-3 p-3 rounded-lg font-medium transition-colors duration-200 hover:bg-slate-700">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                     <span>Overview</span>
@@ -226,15 +218,12 @@
             </div>
         </nav>
 
-        <!-- Main Content Area -->
-        <main class="flex-1 md:ml-64 p-6 md:p-10 bg-slate-50 min-h-screen">
+        <!-- Main Content Area --><main class="flex-1 md:ml-64 p-6 md:p-10 bg-slate-50 min-h-screen">
             
-            <!-- Content Header -->
-            <header class="mb-8 pb-4 border-b border-slate-200">
+            <!-- Content Header --><header class="mb-8 pb-4 border-b border-slate-200">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                     <div>
-                        <!-- Main title now uses text-3xl font-bold as a *base* but will be overridden by JS -->
-                        <h1 id="main-title" class="text-3xl font-bold text-slate-900">[Project Name]</h1>
+                        <!-- Main title now uses text-3xl font-bold as a *base* but will be overridden by JS --><h1 id="main-title" class="text-3xl font-bold text-slate-900">[Project Name]</h1>
                         <h2 id="report-subtitle" class="text-lg text-slate-600 font-medium mt-1">Current Report</h2>
                     </div>
                     <div id="report-controls" class="flex items-center space-x-3 mt-4 md:mt-0">
@@ -252,14 +241,11 @@
                 </div>
             </header>
 
-            <!-- Loading/Error State -->
-            <div id="message-container" class="text-center p-10 hidden"></div>
+            <!-- Loading/Error State --><div id="message-container" class="text-center p-10 hidden"></div>
 
-            <!-- ===== Overview Section ===== -->
-            <section id="overview" class="active space-y-6">
+            <!-- ===== Overview Section ===== --><section id="overview" class="active space-y-6">
                 <div class="card card-hover fade-in bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <!-- JS will populate this card's content -->
-                    <div id="project-details-content">
+                    <!-- JS will populate this card's content --><div id="project-details-content">
                         <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                             <span>Project Details</span>
@@ -284,27 +270,20 @@
                 </div>
             </section>
             
-            <!-- ===== Team Section ===== -->
-            <section id="team" class="space-y-6">
-                <!-- Team section content is now generated entirely by JS -->
-                 <p class="text-slate-500">Loading team members...</p>
+            <!-- ===== Team Section ===== --><section id="team" class="space-y-6">
+                <!-- Team section content is now generated entirely by JS --><p class="text-slate-500">Loading team members...</p>
             </section>
 
-            <!-- ===== Goals Section ===== -->
-            <section id="goals" class="space-y-6">
-                <!-- This section will be populated by JS -->
-                <p class="text-slate-500">Loading goals...</p>
+            <!-- ===== Goals Section ===== --><section id="goals" class="space-y-6">
+                <!-- This section will be populated by JS --><p class="text-slate-500">Loading goals...</p>
             </section>
 
-            <!-- ===== Key Metrics Section ===== -->
-            <section id="dashboard" class="space-y-6">
-                <!-- KPI Grid -->
-                <div id="kpi-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <!-- ===== Key Metrics Section ===== --><section id="dashboard" class="space-y-6">
+                <!-- KPI Grid --><div id="kpi-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                     <p class="text-slate-500 sm:col-span-2 lg:col-span-4">Loading KPIs...</p>
                 </div>
                 
-                <!-- Charts & Accomplishments -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Charts & Accomplishments --><div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="card card-hover fade-in fade-in-delay-2 lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                         <div id="bar-chart-container" class="w-full h-[300px]">
                             <p class="text-slate-500 text-center pt-10">Loading chart...</p>
@@ -323,46 +302,36 @@
                 </div>
             </section>
 
-            <!-- ===== Impact Dashboard Section ===== -->
-            <section id="impact" class="space-y-6">
+            <!-- ===== Impact Dashboard Section ===== --><section id="impact" class="space-y-6">
                 
-                <!-- New 4-Card KPI Grid -->
-                <div id="impact-kpi-grid" class="impact-kpi-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                    <!-- JS will populate this -->
-                    <p class="text-slate-500 sm:col-span-2 lg:col-span-4">Loading impact KPIs...</p>
+                <!-- New 4-Card KPI Grid --><div id="impact-kpi-grid" class="impact-kpi-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                    <!-- JS will populate this --><p class="text-slate-500 sm:col-span-2 lg:col-span-4">Loading impact KPIs...</p>
                 </div>
 
-                <!-- New Map & Growth Chart Layout -->
-                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <!-- New Map & Growth Chart Layout --><div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
                     
-                    <!-- Map Card (Smaller) -->
-                    <!-- UPDATED: Added flex flex-col to the card -->
-                    <div class="card card-hover fade-in fade-in-delay-1 bg-white p-6 rounded-xl border border-slate-200 shadow-sm lg:col-span-3 flex flex-col">
-                        <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
+                    <!-- Map Card (Smaller) --><div class="card card-hover fade-in fade-in-delay-1 bg-white rounded-xl border border-slate-200 shadow-sm lg:col-span-3 flex flex-col">
+                        <h3 class="text-lg font-bold p-6 pb-2 text-slate-800 flex items-center space-x-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                             <span>National Program Reach</span>
                         </h3>
-                        <!-- UPDATED: Removed pt-[30%], added flex-1 and min-h-[200px] -->
-                        <div id="map-container" class="relative flex-1 min-h-[200px]"> <!-- Map aspect ratio -->
+                        <!-- Adjusted map-container to remove internal padding --><div id="map-container" class="relative flex-1 min-h-[200px] p-4 pt-0"> 
                             <svg id="map-svg" class="absolute top-0 left-0 w-full h-full"></svg>
                         </div>
                     </div>
                     
-                    <!-- Top Growth Areas Card -->
-                    <div class="card card-hover fade-in fade-in-delay-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm lg:col-span-2">
+                    <!-- Top Growth Areas Card --><div class="card card-hover fade-in fade-in-delay-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm lg:col-span-2">
                         <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
                             <span>Top Growth Areas</span>
                         </h3>
                         <div id="impact-growth-chart" class="impact-growth-chart space-y-4">
-                            <!-- JS will populate this -->
-                            <p>Loading growth areas...</p>
+                            <!-- JS will populate this --><p>Loading growth areas...</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Old Broader Impact Card (Kept for now, you can remove if needed) -->
-                 <div class="card card-hover fade-in fade-in-delay-3 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <!-- Old Broader Impact Card (Kept for now, you can remove if needed) --><div class="card card-hover fade-in fade-in-delay-3 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                     <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v15H6.5A2.5 2.5 0 0 1 4 14.5V4.5A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                         <span>Broader Impact</span>
@@ -373,8 +342,7 @@
                 </div>
             </section>
 
-            <!-- ===== Community Testimonials Section ===== -->
-            <section id="testimonials" class="space-y-6">
+            <!-- ===== Community Testimonials Section ===== --><section id="testimonials" class="space-y-6">
                 <div class="card card-hover fade-in bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                     <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
@@ -389,10 +357,8 @@
         </main>
     </div>
 
-    <!-- Modal Backdrop -->
-    <div id="modal-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-40 hidden opacity-0 transition-opacity duration-300">
-        <!-- Modal Content -->
-        <div id="modal-content" class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col transform scale-95 transition-all duration-300">
+    <!-- Modal Backdrop --><div id="modal-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-40 hidden opacity-0 transition-opacity duration-300">
+        <!-- Modal Content --><div id="modal-content" class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col transform scale-95 transition-all duration-300">
             <header class="flex items-center justify-between p-4 border-b border-slate-200">
                 <h2 id="modal-title" class="text-lg font-semibold text-slate-800">Metric Details</h2>
                 <button id="modal-close-btn" class="text-slate-400 hover:text-slate-600">
@@ -401,18 +367,15 @@
             </header>
             <div class="p-6 overflow-y-auto">
                 <div id="modal-chart-container" class="w-full min-h-[250px]">
-                    <!-- D3 chart will be drawn here -->
-                </div>
+                    <!-- D3 chart will be drawn here --></div>
             </div>
         </div>
     </div>
 
-    <!-- D3 Chart Tooltip -->
-    <div id="chart-tooltip" class="p-2 text-sm bg-slate-900 text-white rounded-md shadow-lg opacity-0 transition-opacity z-50"></div>
+    <!-- D3 Chart Tooltip --><div id="chart-tooltip" class="p-2 text-sm bg-slate-900 text-white rounded-md shadow-lg opacity-0 transition-opacity z-50"></div>
 
 
-    <!-- Main Application JavaScript -->
-    <script>
+    <!-- Main Application JavaScript --><script>
         document.addEventListener("DOMContentLoaded", initializeApp);
 
         // --- Global State ---
@@ -813,8 +776,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                             <span>${item.goal}</span>
                         </h3>
-                        <!-- UPDATED: Use flex-wrap for objectives -->
-                        <div class="flex flex-wrap gap-4 mt-4">
+                        <!-- UPDATED: Use flex-wrap for objectives --><div class="flex flex-wrap gap-4 mt-4">
                             ${item.objectives.map(obj => `
                                 <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 flex-1 min-w-[200px]">
                                     <p class="text-slate-600 text-sm">${obj}</p>
@@ -1130,10 +1092,8 @@
             const container = d3.select("#map-container");
             const svg = d3.select("#map-svg");
             
-            // Check if map is already drawn
-            if (!svg.select("g").empty()) {
-                return; // Already drawn
-            }
+            // Clear previous map if any
+            svg.select("g").remove();
 
             // Define partner states from project data
             const partnerStates = projectData.impact?.partnerStates || {};
@@ -1163,39 +1123,52 @@
                 
                 const states = topojson.feature(us, us.objects.states);
                 
-                const bounds = container.node().getBoundingClientRect();
-                if (bounds.width < 10) { // Check map container bounds too
-                    console.warn("Map container has no dimensions. Retrying.");
-                    setTimeout(drawUSMap, 100);
-                    return;
-                }
-                
-                const projection = d3.geoAlbersUsa().fitSize([bounds.width, bounds.height], states);
-                const path = d3.geoPath().projection(projection);
+                // Use requestAnimationFrame to ensure container dimensions are stable
+                requestAnimationFrame(() => {
+                    const bounds = container.node().getBoundingClientRect();
+                    // Give a small buffer (e.g., 20px) to prevent the map from touching the very edge
+                    const mapWidth = bounds.width;
+                    const mapHeight = bounds.height;
 
-                svg.append("g")
-                    .selectAll("path")
-                    .data(states.features)
-                    .join("path")
-                    .attr("class", d => `state ${getColorClass(d.properties.name)}`)
-                    .attr("d", path)
-                    .on("mouseover", (event, d) => {
-                        const stateName = d.properties.name;
-                        const status = getStatus(stateName); // "Partner", "Prospective", or undefined
-                        let tooltipHtml = `<strong>${stateName}</strong>`;
-                        if (status) { // Only show status if it exists
-                            tooltipHtml += `<br/>Status: ${status}`;
-                        }
-                        tooltip.style("opacity", 1)
-                               .html(tooltipHtml);
-                    })
-                    .on("mousemove", (event) => {
-                         tooltip.style("left", (event.pageX + 10) + "px")
-                                .style("top", (event.pageY - 28) + "px");
-                    })
-                    .on("mouseleave", () => {
-                        tooltip.style("opacity", 0);
-                    });
+                    if (mapWidth < 10 || mapHeight < 10) { 
+                        console.warn("Map container has no dimensions after RAF. Retrying in 100ms.");
+                        setTimeout(drawUSMap, 100);
+                        return;
+                    }
+                    
+                    // --- UPDATE ---
+                    // Use fitSize and apply a small padding to prevent clipping at the very edge,
+                    // but still maximize the map within the container.
+                    const projection = d3.geoAlbersUsa()
+                        .fitSize([mapWidth - 5, mapHeight - 5], states); // Reduced padding to 5px
+                    // --- END UPDATE ---
+                    
+                    const path = d3.geoPath().projection(projection);
+
+                    svg.append("g")
+                        .selectAll("path")
+                        .data(states.features)
+                        .join("path")
+                        .attr("class", d => `state ${getColorClass(d.properties.name)}`)
+                        .attr("d", path)
+                        .on("mouseover", (event, d) => {
+                            const stateName = d.properties.name;
+                            const status = getStatus(stateName); // "Partner", "Prospective", or undefined
+                            let tooltipHtml = `<strong>${stateName}</strong>`;
+                            if (status) { // Only show status if it exists
+                                tooltipHtml += `<br/>Status: ${status}`;
+                            }
+                            tooltip.style("opacity", 1)
+                                   .html(tooltipHtml);
+                        })
+                        .on("mousemove", (event) => {
+                             tooltip.style("left", (event.pageX + 10) + "px")
+                                    .style("top", (event.pageY - 28) + "px");
+                        })
+                        .on("mouseleave", () => {
+                            tooltip.style("opacity", 0);
+                        });
+                });
 
             } catch (error) {
                 console.error("Error drawing map:", error);
