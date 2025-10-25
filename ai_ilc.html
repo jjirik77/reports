@@ -950,16 +950,21 @@
                 return;
             }
             
-            // Clear previous SVG
-            container.select("svg").remove();
+            // --- FIX ---
+            // 1. Clear ALL previous content (both bad <p> tags and old <svg> tags)
+            container.html(""); 
 
-            // Get container dimensions
+            // 2. Get container dimensions
             const bounds = container.node().getBoundingClientRect();
+            
+            // 3. Check bounds and retry if not ready
             if (bounds.width < 10 || bounds.height < 10) {
-                console.warn("Chart container has no dimensions. Chart will not be drawn.");
-                container.html(`<p class="text-slate-500 text-center pt-10">Cannot draw chart. Container not visible or has no size.</p>`);
-                return;
+                console.warn("Chart container has no dimensions. Retrying in 100ms.");
+                // If it fails, try again once after a short delay.
+                setTimeout(() => drawBarChart(data, containerSelector, chartTitle), 100);
+                return; // Stop this execution
             }
+            // --- END FIX ---
             
             const margin = { top: 40, right: 20, bottom: 50, left: 60 };
             const width = bounds.width - margin.left - margin.right;
@@ -1045,10 +1050,16 @@
             const container = d3.select(containerSelector);
             if (container.empty()) return;
             
-            container.select("svg").remove();
+            // --- APPLYING FIX ---
+            container.html(""); // Clear previous content
 
             const bounds = container.node().getBoundingClientRect();
-            if (bounds.width < 10) return; // Don't draw if container isn't ready
+            if (bounds.width < 10) { // Don't draw if container isn't ready
+                // Retry logic for modal
+                setTimeout(() => createModalBarChart(data, containerSelector), 100);
+                return;
+            }
+            // --- END FIX ---
 
             const margin = { top: 30, right: 20, bottom: 40, left: 50 };
             const width = bounds.width - margin.left - margin.right;
@@ -1150,6 +1161,12 @@
                 const states = topojson.feature(us, us.objects.states);
                 
                 const bounds = container.node().getBoundingClientRect();
+                if (bounds.width < 10) { // Check map container bounds too
+                    console.warn("Map container has no dimensions. Retrying.");
+                    setTimeout(drawUSMap, 100);
+                    return;
+                }
+                
                 const projection = d3.geoAlbersUsa().fitSize([bounds.width, bounds.height], states);
                 const path = d3.geoPath().projection(projection);
 
