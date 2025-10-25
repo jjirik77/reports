@@ -19,7 +19,7 @@
       },
       {
         "label": "Period",
-        "value": "October 1, 2025 to December 20, 2028"
+        "value": "10/01/2025 to 09/30/2028"
       }
     ],
     "executiveSummary": [
@@ -148,11 +148,37 @@
     ],
     "accomplishments": [
       "Successfully established 8 inter-disciplinary learning communities across 5 partner institutions.",
-      "Launched the 'AI in STEM' faculty workshop series, training over 120 educators.",
-      "Pioneered 24 new AI instructional modules, now piloted in 15 courses."
+      "Launched the 'AI in STEM' faculty workshop series, training over 120 educators to date.",
+      "Developed and open-sourced 24 new AI-integrated instructional modules."
     ]
   },
   "impact": {
+    "impactKpis": [
+      {
+        "title": "Student Completions",
+        "value": 193,
+        "growth": "+360%",
+        "description": "A dramatic increase in students finishing our centralized courses."
+      },
+      {
+        "title": "K-12 Schools Adoptions",
+        "value": 291,
+        "growth": "+39%",
+        "description": "Represents schools actively using our open-source curriculum."
+      },
+      {
+        "title": "Virtual Labs Completion",
+        "value": 3080,
+        "growth": "+73%",
+        "description": "Instances of hands-on labs launched in our virtual environment."
+      },
+      {
+        "title": "Strategic Employers Partners",
+        "value": 31,
+        "growth": "+63%",
+        "description": "Growth in industry partners providing work-based learning."
+      }
+    ],
     "partnerStates": {
       "Florida": "Partner",
       "Washington": "Partner",
@@ -160,10 +186,11 @@
       "Texas": "Partner",
       "Illinois": "Prospective"
     },
-    "impactMetrics": [
-      "500+ faculty members reached through workshops and webinars.",
-      "25+ new AI modules integrated into curricula across 8 institutions.",
-      "10,000+ students estimated to be impacted by new AI-infused courses within three years."
+    "topGrowthAreas": [
+      { "label": "Student Completions", "value": 360 },
+      { "label": "Student Engagements", "value": 300 },
+      { "label": "Work-Based Learning", "value": 85 },
+      { "label": "Virtual Labs", "value": 73 }
     ],
     "broaderImpact": [
       "The broader impact of this proposal extends to workforce development and economic competitiveness. As AI continues to reshape industries and job markets, it is essential that the future workforce is equipped with the skills necessary to thrive in an AI-driven economy. The documentation and dissemination of best practices, processes, and outcomes from this project have a far-reaching impact on the broader educational community.",
@@ -173,20 +200,21 @@
   "testimonials": {
     "quotes": [
       {
-        "quote": "The AI workshops provided aclear roadmap for integrating complex topics into my existing curriculum. My students are more engaged than ever.",
-        "author": "Dr. Jane Smith",
-        "title": "Professor, Computer Science"
+        "quote": "The AI integration modules have completely changed how I approach my data analysis projects. It's no longer just about running numbers, but about asking smarter questions.",
+        "author": "Student",
+        "title": "Data Science Program"
       },
       {
-        "quote": "As a manufacturing instructor, I never thought AI was relevant to my field. This program completely changed my perspective. Our students will now be ready for the smart factories of the future.",
-        "author": "Mark Johnson",
-        "title": "Faculty, Automotive & Manufacturing"
+        "quote": "I was hesitant about AI, seeing it as a threat. The faculty workshop reframed it as a powerful assistant. I now use AI tools to automate grading and personalize student feedback.",
+        "author": "Faculty Member",
+        "title": "Manufacturing Technology"
       },
       {
-        "quote": "The inter-disciplinary collaboration has been fantastic. I'm now working with the Health Sciences department on a project using AI for medical imaging analysis.",
-        "author": "Prof. David Lee",
-        "title": "Instructor, IT & Data Analytics"
+        "quote": "As an industry partner, I'm thrilled to see graduates who not only have the core skills but also understand how to apply AI. It makes them immediately valuable.",
+        "author": "Industry Partner",
+        "title": "Tech Advisory Board"
       }
     ]
   }
 }
+
