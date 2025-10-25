@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -99,6 +99,12 @@
             fill: #6366f1; /* indigo-500 */
             cursor: pointer;
         }
+        
+        /* NEW: Growth Bar Fill Animation */
+        .growth-bar-fill {
+            width: 0%;
+            transition: width 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
 
         /* Print-Specific Styles */
         @media print {
@@ -115,7 +121,7 @@
             }
 
             /* Hide all interactive elements */
-            nav, #report-controls, #modal-backdrop, #chart-tooltip, .kpi-card, #bar-chart-container, #growth-chart-container, #map-container {
+            nav, #report-controls, #modal-backdrop, #chart-tooltip, .kpi-card, #bar-chart-container, #growth-chart-container, #map-container, .impact-kpi-grid, .impact-growth-chart {
                 display: none !important;
             }
 
@@ -319,37 +325,50 @@
             </section>
 
             <!-- ===== Impact Dashboard Section ===== -->
+            <!-- UPDATED: This section is completely rebuilt -->
             <section id="impact" class="space-y-6">
-                <!-- Map Card -->
-                <div class="card card-hover fade-in bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        <span>National Program Reach</span>
-                    </h3>
-                    <div id="map-container">
-                        <svg id="map-svg"></svg>
-                    </div>
-                </div>
                 
-                <!-- Metrics & Impact Grid -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="card card-hover fade-in fade-in-delay-1 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <!-- New 4-Card KPI Grid -->
+                <div id="impact-kpi-grid" class="impact-kpi-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                    <!-- JS will populate this -->
+                    <p class="text-slate-500 sm:col-span-2 lg:col-span-4">Loading impact KPIs...</p>
+                </div>
+
+                <!-- New Map & Growth Chart Layout -->
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                    
+                    <!-- Map Card (Smaller) -->
+                    <div class="card card-hover fade-in fade-in-delay-1 bg-white p-6 rounded-xl border border-slate-200 shadow-sm lg:col-span-3">
                         <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
-                            <span>Key Impact Metrics</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <span>National Program Reach</span>
                         </h3>
-                        <div id="impact-metrics-content" class="prose prose-slate max-w-none text-slate-600">
-                            <p>Loading impact metrics...</p>
+                        <div id="map-container" class="pt-[60%]"> <!-- Map aspect ratio -->
+                            <svg id="map-svg"></svg>
                         </div>
                     </div>
-                    <div class="card card-hover fade-in fade-in-delay-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    
+                    <!-- Top Growth Areas Card -->
+                    <div class="card card-hover fade-in fade-in-delay-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm lg:col-span-2">
                         <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
-                            <span>Broader Impact</span>
+                            <span>Top Growth Areas</span>
                         </h3>
-                        <div id="broader-impact-content" class="prose prose-slate max-w-none text-slate-600 space-y-4">
-                            <p>Loading broader impact...</p>
+                        <div id="impact-growth-chart" class="impact-growth-chart space-y-4">
+                            <!-- JS will populate this -->
+                            <p>Loading growth areas...</p>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Old Broader Impact Card (Kept for now, you can remove if needed) -->
+                 <div class="card card-hover fade-in fade-in-delay-3 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v15H6.5A2.5 2.5 0 0 1 4 14.5V4.5A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                        <span>Broader Impact</span>
+                    </h3>
+                    <div id="broader-impact-content" class="prose prose-slate max-w-none text-slate-600 space-y-4">
+                        <p>Loading broader impact...</p>
                     </div>
                 </div>
             </section>
@@ -397,7 +416,6 @@
         document.addEventListener("DOMContentLoaded", initializeApp);
 
         // --- Global State ---
-        // UPDATED: Pointing to the new JSON file
         const API_URL = "./ai_ilc_data.json"; 
         let projectData = {}; // Will be populated by fetch
         let activeChartDrawers = {}; // Store functions to redraw charts on tab switch
@@ -410,15 +428,12 @@
          * Initializes the application: sets up listeners and observers, and populates data.
          */
         function initializeApp() {
-            // UPDATED: Re-introduced fetch logic
             const messageContainer = document.getElementById("message-container");
             messageContainer.textContent = "Loading dashboard data...";
             messageContainer.classList.remove("hidden");
 
             // Fetch data with cache-busting
-            // Create an absolute URL object
             const url = new URL(API_URL, window.location.href);
-            // Add the cache-busting parameter
             url.searchParams.append('_', new Date().getTime());
 
             fetch(url)
@@ -463,7 +478,6 @@
         }
         
         /**
-         * NEW FUNCTION
          * Dynamically aligns the nav spacer to match the content header height.
          */
         function alignNavSpacer() {
@@ -479,23 +493,17 @@
             }
             
             try {
-                // Get computed styles to read padding/margin in pixels
                 const mainStyles = window.getComputedStyle(main);
                 const headerStyles = window.getComputedStyle(header);
                 const navInnerStyles = window.getComputedStyle(navInner);
 
-                // Get pixel values from styles
                 const mainPaddingTop = parseFloat(mainStyles.paddingTop) || 0;       // 40px from md:p-10
                 const headerHeight = header.offsetHeight || 0;                        // Dynamic height of header
                 const headerMarginBottom = parseFloat(headerStyles.marginBottom) || 0;  // 32px from mb-8
                 const navInnerPaddingTop = parseFloat(navInnerStyles.paddingTop) || 0;    // 16px from p-4
                 
-                // Total space on the content side, from top of <main> to top of first card <section>
-                // This is the target height.
                 const contentOffsetTop = mainPaddingTop + headerHeight + headerMarginBottom;
                 
-                // Calculate the height the spacer needs to be
-                // Spacer height = (Target Height) - (padding already above nav buttons)
                 const spacerHeight = contentOffsetTop - navInnerPaddingTop;
 
                 if (spacerHeight > 0) {
@@ -503,7 +511,6 @@
                 }
             } catch(e) {
                 console.error("Error aligning nav spacer:", e);
-                // Fallback to a reasonable default if calculation fails
                 if (navSpacer) navSpacer.style.height = '224px'; // h-56
             }
         }
@@ -534,8 +541,6 @@
                 // Redraw chart if one is associated with this tab
                 if (activeChartDrawers[targetId]) {
                     activeChartDrawers[targetId]();
-                    // Don't delete, allow redraw if user clicks back
-                    // delete activeChartDrawers[targetId]; 
                 }
             });
 
@@ -544,12 +549,12 @@
                 document.getElementById("report-subtitle").textContent = e.target.value;
             });
 
+            // Print Button
             document.getElementById("print-pdf-btn").addEventListener("click", () => {
                 window.print();
             });
 
             // Modal Listeners
-            // Note: Listener is on the parent grid, not individual cards
             document.getElementById("kpi-grid").addEventListener("click", (e) => {
                 const kpiCard = e.target.closest(".kpi-card");
                 if (!kpiCard) return;
@@ -631,14 +636,20 @@
             intersectionObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add("is-visible");
+                        const el = entry.target;
+                        el.classList.add("is-visible");
 
                         // Trigger count-up animation
-                        if (entry.target.classList.contains("kpi-value") && entry.target.dataset.target) {
-                            animateCounter(entry.target);
+                        if (el.classList.contains("kpi-value") && el.dataset.target) {
+                            animateCounter(el);
                         }
                         
-                        observer.unobserve(entry.target);
+                        // NEW: Trigger growth bar animation
+                        if (el.classList.contains("growth-bar-fill") && el.dataset.targetWidth) {
+                            el.style.width = el.dataset.targetWidth;
+                        }
+                        
+                        observer.unobserve(el);
                     }
                 });
             }, options);
@@ -728,12 +739,15 @@
             }
             
             // Add map drawing function
-            activeChartDrawers["impact"] = () => drawUSMap();
+            activeChartDrawers["impact"] = () => {
+                drawUSMap();
+                // NEW: Also populate the growth chart
+                populateImpactGrowthChart(data.impact?.topGrowthAreas);
+            };
         }
 
         function populateOverview(data) {
             // Project Details Table
-            // Note: The H3 for Project Details is now static in the HTML, so we justpopulate the table.
             const tableBody = document.getElementById("project-details-table").querySelector("tbody");
             if (data.projectDetails) {
                 tableBody.innerHTML = data.projectDetails.map(item => `
@@ -747,7 +761,6 @@
             }
 
             // Executive Summary
-            // Note: The H3 for Exec Summary is now static in the HTML.
             const summaryContainer = document.getElementById("exec-summary-content");
             if (data.executiveSummary) {
                 summaryContainer.innerHTML = data.executiveSummary.map(p => `<p>${p}</p>`).join("");
@@ -832,7 +845,6 @@
             }
             
             // Accomplishments
-            // Note: The H3 for Accomplishments is now static in the HTML.
             const accomplishmentsContainer = document.getElementById("accomplishments-content");
             if (data.accomplishments) {
                  accomplishmentsContainer.innerHTML = `<ul class="list-disc list-inside space-y-2">` + 
@@ -843,25 +855,69 @@
         }
         
         function populateImpactDashboard(data) {
-            // Note: The H3s for this section are now static in the HTML.
-            const metricsContainer = document.getElementById("impact-metrics-content");
-            if (data.impactMetrics) {
-                metricsContainer.innerHTML = `<ul class="list-disc list-inside space-y-2">` + 
-                    data.impactMetrics.map(p => `<li>${p}</li>`).join("") + `</ul>`;
+            // NEW: Populate Impact KPI Grid
+            const kpiGrid = document.getElementById("impact-kpi-grid");
+            if (data.impactKpis && data.impactKpis.length > 0) {
+                kpiGrid.innerHTML = data.impactKpis.map((kpi, i) => `
+                    <div class="card-hover fade-in bg-white p-5 rounded-xl border border-slate-200 shadow-sm" 
+                         style="transition-delay: ${i*100}ms">
+                        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider">${kpi.title}</h3>
+                        <div class="flex items-baseline space-x-2 mt-2">
+                            <span class="kpi-value text-4xl font-bold text-slate-900" data-target="${kpi.value}">0</span>
+                            <span class="text-lg font-semibold ${kpi.growth.startsWith('+') ? 'text-green-600' : 'text-red-600'}">
+                                ${kpi.growth}
+                            </span>
+                        </div>
+                        <p class="text-sm text-slate-500 mt-2">${kpi.description}</p>
+                    </div>
+                `).join("");
             } else {
-                metricsContainer.innerHTML = `<p>No impact metrics available.</p>`;
+                kpiGrid.innerHTML = `<p class="text-slate-500 md:col-span-2 lg:col-span-4">No impact KPI data available.</p>`;
             }
             
+            // Note: The H3s for the other cards are static in the HTML.
+            // This function is now just for the *content* of the old cards.
             const broaderImpactContainer = document.getElementById("broader-impact-content");
             if (data.broaderImpact) {
                 broaderImpactContainer.innerHTML = data.broaderImpact.map(p => `<p>${p}</p>`).join("");
             } else {
                 broaderImpactContainer.innerHTML = `<p>No broader impact summary available.</p>`;
             }
+            
+            // Note: The function to populate the growth chart is separate
+            // It is called by the `activeChartDrawers["impact"]` function
+        }
+        
+        // NEW: Function to populate the Impact Growth Chart
+        function populateImpactGrowthChart(data) {
+            const container = document.getElementById("impact-growth-chart");
+            if (!data || data.length === 0) {
+                container.innerHTML = `<p>No growth data available.</p>`;
+                return;
+            }
+            
+            // Find max value to normalize bar widths
+            const maxValue = d3.max(data, d => d.value);
+            
+            container.innerHTML = data.map((item, i) => `
+                <div class="fade-in" style="transition-delay: ${i*100}ms">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-semibold text-slate-700">${item.label}</span>
+                        <span class="text-sm font-semibold text-blue-600">+${item.value}%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-2">
+                        <div class="growth-bar-fill bg-blue-600 h-2 rounded-full" 
+                             data-target-width="${(item.value / maxValue) * 100}%">
+                        </div>
+                    </div>
+                </div>
+            `).join("");
+            
+            // Re-run observer for these new elements
+            observeVisibleFadeIns();
         }
         
         function populateTestimonials(data) {
-            // Note: The H3 for this section is now static in the HTML.
             const container = document.getElementById("testimonials-content");
             if (data.quotes && data.quotes.length > 0) {
                 container.innerHTML = data.quotes.map((item, i) => `
