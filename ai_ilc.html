@@ -281,16 +281,8 @@
             
             <!-- ===== Team Section ===== -->
             <section id="team" class="space-y-6">
-                <div class="card card-hover fade-in bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        <span>Project Leadership Team</span>
-                    </h3>
-                    <p id="team-intro" class="text-slate-600 mb-6 prose prose-slate max-w-none">Loading team intro...</p>
-                    <div id="team-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                         <p class="text-slate-500">Loading team members...</p>
-                    </div>
-                </div>
+                <!-- Team section content is now generated entirely by JS -->
+                 <p class="text-slate-500">Loading team members...</p>
             </section>
 
             <!-- ===== Goals Section ===== -->
@@ -424,7 +416,12 @@
             messageContainer.classList.remove("hidden");
 
             // Fetch data with cache-busting
-            fetch(`${API_URL}?_=${new Date().getTime()}`)
+            // Create an absolute URL object
+            const url = new URL(API_URL, window.location.href);
+            // Add the cache-busting parameter
+            url.searchParams.append('_', new Date().getTime());
+
+            fetch(url)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -736,7 +733,7 @@
 
         function populateOverview(data) {
             // Project Details Table
-            // Note: The H3 for Project Details is now static in the HTML, so we just populate the table.
+            // Note: The H3 for Project Details is now static in the HTML, so we justpopulate the table.
             const tableBody = document.getElementById("project-details-table").querySelector("tbody");
             if (data.projectDetails) {
                 tableBody.innerHTML = data.projectDetails.map(item => `
@@ -760,25 +757,30 @@
         }
 
         function populateTeam(data) {
-            // Note: The H3 for Team is now static in the HTML.
-            const intro = document.getElementById("team-intro");
-            if (data.introduction) {
-                intro.textContent = data.introduction;
-            } else {
-                intro.textContent = "Loading team introduction...";
-            }
-            
-            const grid = document.getElementById("team-grid");
+            // UPDATED: Generate individual cards for each team member
+            const section = document.getElementById("team"); 
             if (data.leadership && data.leadership.length > 0) {
-                grid.innerHTML = data.leadership.map((member, i) => `
-                    <div class="fade-in" style="transition-delay: ${i*100}ms">
-                        <h4 class="font-semibold text-lg text-blue-700">${member.name}</h4>
-                        <p class="font-medium text-slate-600 text-sm mb-2">${member.title}</p>
-                        <p class="text-slate-500 text-sm">${member.bio}</p>
+                 section.innerHTML = `
+                    <div class="card card-hover fade-in bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                         <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                             <span>Project Leadership Team</span>
+                         </h3>
+                         <p class="text-slate-600 mb-6 prose prose-slate max-w-none">${data.introduction || 'Loading team introduction...'}</p>
                     </div>
-                `).join("");
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        ${data.leadership.map((member, i) => `
+                            <div class="card card-hover fade-in bg-white p-6 rounded-xl border border-slate-200 shadow-sm" style="transition-delay: ${ (i + 1) * 100}ms">
+                                <h4 class="font-semibold text-lg text-blue-700">${member.name}</h4>
+                                <p class="font-medium text-slate-600 text-sm mb-2">${member.title}</p>
+                                <p class="text-slate-500 text-sm">${member.bio}</p>
+                            </div>
+                        `).join("")}
+                    </div>
+                 `;
             } else {
-                grid.innerHTML = `<p class="text-slate-500">No team members listed.</p>`;
+                 section.innerHTML = `<p class="text-slate-500">No team members listed.</p>`;
             }
         }
 
@@ -792,9 +794,10 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                             <span>${item.goal}</span>
                         </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- UPDATED: Use flex-wrap for objectives -->
+                        <div class="flex flex-wrap gap-4 mt-4">
                             ${item.objectives.map(obj => `
-                                <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 h-full">
+                                <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 flex-1 min-w-[200px]">
                                     <p class="text-slate-600 text-sm">${obj}</p>
                                 </div>
                             `).join("")}
