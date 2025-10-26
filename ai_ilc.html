@@ -122,10 +122,31 @@
                 color: #000;
             }
 
-            /* Hide all interactive elements */
-            nav, #report-controls, #modal-backdrop, #chart-tooltip, #map-tooltip, .kpi-card, #bar-chart-container, #growth-chart-container, #map-container, .impact-kpi-grid, .impact-growth-chart {
+            /* Hide interactive elements, keep chart/map containers */
+            nav, #report-controls, #modal-backdrop, #chart-tooltip, #map-tooltip, .kpi-card, .impact-kpi-grid, .impact-growth-chart { /* Removed #bar-chart-container, #map-container */
                 display: none !important;
             }
+
+            /* Ensure chart/map containers are block elements */
+             #bar-chart-container, #map-container {
+                display: block !important;
+                width: 100%;
+                max-width: 600px; /* Limit width */
+                height: auto;     /* Adjust height automatically */
+                margin: 2em auto; /* Center with margins */
+                page-break-inside: avoid; /* Try to prevent breaking inside */
+            }
+             #map-container {
+                 min-height: 300px; /* Give map a decent min height */
+             }
+
+            /* Ensure SVGs inside are visible */
+             #bar-chart-container svg, #map-container svg {
+                display: block !important;
+                width: 100% !important;
+                height: auto !important;
+            }
+
 
             main {
                 margin-left: 0 !important;
@@ -163,6 +184,7 @@
                 box-shadow: none !important;
                 border-radius: 0 !important;
                 padding: 0.25in;
+                page-break-inside: avoid; /* Try to keep card content together */
             }
 
             table, th, td {
