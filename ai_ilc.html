@@ -1112,8 +1112,9 @@
             svg.selectAll("*").remove();
 
             // --- REVERTED TO JSON DATA ---
-            // Access partnerStates from the globally fetched projectData
+            // Access partnerStates and partnerDetails from the globally fetched projectData
             const partnerStates = projectData.impact?.partnerStates || {};
+            const partnerDetails = projectData.impact?.partnerDetails || {}; // Added partnerDetails
 
             // Helper to get status directly from the JSON data
             function getStatus(stateName) {
@@ -1199,15 +1200,18 @@
                             mapTooltip.style("left", `${x + 15}px`);
                             mapTooltip.style("top", `${y - 15}px`);
 
-                            // --- REVERTED TOOLTIP LOGIC ---
+                            // --- UPDATED TOOLTIP LOGIC ---
                             let status = getStatus(stateName); // Get status from JSON
+                            let partnerName = partnerDetails[stateName]; // Get partner name from JSON
                             let tooltipHtml = `<strong>${stateName}</strong>`;
                             if (status) { // Only show status if it exists in JSON
                                 tooltipHtml += `<br/><span class="text-xs text-slate-300">${status}</span>`;
                             }
-                            // Removed the partnerData lookup as it's not in the JSON structure
+                            if (partnerName) { // Append partner name if it exists and is not empty
+                                tooltipHtml += `<br/><span class="text-xs font-semibold text-yellow-300">Partner:</span> <span class="text-xs">${partnerName}</span>`;
+                            }
                             mapTooltip.html(tooltipHtml);
-                            // --- END REVERT ---
+                            // --- END UPDATE ---
                         })
                         .on("mouseout", function(event, d) {
                             // Reset fill using the original color logic based on JSON data
