@@ -24,7 +24,7 @@
         /* UPDATED hover effect per critique */
         .card-hover:hover {
             /* Uses shadow-md from Tailwind */
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
             /* Highlights with your primary blue color */
             border-color: #2563eb; /* border-blue-600 */
         }
@@ -58,21 +58,25 @@
             background-color: #2563eb; /* bg-blue-600 */
             color: white;
         }
-        
+
         /* D3 Chart Tooltip */
-        #chart-tooltip {
+        #chart-tooltip, #map-tooltip { /* Apply base styles to both tooltips */
             position: absolute;
             opacity: 0;
             transition: opacity 0.2s ease;
             pointer-events: none;
             z-index: 50;
+            /* Tailwind classes for styling */
+            @apply p-2 text-sm bg-slate-900 text-white rounded-md shadow-lg;
         }
-        
+
         /* Map Styles */
         #map-container {
             position: relative;
             width: 100%;
-            height: 100%; /* Changed from aspect ratio */
+            height: 100%; /* Ensure it fills parent */
+            box-sizing: border-box;
+            overflow: hidden; /* Hide anything slightly outside the viewBox */
         }
         #map-svg {
             position: absolute;
@@ -80,20 +84,25 @@
             left: 0;
             width: 100%;
             height: 100%;
+            /* Ensure SVG scales nicely */
+            display: block;
         }
         .state {
             stroke: #fff;
-            stroke-width: 0.5px;
+            stroke-width: 0.5px; /* Adjusted slightly */
             transition: fill 0.2s ease-in-out;
         }
-        .state-Partner { fill: #3b82f6; } /* blue-500 */
-        .state-Prospective { fill: #f59e0b; } /* amber-500 */
-        .state-Default { fill: #d1d5db; } /* gray-300 */
+        /* Colors from the provided code snippet */
+        .state-MajorPartner { fill: #facc15; } /* Accent Yellow */
+        .state-ActivePartner { fill: #3b82f6; } /* Primary Blue */
+        .state-NotEngaged { fill: #cbd5e1; } /* Gray */
+
+        /* NEW: Hover state color from snippet */
         .state:hover {
-            fill: #6366f1; /* indigo-500 */
+            fill: #60a5fa; /* blue-400 */
             cursor: pointer;
         }
-        
+
         /* NEW: Growth Bar Fill Animation */
         .growth-bar-fill {
             width: 0%;
@@ -115,7 +124,7 @@
             }
 
             /* Hide all interactive elements */
-            nav, #report-controls, #modal-backdrop, #chart-tooltip, .kpi-card, #bar-chart-container, #growth-chart-container, #map-container, .impact-kpi-grid, .impact-growth-chart {
+            nav, #report-controls, #modal-backdrop, #chart-tooltip, #map-tooltip, .kpi-card, #bar-chart-container, #growth-chart-container, #map-container, .impact-kpi-grid, .impact-growth-chart {
                 display: none !important;
             }
 
@@ -125,13 +134,13 @@
                 width: 100% !important;
                 min-height: auto !important;
             }
-            
+
             header {
                 flex-direction: column;
                 align-items: flex-start !important;
                 margin-bottom: 0.5in;
             }
-            
+
             h1, h2, h3, h4, p {
                 color: #000 !important;
             }
@@ -149,7 +158,7 @@
                 page-break-before: auto; /* No page break before the first section */
                 margin-top: 0;
             }
-            
+
             .card {
                 border: 1px solid #ccc !important;
                 box-shadow: none !important;
@@ -161,7 +170,7 @@
                 border: 1px solid #000 !important;
                 border-collapse: collapse;
             }
-            
+
             th, td {
                 padding: 4pt;
             }
@@ -170,7 +179,7 @@
                 text-decoration: none;
                 color: #000;
             }
-            
+
             /* Page setup */
             @page {
                 margin: 1in;
@@ -181,10 +190,10 @@
 <body class="bg-slate-50 text-slate-800 antialiased">
 
     <div id="app-container" class="flex flex-col md:flex-row min-h-screen">
-        
+
         <!-- Left Navigation Sidebar --><nav id="main-nav" class="w-full md:fixed md:top-0 md:left-0 md:h-full md:w-64 bg-slate-900 text-slate-200 flex-shrink-0 z-20">
             <!-- DYNAMIC SPACER: This div's height is set by JavaScript to align with the content --><div id="nav-spacer" class="hidden md:block"></div>
-            
+
             <!-- This container's ID is used for the height calculation --><div id="nav-inner-container" class="p-4 space-y-2">
                 <button data-target="overview" class="nav-btn active w-full flex items-center space-x-3 p-3 rounded-lg font-medium transition-colors duration-200 hover:bg-slate-700">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
@@ -219,7 +228,7 @@
         </nav>
 
         <!-- Main Content Area --><main class="flex-1 md:ml-64 p-6 md:p-10 bg-slate-50 min-h-screen">
-            
+
             <!-- Content Header --><header class="mb-8 pb-4 border-b border-slate-200">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                     <div>
@@ -269,7 +278,7 @@
                     </div>
                 </div>
             </section>
-            
+
             <!-- ===== Team Section ===== --><section id="team" class="space-y-6">
                 <!-- Team section content is now generated entirely by JS --><p class="text-slate-500">Loading team members...</p>
             </section>
@@ -282,14 +291,14 @@
                 <!-- KPI Grid --><div id="kpi-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                     <p class="text-slate-500 sm:col-span-2 lg:col-span-4">Loading KPIs...</p>
                 </div>
-                
+
                 <!-- Charts & Accomplishments --><div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="card card-hover fade-in fade-in-delay-2 lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                         <div id="bar-chart-container" class="w-full h-[300px]">
                             <p class="text-slate-500 text-center pt-10">Loading chart...</p>
                         </div>
                     </div>
-                    
+
                     <div class="card card-hover fade-in fade-in-delay-3 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                         <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
@@ -303,23 +312,23 @@
             </section>
 
             <!-- ===== Impact Dashboard Section ===== --><section id="impact" class="space-y-6">
-                
+
                 <!-- New 4-Card KPI Grid --><div id="impact-kpi-grid" class="impact-kpi-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                     <!-- JS will populate this --><p class="text-slate-500 sm:col-span-2 lg:col-span-4">Loading impact KPIs...</p>
                 </div>
 
                 <!-- New Map & Growth Chart Layout --><div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                    
-                    <!-- Map Card (Smaller) --><div class="card card-hover fade-in fade-in-delay-1 bg-white rounded-xl border border-slate-200 shadow-sm lg:col-span-3 flex flex-col">
-                        <h3 class="text-lg font-bold p-6 pb-2 text-slate-800 flex items-center space-x-2">
+
+                    <!-- Map Card (Smaller) --><div class="card card-hover fade-in fade-in-delay-1 bg-white rounded-xl border border-slate-200 shadow-sm lg:col-span-3 flex flex-col p-6"> <!-- Standard card padding -->
+                        <!-- Title --><h3 class="text-lg font-bold pb-4 text-slate-800 flex items-center space-x-2"> <!-- Added bottom padding -->
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                             <span>National Program Reach</span>
                         </h3>
-                        <!-- Adjusted map-container to remove internal padding --><div id="map-container" class="relative flex-1 min-h-[200px] p-4 pt-0"> 
+                        <!-- Container remains flex-1, Minimum height increased --><div id="map-container" class="relative flex-1 min-h-[300px]">
                             <svg id="map-svg" class="absolute top-0 left-0 w-full h-full"></svg>
                         </div>
                     </div>
-                    
+
                     <!-- Top Growth Areas Card --><div class="card card-hover fade-in fade-in-delay-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm lg:col-span-2">
                         <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center space-x-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
@@ -373,20 +382,22 @@
     </div>
 
     <!-- D3 Chart Tooltip --><div id="chart-tooltip" class="p-2 text-sm bg-slate-900 text-white rounded-md shadow-lg opacity-0 transition-opacity z-50"></div>
+    <!-- NEW: Map Tooltip Element --><div id="map-tooltip" class="p-2 text-sm bg-slate-900 text-white rounded-md shadow-lg opacity-0 transition-opacity z-50"></div>
 
 
     <!-- Main Application JavaScript --><script>
         document.addEventListener("DOMContentLoaded", initializeApp);
 
         // --- Global State ---
-        const API_URL = "./ai_ilc_data.json"; 
+        const API_URL = "./ai_ilc_data.json";
         let projectData = {}; // Will be populated by fetch
         let activeChartDrawers = {}; // Store functions to redraw charts on tab switch
         let intersectionObserver;
-        const tooltip = d3.select("#chart-tooltip");
+        const chartTooltip = d3.select("#chart-tooltip"); // Renamed for clarity
+        const mapTooltip = d3.select("#map-tooltip"); // Added map tooltip selection
         let resizeObserver; // For dynamic nav spacer
 
-        
+
         /**
          * Initializes the application: sets up listeners and observers, and populates data.
          */
@@ -410,18 +421,18 @@
                     projectData = data; // Store fetched data globally
                     messageContainer.textContent = ""; // Clear loading message
                     messageContainer.classList.add("hidden");
-                    
+
                     populateDashboard(projectData);
                     setupEventListeners();
                     setupObserver();
-                    
+
                     // --- DYNAMIC ALIGNMENT LOGIC ---
-                    alignNavSpacer(); 
-                    
+                    alignNavSpacer();
+
                     const header = document.querySelector('main header');
                     if (header) {
                         resizeObserver = new ResizeObserver(alignNavSpacer);
-                        resizeObserver.observe(header); 
+                        resizeObserver.observe(header);
                     }
                     // --- END LOGIC ---
 
@@ -439,7 +450,7 @@
                     `;
                 });
         }
-        
+
         /**
          * Dynamically aligns the nav spacer to match the content header height.
          */
@@ -454,7 +465,7 @@
                 if (navSpacer) navSpacer.style.height = '0px'; // Reset on mobile
                 return;
             }
-            
+
             try {
                 const mainStyles = window.getComputedStyle(main);
                 const headerStyles = window.getComputedStyle(header);
@@ -464,9 +475,9 @@
                 const headerHeight = header.offsetHeight || 0;                        // Dynamic height of header
                 const headerMarginBottom = parseFloat(headerStyles.marginBottom) || 0;  // 32px from mb-8
                 const navInnerPaddingTop = parseFloat(navInnerStyles.paddingTop) || 0;    // 16px from p-4
-                
+
                 const contentOffsetTop = mainPaddingTop + headerHeight + headerMarginBottom;
-                
+
                 const spacerHeight = contentOffsetTop - navInnerPaddingTop;
 
                 if (spacerHeight > 0) {
@@ -488,7 +499,7 @@
                 if (!navButton || navButton.classList.contains("active")) return;
 
                 const targetId = navButton.dataset.target;
-                
+
                 // Update nav button styles
                 document.querySelectorAll("#main-nav .nav-btn").forEach(btn => btn.classList.remove("active"));
                 navButton.classList.add("active");
@@ -497,13 +508,16 @@
                 document.querySelectorAll("main section").forEach(section => {
                     section.classList.toggle("active", section.id === targetId);
                 });
-                
+
                 // Trigger animations for the new section
                 observeVisibleFadeIns();
-                
+
                 // Redraw chart if one is associated with this tab
                 if (activeChartDrawers[targetId]) {
-                    activeChartDrawers[targetId]();
+                    // Use requestAnimationFrame to ensure container is visible before drawing
+                    requestAnimationFrame(() => {
+                        activeChartDrawers[targetId]();
+                    });
                 }
             });
 
@@ -530,10 +544,10 @@
                     console.error("Could not parse modal data:", err);
                     modalData = [];
                 }
-                
+
                 openModal(title, modalData);
             });
-            
+
             document.getElementById("modal-close-btn").addEventListener("click", closeModal);
             document.getElementById("modal-backdrop").addEventListener("click", (e) => {
                 if (e.target.id === "modal-backdrop") {
@@ -541,16 +555,16 @@
                 }
             });
         }
-        
+
         /**
          * Opens and populates the modal, then draws the chart.
          */
         function openModal(title, data) {
             const modalBackdrop = document.getElementById("modal-backdrop");
             const modalContent = document.getElementById("modal-content");
-            
+
             document.getElementById("modal-title").textContent = title;
-            
+
             // Show modal with animation
             modalBackdrop.classList.remove("hidden");
             setTimeout(() => {
@@ -575,10 +589,10 @@
         function closeModal() {
             const modalBackdrop = document.getElementById("modal-backdrop");
             const modalContent = document.getElementById("modal-content");
-            
+
             modalBackdrop.classList.remove("opacity-100");
             modalContent.classList.remove("scale-100");
-            
+
             setTimeout(() => {
                 modalBackdrop.classList.add("hidden");
                 // Clear chart on close to prevent weird resizing artifacts
@@ -606,18 +620,18 @@
                         if (el.classList.contains("kpi-value") && el.dataset.target) {
                             animateCounter(el);
                         }
-                        
+
                         // NEW: Trigger growth bar animation
                         if (el.classList.contains("growth-bar-fill") && el.dataset.targetWidth) {
                             el.style.width = el.dataset.targetWidth;
                         }
-                        
+
                         observer.unobserve(el);
                     }
                 });
             }, options);
         }
-        
+
         /**
          * Tells the observer to watch .fade-in elements in the currently active section.
          */
@@ -640,18 +654,18 @@
         function animateCounter(el) {
             const target = +el.dataset.target;
             if (isNaN(target)) return;
-            
+
             // If already animated, don't re-run
             if (el.textContent === target.toLocaleString()) return;
 
             let startTimestamp = null;
             const duration = 1500; // 1.5 seconds
-            
+
             const step = (timestamp) => {
                 if (!startTimestamp) startTimestamp = timestamp;
                 const progress = Math.min((timestamp - startTimestamp) / duration, 1);
                 const currentValue = Math.floor(progress * target);
-                
+
                 el.textContent = currentValue.toLocaleString();
 
                 if (progress < 1) {
@@ -683,22 +697,22 @@
             if (data.metrics) populateMetrics(data.metrics);
             if (data.impact) populateImpactDashboard(data.impact);
             if (data.testimonials) populateTestimonials(data.testimonials);
-            
+
             // Define chart drawing functions to be called on tab switch
             if (data.metrics?.mainChartData) {
                 const chartData = data.metrics.mainChartData;
                 const chartContainer = "#bar-chart-container";
-                
+
                 // --- UPDATE ---
                 // Read the overall progress value
                 const overallProgress = data.metrics?.overallProgress || 0;
                 // Create the dynamic title
                 const chartTitle = `Goal Progress (${overallProgress}%)`;
                 // --- END UPDATE ---
-                
+
                 activeChartDrawers["dashboard"] = () => drawBarChart(
-                    chartData, 
-                    chartContainer, 
+                    chartData,
+                    chartContainer,
                     chartTitle // Pass the dynamic title to the function
                 );
                 // Draw the chart for the default active tab
@@ -706,10 +720,13 @@
                     activeChartDrawers["dashboard"]();
                 });
             }
-            
+
             // Add map drawing function
             activeChartDrawers["impact"] = () => {
-                drawUSMap();
+                // Ensure map draws AFTER container is visible
+                requestAnimationFrame(() => {
+                   drawUSMap();
+                });
                 // NEW: Also populate the growth chart
                 populateImpactGrowthChart(data.impact?.topGrowthAreas);
             };
@@ -740,7 +757,7 @@
 
         function populateTeam(data) {
             // UPDATED: Generate individual cards for each team member
-            const section = document.getElementById("team"); 
+            const section = document.getElementById("team");
             if (data.leadership && data.leadership.length > 0) {
                  section.innerHTML = `
                     <div class="card card-hover fade-in bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
@@ -750,7 +767,7 @@
                          </h3>
                          <p class="text-slate-600 mb-6 prose prose-slate max-w-none">${data.introduction || 'Loading team introduction...'}</p>
                     </div>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         ${data.leadership.map((member, i) => `
                             <div class="card card-hover fade-in bg-white p-6 rounded-xl border border-slate-200 shadow-sm" style="transition-delay: ${ (i + 1) * 100}ms">
@@ -795,7 +812,7 @@
             const grid = document.getElementById("kpi-grid");
             if (data.kpis && data.kpis.length > 0) {
                 grid.innerHTML = data.kpis.map((kpi, i) => `
-                    <div class="kpi-card card-hover fade-in bg-white p-4 rounded-xl border border-slate-200 shadow-sm cursor-pointer" 
+                    <div class="kpi-card card-hover fade-in bg-white p-4 rounded-xl border border-slate-200 shadow-sm cursor-pointer"
                          style="transition-delay: ${i*100}ms"
                          data-values='${JSON.stringify(kpi.modalData || [])}'>
                         <h3 class="kpi-title text-sm font-medium text-slate-500 truncate">${kpi.title}</h3>
@@ -811,23 +828,23 @@
             } else {
                 grid.innerHTML = `<p class="text-slate-500 md:col-span-2 lg:col-span-4">No KPI data available.</p>`;
             }
-            
+
             // Accomplishments
             const accomplishmentsContainer = document.getElementById("accomplishments-content");
             if (data.accomplishments) {
-                 accomplishmentsContainer.innerHTML = `<ul class="list-disc list-inside space-y-2">` + 
+                 accomplishmentsContainer.innerHTML = `<ul class="list-disc list-inside space-y-2">` +
                     data.accomplishments.map(p => `<li>${p}</li>`).join("") + `</ul>`;
             } else {
                 accomplishmentsContainer.innerHTML = `<p>No accomplishments available.</p>`;
             }
         }
-        
+
         function populateImpactDashboard(data) {
             // NEW: Populate Impact KPI Grid
             const kpiGrid = document.getElementById("impact-kpi-grid");
             if (data.impactKpis && data.impactKpis.length > 0) {
                 kpiGrid.innerHTML = data.impactKpis.map((kpi, i) => `
-                    <div class="card-hover fade-in bg-white p-5 rounded-xl border border-slate-200 shadow-sm" 
+                    <div class="card-hover fade-in bg-white p-5 rounded-xl border border-slate-200 shadow-sm"
                          style="transition-delay: ${i*100}ms">
                         <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider">${kpi.title}</h3>
                         <div class="flex items-baseline space-x-2 mt-2">
@@ -842,7 +859,7 @@
             } else {
                 kpiGrid.innerHTML = `<p class="text-slate-500 md:col-span-2 lg:col-span-4">No impact KPI data available.</p>`;
             }
-            
+
             // Note: The H3s for the other cards are static in the HTML.
             // This function is now just for the *content* of the old cards.
             const broaderImpactContainer = document.getElementById("broader-impact-content");
@@ -851,11 +868,11 @@
             } else {
                 broaderImpactContainer.innerHTML = `<p>No broader impact summary available.</p>`;
             }
-            
+
             // Note: The function to populate the growth chart is separate
             // It is called by the `activeChartDrawers["impact"]` function
         }
-        
+
         // NEW: Function to populate the Impact Growth Chart
         function populateImpactGrowthChart(data) {
             const container = document.getElementById("impact-growth-chart");
@@ -863,10 +880,10 @@
                 container.innerHTML = `<p>No growth data available.</p>`;
                 return;
             }
-            
+
             // Find max value to normalize bar widths
             const maxValue = d3.max(data, d => d.value);
-            
+
             container.innerHTML = data.map((item, i) => `
                 <div class="fade-in" style="transition-delay: ${i*100}ms">
                     <div class="flex justify-between items-center mb-1">
@@ -874,17 +891,17 @@
                         <span class="text-sm font-semibold text-blue-600">+${item.value}%</span>
                     </div>
                     <div class="w-full bg-slate-200 rounded-full h-2">
-                        <div class="growth-bar-fill bg-blue-600 h-2 rounded-full" 
+                        <div class="growth-bar-fill bg-blue-600 h-2 rounded-full"
                              data-target-width="${(item.value / maxValue) * 100}%">
                         </div>
                     </div>
                 </div>
             `).join("");
-            
+
             // Re-run observer for these new elements
             observeVisibleFadeIns();
         }
-        
+
         function populateTestimonials(data) {
             const container = document.getElementById("testimonials-content");
             if (data.quotes && data.quotes.length > 0) {
@@ -914,14 +931,14 @@
                 console.error("Chart container not found:", containerSelector);
                 return;
             }
-            
+
             // --- FIX ---
             // 1. Clear ALL previous content (both bad <p> tags and old <svg> tags)
-            container.html(""); 
+            container.html("");
 
             // 2. Get container dimensions
             const bounds = container.node().getBoundingClientRect();
-            
+
             // 3. Check bounds and retry if not ready
             if (bounds.width < 10 || bounds.height < 10) {
                 console.warn("Chart container has no dimensions. Retrying in 100ms.");
@@ -930,7 +947,7 @@
                 return; // Stop this execution
             }
             // --- END FIX ---
-            
+
             const margin = { top: 40, right: 20, bottom: 50, left: 60 };
             const width = bounds.width - margin.left - margin.right;
             const height = bounds.height - margin.top - margin.bottom;
@@ -989,16 +1006,16 @@
                 .attr("height", 0) // Start with no height
                 .on("mouseover", (event, d) => {
                     d3.select(event.currentTarget).attr("fill", "#2563eb"); // blue-600
-                    tooltip.style("opacity", 1)
+                    chartTooltip.style("opacity", 1) // Use chartTooltip
                            .html(`<strong>${d.category}</strong><br/>Value: ${d.value.toLocaleString()}`);
                 })
                 .on("mousemove", (event) => {
-                     tooltip.style("left", (event.pageX + 10) + "px")
+                     chartTooltip.style("left", (event.pageX + 10) + "px") // Use chartTooltip
                             .style("top", (event.pageY - 28) + "px");
                 })
                 .on("mouseleave", (event) => {
                     d3.select(event.currentTarget).attr("fill", "#3b82f6"); // blue-500
-                    tooltip.style("opacity", 0);
+                    chartTooltip.style("opacity", 0); // Use chartTooltip
                 })
                 // Animation
                 .transition()
@@ -1007,14 +1024,14 @@
                 .attr("y", d => y(d.value))
                 .attr("height", d => height - y(d.value));
         }
-        
+
         /**
          * Draws a bar chart specifically for the modal.
          */
         function createModalBarChart(data, containerSelector) {
             const container = d3.select(containerSelector);
             if (container.empty()) return;
-            
+
             // --- APPLYING FIX ---
             container.html(""); // Clear previous content
 
@@ -1067,16 +1084,16 @@
                 .attr("height", 0)
                 .on("mouseover", (event, d) => {
                     d3.select(event.currentTarget).attr("fill", "#059669"); // emerald-600
-                    tooltip.style("opacity", 1)
+                    chartTooltip.style("opacity", 1) // Use chartTooltip
                            .html(`<strong>${d.label}</strong><br/>Value: ${d.value.toLocaleString()}`);
                 })
                 .on("mousemove", (event) => {
-                     tooltip.style("left", (event.pageX + 10) + "px")
+                     chartTooltip.style("left", (event.pageX + 10) + "px") // Use chartTooltip
                             .style("top", (event.pageY - 28) + "px");
                 })
                 .on("mouseleave", (event) => {
                     d3.select(event.currentTarget).attr("fill", "#10b981");
-                    tooltip.style("opacity", 0);
+                    chartTooltip.style("opacity", 0); // Use chartTooltip
                 })
                 .transition()
                 .duration(500)
@@ -1084,35 +1101,38 @@
                 .attr("y", d => y(d.value))
                 .attr("height", d => height - y(d.value));
         }
-        
+
         /**
-         * Draws the interactive US Map.
+         * Draws the interactive US Map using the viewBox approach.
          */
         async function drawUSMap() {
-            const container = d3.select("#map-container");
-            const svg = d3.select("#map-svg");
-            
-            // Clear previous map if any
-            svg.select("g").remove();
+            const container = d3.select("#map-container"); // Container div
+            const svg = d3.select("#map-svg"); // SVG element
 
-            // Define partner states from project data
-            const partnerStates = projectData.impact?.partnerStates || {};
-            
-            function getStatus(stateName) {
-                return partnerStates[stateName]; // Will be "Partner", "Prospective", or undefined
-            }
-            
-            function getColorClass(stateName) {
-                const status = getStatus(stateName);
-                if (status === "Partner") {
-                    return 'state-Partner';
-                }
-                if (status === "Prospective") {
-                    return 'state-Prospective';
-                }
-                return 'state-Default';
-            }
-            
+            // Clear previous map content
+            svg.selectAll("*").remove();
+
+            // Data from the provided snippet (using Sets/Object for categories)
+            const majorPartnerStates = new Set(['HI', 'TX', 'CO', 'PR', 'FL', 'NC', 'OH', 'NJ']);
+            const activeStates = new Set(['AL', 'AZ', 'CA', 'CO', 'FL', 'GA', 'IL', 'IN', 'KY', 'LA', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'NJ', 'NM', 'NY', 'NC', 'OH', 'PA', 'PR', 'SC', 'TN', 'TX', 'UT', 'VA', 'WA', 'WI', 'HI', 'ND', 'SD']);
+            const partnerData = {'HI': 'EPI: University of Hawaii, Maui', 'CA': 'WASTC', 'AZ': 'University of Arizona','NM': 'Eastern New Mexico University - Ruidoso', 'TX': 'EPI: El Paso Community College, Alamo College District','CO': 'University of Colorado, Colorado Springs', 'LA': 'Bossier Parish Community College','AL': 'University of Alabama, Huntsville', 'TN': 'Tennessee Tech University','FL': 'Florida Career Pathways Network, St. Pete Community College', 'NC': 'Fayetteville Technical Community College','KY': 'Southcentral Kentucky Community and Technical College', 'KS': 'Wichita State University, EnterpriseKC','MO': 'St. Louis Community College', 'IN': 'Ivy Tech Community College, Purdue Northwest University','MN': 'Metro State University', 'OH': 'Sinclair Community College','NJ': 'Brookdale Community College', 'WA': 'Whatcom Community College','ND': 'Minot State University', 'SD': 'Dakota State University','PR': 'EPI: Polytechnic University of Puerto Rico'};
+            const stateNameMap = {"Alabama":{"abbr":"AL"},"Alaska":{"abbr":"AK"},"Arizona":{"abbr":"AZ"},"Arkansas":{"abbr":"AR"},"California":{"abbr":"CA"},"Colorado":{"abbr":"CO"},"Connecticut":{"abbr":"CT"},"Delaware":{"abbr":"DE"},"District of Columbia":{"abbr":"DC"},"Florida":{"abbr":"FL"},"Georgia":{"abbr":"GA"},"Hawaii":{"abbr":"HI"},"Idaho":{"abbr":"ID"},"Illinois":{"abbr":"IL"},"Indiana":{"abbr":"IN"},"Iowa":{"abbr":"IA"},"Kansas":{"abbr":"KS"},"Kentucky":{"abbr":"KY"},"Louisiana":{"abbr":"LA"},"Maine":{"abbr":"ME"},"Maryland":{"abbr":"MD"},"Massachusetts":{"abbr":"MA"},"Michigan":{"abbr":"MI"},"Minnesota":{"abbr":"MN"},"Mississippi":{"abbr":"MS"},"Missouri":{"abbr":"MO"},"Montana":{"abbr":"MT"},"Nebraska":{"abbr":"NE"},"Nevada":{"abbr":"NV"},"New Hampshire":{"abbr":"NH"},"New Jersey":{"abbr":"NJ"},"New Mexico":{"abbr":"NM"},"New York":{"abbr":"NY"},"North Carolina":{"abbr":"NC"},"North Dakota":{"abbr":"ND"},"Ohio":{"abbr":"OH"},"Oklahoma":{"abbr":"OK"},"Oregon":{"abbr":"OR"},"Pennsylvania":{"abbr":"PA"},"Puerto Rico":{"abbr":"PR"},"Rhode Island":{"abbr":"RI"},"South Carolina":{"abbr":"SC"},"South Dakota":{"abbr":"SD"},"Tennessee":{"abbr":"TN"},"Texas":{"abbr":"TX"},"Utah":{"abbr":"UT"},"Vermont":{"abbr":"VT"},"Virginia":{"abbr":"VA"},"Washington":{"abbr":"WA"},"West Virginia":{"abbr":"WV"},"Wisconsin":{"abbr":"WI"},"Wyoming":{"abbr":"WY"}};
+
+            // Color function based on the provided logic
+            const getColor = (stateAbbr) => {
+                if (majorPartnerStates.has(stateAbbr)) return '#facc15'; /* Accent Yellow */
+                if (activeStates.has(stateAbbr)) return '#3b82f6'; /* Primary Blue */
+                return '#cbd5e1'; /* Gray */
+            };
+
+             // Color *class* function (more consistent with original approach, but uses new logic)
+            const getColorClass = (stateAbbr) => {
+                if (majorPartnerStates.has(stateAbbr)) return 'state-MajorPartner';
+                if (activeStates.has(stateAbbr)) return 'state-ActivePartner';
+                return 'state-NotEngaged';
+            };
+
+
             try {
                 // Fetch GeoJSON data
                 const us = await d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json");
@@ -1120,61 +1140,80 @@
                      container.html("<p>Error loading map data.</p>");
                      return;
                 }
-                
+
                 const states = topojson.feature(us, us.objects.states);
-                
+
                 // Use requestAnimationFrame to ensure container dimensions are stable
                 requestAnimationFrame(() => {
                     const bounds = container.node().getBoundingClientRect();
-                    // Give a small buffer (e.g., 20px) to prevent the map from touching the very edge
                     const mapWidth = bounds.width;
                     const mapHeight = bounds.height;
 
-                    if (mapWidth < 10 || mapHeight < 10) { 
+                    if (mapWidth < 10 || mapHeight < 10) {
                         console.warn("Map container has no dimensions after RAF. Retrying in 100ms.");
                         setTimeout(drawUSMap, 100);
                         return;
                     }
-                    
-                    // --- UPDATE ---
-                    // Use fitSize and apply a small padding to prevent clipping at the very edge,
-                    // but still maximize the map within the container.
+
+                    // 1. Use fitSize to get the correct scaling and translation for the container size
                     const projection = d3.geoAlbersUsa()
-                        .fitSize([mapWidth - 5, mapHeight - 5], states); // Reduced padding to 5px
-                    // --- END UPDATE ---
-                    
+                        .fitSize([mapWidth, mapHeight], states);
+
                     const path = d3.geoPath().projection(projection);
 
-                    svg.append("g")
+                    // 2. Calculate the actual bounds of the projected map features
+                    const [[x0, y0], [x1, y1]] = path.bounds(states);
+                    const projectedWidth = x1 - x0;
+                    const projectedHeight = y1 - y0;
+
+                    // 3. Set the SVG viewBox to these calculated bounds, effectively cropping the whitespace
+                    svg.attr("viewBox", `${x0} ${y0} ${projectedWidth} ${projectedHeight}`)
+                       .attr("preserveAspectRatio", "xMidYMid meet"); // Ensure scaling behaves correctly
+
+
+                    // 4. Draw the paths WITHOUT any additional group transform
+                    svg.append("g") // Append the group for paths
                         .selectAll("path")
                         .data(states.features)
                         .join("path")
-                        .attr("class", d => `state ${getColorClass(d.properties.name)}`)
                         .attr("d", path)
-                        .on("mouseover", (event, d) => {
-                            const stateName = d.properties.name;
-                            const status = getStatus(stateName); // "Partner", "Prospective", or undefined
-                            let tooltipHtml = `<strong>${stateName}</strong>`;
-                            if (status) { // Only show status if it exists
-                                tooltipHtml += `<br/>Status: ${status}`;
-                            }
-                            tooltip.style("opacity", 1)
-                                   .html(tooltipHtml);
+                        // Use class for styling consistency
+                        .attr("class", d => `state ${getColorClass(stateNameMap[d.properties.name]?.abbr)}`)
+                        // Set fill directly as a fallback or override if needed (optional)
+                        // .attr("fill", d => getColor(stateNameMap[d.properties.name]?.abbr))
+                        .on("mousemove", function(event, d) { // Use mousemove for positioning tooltip
+                            // Use pageX/pageY for tooltip relative to the whole page
+                            const x = event.pageX;
+                            const y = event.pageY;
+
+                            const stateAbbr = stateNameMap[d.properties.name]?.abbr;
+                            d3.select(this).attr('fill', '#60a5fa'); // Hover color from snippet
+
+                            mapTooltip.style("opacity", 1); // Use mapTooltip
+                            // Position relative to page, slightly offset
+                            mapTooltip.style("left", `${x + 15}px`);
+                            mapTooltip.style("top", `${y - 15}px`);
+
+                            let status = "Not Engaged"; // Default status
+                             if (majorPartnerStates.has(stateAbbr)) status = "Major Partner";
+                             else if (activeStates.has(stateAbbr)) status = "Active Partner";
+
+                            let partnerInfo = partnerData[stateAbbr] ? `<br><span class="font-bold text-yellow-300">Partner:</span> <span class="text-xs">${partnerData[stateAbbr]}</span>` : '';
+                            mapTooltip.html(`${d.properties.name}<br><span class="text-xs text-slate-300">${status}</span>${partnerInfo}`);
                         })
-                        .on("mousemove", (event) => {
-                             tooltip.style("left", (event.pageX + 10) + "px")
-                                    .style("top", (event.pageY - 28) + "px");
-                        })
-                        .on("mouseleave", () => {
-                            tooltip.style("opacity", 0);
+                        .on("mouseout", function(event, d) {
+                            // Reset fill using the original color logic
+                            d3.select(this).attr("fill", getColor(stateNameMap[d.properties.name]?.abbr));
+                            mapTooltip.style("opacity", 0); // Use mapTooltip
                         });
                 });
 
             } catch (error) {
-                console.error("Error drawing map:", error);
-                container.html("<p>Error loading map data.</p>");
+                console.error("Map Error:", error);
+                container.html(`<p class="text-center text-red-500">Could not load map data.</p>`);
             }
         }
+
 
     </script>
 </body>
