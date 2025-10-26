@@ -24,7 +24,6 @@
     ],
     "executiveSummary": [
       "The evolution of technology has profoundly shaped modern education, particularly in Science, Technology, Engineering, and Mathematics (STEM) programs. The Nation’s community colleges have a unique strength and ability to adopt and then incorporate emerging technologies in the teaching and learning process. Community colleges play a major role in developing the nations technical workforce.",
-      "This project leverage the unique ability of community colleges to form Inter-disciplinary Learning Communities (ILCs) as collaborative educational environments where students and faculty from different academic disciplines come together to explore common themes, issues, and emerging technologies from multiple and different perspectives.",
       "This project integrates AI into the curriculum of STEM programs, focusing on two key aspects:",
       "<strong>1. AI as a Tool for Problem - Solving and Innovation:</strong> Our team is developing curricula that teach students how to use AI tools to solve real-world problems in their chosen fields. By teaching students to use AI as a tool, our team empowers them to drive innovation in their chosen professions.",
       "<strong>2. AI Literacy Across Disciplines:</strong> Our team ensures that AI education is not confined to specialized programs but is integrated into all STEM disciplines. This approach is creating a workforce where every individual, regardless of their field, has the skills to leverage AI's potential. This broad-based AI literacy will be critical for the future economy, where AI is expected to play a role in nearly every industry."
@@ -92,7 +91,7 @@
     ]
   },
   "metrics": {
-     "overallProgress": 75,
+    "overallProgress": 75,
     "kpis": [
       {
         "title": "Workshops Delivered",
@@ -142,20 +141,20 @@
       }
     ],
     "mainChartData": [
-      { "category": "Communities", "value": 90 },
-      { "category": "Students", "value": 75 },
-      { "category": "Resources", "value": 85 },
-      { "category": "Else", "value": 50 }
+      { "category": "Goal 1", "value": 90 },
+      { "category": "Goal 2", "value": 75 },
+      { "category": "Goal 3", "value": 85 },
+      { "category": "Goal 4", "value": 50 }
     ],
     "accomplishments": [
       "Successfully established 8 inter-disciplinary learning communities across 5 partner institutions.",
-      "Launched the 'AI in STEM' faculty workshop series, training over 120 educators to date.",
-      "Developed and open-sourced 24 new AI-integrated instructional modules."
+      "Launched the 'AI Ready' faculty development series, training over 120 educators.",
+      "Developed and piloted 24 AI-integrated instructional modules in STEM courses."
     ]
   },
   "impact": {
     "impactKpis": [
-      {
+       {
         "title": "Student Completions",
         "value": 193,
         "growth": "+360%",
@@ -187,33 +186,41 @@
       "Texas": "Partner",
       "Illinois": "Prospective"
     },
+    "partnerDetails": {
+        "Florida": "St. Petersburg Community College",
+        "Washington": "WhatCom Community College",
+        "Texas": "El Paso Community College",
+        "New York": "",
+        "Illinois": "Moraine Valley Community College"
+    },
     "topGrowthAreas": [
-      { "label": "Student Completions", "value": 360 },
-      { "label": "Student Engagements", "value": 300 },
-      { "label": "Work-Based Learning", "value": 85 },
-      { "label": "Virtual Labs", "value": 73 }
+       {"label": "Student Completions", "value": 360},
+       {"label": "Student Engagements", "value": 300},
+       {"label": "Work-Based Learning", "value": 85},
+       {"label": "Virtual Labs", "value": 73}
     ],
     "broaderImpact": [
-      "The broader impact of this proposal extends to workforce development and economic competitiveness. As AI continues to reshape industries and job markets, it is essential that the future workforce is equipped with the skills necessary to thrive in an AI-driven economy. The documentation and dissemination of best practices, processes, and outcomes from this project have a far-reaching impact on the broader educational community.",
+      "The broader impact of this proposal extends to workforce development and economic competitiveness. As AI continues to reshape industries and job markets, it is essential that the future workforce is equipped with the skills necessary to thrive in an AI-driven economy.",
+      "The documentation and dissemination of best practices, processes, and outcomes from this project have a far-reaching impact on the broader educational community.",
       "The ILC helps develop a comprehensive set of resources, including case studies, instructional materials, and policy recommendations, that will be shared with community colleges across the nation. These resources are providing valuable guidance for institutions seeking to replicate or adapt the projects approach to AI education."
     ]
   },
   "testimonials": {
     "quotes": [
-      {
-        "quote": "The AI integration modules have completely changed how I approach my data analysis projects. It's no longer just about running numbers, but about asking smarter questions.",
-        "author": "Student",
-        "title": "Data Science Program"
+       {
+        "quote": "This project fundamentally changed how I approach teaching computer science. Integrating AI isn't just about new tools; it's about preparing students for the future.",
+        "author": "Dr. Anya Sharma",
+        "title": "Professor of Computer Science"
       },
       {
-        "quote": "I was hesitant about AI, seeing it as a threat. The faculty workshop reframed it as a powerful assistant. I now use AI tools to automate grading and personalize student feedback.",
-        "author": "Faculty Member",
-        "title": "Manufacturing Technology"
+        "quote": "The inter-disciplinary workshops were fantastic. Collaborating with faculty from manufacturing and health sciences opened my eyes to new applications for AI.",
+        "author": "Mark Chen",
+        "title": "Instructor, Information Technology"
       },
-      {
-        "quote": "As an industry partner, I'm thrilled to see graduates who not only have the core skills but also understand how to apply AI. It makes them immediately valuable.",
-        "author": "Industry Partner",
-        "title": "Tech Advisory Board"
+       {
+        "quote": "Seeing students from different STEM fields work together on AI projects has been incredibly rewarding. This is the future of technical education.",
+        "author": "Prof. David Lee",
+        "title": "Automotive Technology Dept. Chair"
       }
     ]
   }
