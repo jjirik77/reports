@@ -76,6 +76,7 @@
             width: 100%;
             height: 100%; /* Ensure it fills parent */
             box-sizing: border-box;
+            overflow: hidden; /* Hide anything slightly outside the viewBox */
         }
         #map-svg {
             position: absolute;
@@ -83,10 +84,12 @@
             left: 0;
             width: 100%;
             height: 100%;
+            /* Ensure SVG scales nicely */
+            display: block; 
         }
         .state {
             stroke: #fff;
-            stroke-width: 0.5px;
+            stroke-width: 0.5px; /* Adjusted slightly */
             transition: fill 0.2s ease-in-out;
         }
         /* Colors from the provided code snippet */
@@ -316,8 +319,8 @@
 
                 <!-- New Map & Growth Chart Layout --><div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
-                    <!-- Map Card --><div class="card card-hover fade-in fade-in-delay-1 bg-white rounded-xl border border-slate-200 shadow-sm lg:col-span-3 flex flex-col p-6"> <!-- Added p-6 back -->
-                        <!-- Title outside map-container but inside card padding --><h3 class="text-lg font-bold pb-2 text-slate-800 flex items-center space-x-2">
+                    <!-- Map Card --><div class="card card-hover fade-in fade-in-delay-1 bg-white rounded-xl border border-slate-200 shadow-sm lg:col-span-3 flex flex-col p-6"> <!-- Standard card padding -->
+                        <!-- Title --><h3 class="text-lg font-bold pb-4 text-slate-800 flex items-center space-x-2"> <!-- Added bottom padding -->
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                             <span>National Program Reach</span>
                         </h3>
@@ -1100,10 +1103,9 @@
         }
 
         /**
-         * Draws the interactive US Map using the provided code structure.
+         * Draws the interactive US Map using the viewBox approach.
          */
         async function drawUSMap() {
-            // Select existing elements
             const container = d3.select("#map-container"); // Container div
             const svg = d3.select("#map-svg"); // SVG element
 
@@ -1153,13 +1155,22 @@
                         return;
                     }
 
-                    // Use fitSize to respect aspect ratio and fill container
+                    // 1. Use fitSize to get the correct scaling and translation
                     const projection = d3.geoAlbersUsa()
                         .fitSize([mapWidth, mapHeight], states);
 
                     const path = d3.geoPath().projection(projection);
 
-                    // Append paths directly to the SVG element
+                    // 2. Calculate the actual bounds of the projected map features
+                    const [[x0, y0], [x1, y1]] = path.bounds(states);
+                    const projectedWidth = x1 - x0;
+                    const projectedHeight = y1 - y0;
+
+                    // 3. Set the SVG viewBox to these calculated bounds
+                    svg.attr("viewBox", `${x0} ${y0} ${projectedWidth} ${projectedHeight}`)
+                       .attr("preserveAspectRatio", "xMidYMid meet"); // Ensure scaling behaves correctly
+
+                    // 4. Draw the paths WITHOUT any additional group transform
                     svg.append("g") // Append the group for paths
                         .selectAll("path")
                         .data(states.features)
@@ -1170,17 +1181,17 @@
                         // Set fill directly as a fallback or override if needed (optional)
                         // .attr("fill", d => getColor(stateNameMap[d.properties.name]?.abbr))
                         .on("mousemove", function(event, d) { // Use mousemove for positioning tooltip
-                            const containerRect = container.node().getBoundingClientRect();
-                            // Calculate position relative to the container for correct tooltip placement
-                            const x = event.clientX - containerRect.left;
-                            const y = event.clientY - containerRect.top;
+                            // Use pageX/pageY for tooltip relative to the whole page
+                            const x = event.pageX;
+                            const y = event.pageY;
 
                             const stateAbbr = stateNameMap[d.properties.name]?.abbr;
                             d3.select(this).attr('fill', '#60a5fa'); // Hover color from snippet
 
                             mapTooltip.style("opacity", 1); // Use mapTooltip
-                            mapTooltip.style("left", `${x + 15}px`); // Position relative to container
-                            mapTooltip.style("top", `${y}px`);
+                            // Position relative to page, slightly offset
+                            mapTooltip.style("left", `${x + 15}px`);
+                            mapTooltip.style("top", `${y - 15}px`);
 
                             let status = "Not Engaged"; // Default status
                              if (majorPartnerStates.has(stateAbbr)) status = "Major Partner";
