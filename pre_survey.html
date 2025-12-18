@@ -173,7 +173,6 @@
 
         <!-- Footer / Researcher Toggle -->
         <div class="mt-12 text-center text-sm text-gray-400">
-            <p>© 2024 University Workshop Series. All rights reserved.</p>
             <button onclick="toggleDashboard()" class="mt-4 text-xs text-gray-300 hover:text-gray-500 underline" id="toggle-dashboard-btn">
                 Researcher Login
             </button>
@@ -254,15 +253,26 @@
         let surveyData = [];
 
         try {
-            const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
-            if (!firebaseConfig.apiKey) throw new Error("Missing Config");
-            
+            // Your Firebase Configuration (Pasted from your request)
+            const firebaseConfig = {
+                apiKey: "AIzaSyB0qrIZiLX7AZO6-oYYgDF1gcKnrXjmd-Q",
+                authDomain: "ai-resistant-pre-survey.firebaseapp.com",
+                projectId: "ai-resistant-pre-survey",
+                storageBucket: "ai-resistant-pre-survey.firebasestorage.app",
+                messagingSenderId: "571842888974",
+                appId: "1:571842888974:web:c5dce3444a3048ac42035f",
+                measurementId: "G-VKDPJHNK18"
+            };
+
+            // Initialize Firebase
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
-            appId = window.__app_id || 'default-app-id';
+            
+            // Set a static App ID for consistent data storage on GitHub
+            appId = 'ai-resistant-survey'; 
 
-            // Start Auth if config succeeded
+            // Start Auth
             initAuth();
             
             // Listen for auth state
@@ -291,15 +301,13 @@
                     }
                 }, 3000);
 
-                if (typeof window.__initial_auth_token !== 'undefined' && window.__initial_auth_token) {
-                    await signInWithCustomToken(auth, window.__initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                // Use Anonymous auth for survey takers
+                await signInAnonymously(auth);
+                
                 clearTimeout(timeoutId);
             } catch (err) {
                 console.error("Auth Error:", err);
-                btnText.textContent = "Auth Error (Refresh)";
+                btnText.textContent = "Auth Error (Check Console)";
             }
         }
 
