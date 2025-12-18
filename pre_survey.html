@@ -181,18 +181,23 @@
 
         <!-- RESEARCHER DASHBOARD (Hidden by default) -->
         <div id="researcher-dashboard" class="hidden mt-12 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden fade-in">
-            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center flex-wrap gap-4">
                 <div>
                     <h2 class="text-lg font-semibold text-gray-800">Researcher Dashboard</h2>
                     <p class="text-sm text-gray-500">Live data view</p>
                 </div>
-                <div class="flex gap-3">
+                <div class="flex gap-2">
                     <button onclick="fetchData()" class="p-2 text-gray-500 hover:text-indigo-600 transition-colors" title="Refresh Data">
                         <i data-lucide="refresh-cw" class="w-5 h-5"></i>
                     </button>
-                    <button onclick="downloadCSV()" id="export-btn" disabled class="flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-white bg-gray-400 cursor-not-allowed transition-colors">
-                        <i data-lucide="download" class="w-4 h-4"></i>
-                        Export CSV
+                    <!-- Export Actions -->
+                    <button onclick="downloadCSV()" id="export-csv-btn" disabled class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-white bg-gray-400 cursor-not-allowed transition-colors">
+                        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                        CSV
+                    </button>
+                    <button onclick="downloadJSON()" id="export-json-btn" disabled class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-white bg-gray-400 cursor-not-allowed transition-colors">
+                        <i data-lucide="file-json" class="w-4 h-4"></i>
+                        JSON
                     </button>
                 </div>
             </div>
@@ -229,16 +234,6 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, query, orderBy, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Firebase Init ---
-        const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = window.__app_id || 'default-app-id';
-
-        let currentUser = null;
-        let surveyData = [];
-
         // --- DOM Elements ---
         const form = document.getElementById('survey-form');
         const submitBtn = document.getElementById('submit-btn');
@@ -249,31 +244,64 @@
         const dashboard = document.getElementById('researcher-dashboard');
         const toggleBtn = document.getElementById('toggle-dashboard-btn');
         const tableBody = document.getElementById('data-table-body');
-        const exportBtn = document.getElementById('export-btn');
+        const exportCsvBtn = document.getElementById('export-csv-btn');
+        const exportJsonBtn = document.getElementById('export-json-btn');
         const recordCount = document.getElementById('record-count');
+
+        // --- Firebase Init ---
+        let app, auth, db, appId;
+        let currentUser = null;
+        let surveyData = [];
+
+        try {
+            const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
+            if (!firebaseConfig.apiKey) throw new Error("Missing Config");
+            
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            appId = window.__app_id || 'default-app-id';
+
+            // Start Auth if config succeeded
+            initAuth();
+            
+            // Listen for auth state
+            onAuthStateChanged(auth, (user) => {
+                currentUser = user;
+                if (user) {
+                    submitBtn.disabled = false;
+                    btnText.textContent = "Submit Survey";
+                    console.log("User authenticated:", user.uid);
+                }
+            });
+
+        } catch (error) {
+            console.error("Initialization Error:", error);
+            btnText.textContent = "Config Error";
+        }
 
         // --- Auth Logic ---
         async function initAuth() {
+            if (!auth) return;
             try {
+                // Feedback if it takes too long
+                const timeoutId = setTimeout(() => {
+                    if (btnText && btnText.textContent === "Initializing...") {
+                        btnText.textContent = "Connecting...";
+                    }
+                }, 3000);
+
                 if (typeof window.__initial_auth_token !== 'undefined' && window.__initial_auth_token) {
                     await signInWithCustomToken(auth, window.__initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
+                clearTimeout(timeoutId);
             } catch (err) {
                 console.error("Auth Error:", err);
-                btnText.textContent = "Auth Error";
+                btnText.textContent = "Auth Error (Refresh)";
             }
         }
-
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            if (user) {
-                submitBtn.disabled = false;
-                btnText.textContent = "Submit Survey";
-                console.log("User authenticated:", user.uid);
-            }
-        });
 
         // --- Form Logic ---
         
@@ -381,7 +409,7 @@
                 surveyData.sort((a, b) => b.submittedAtDate - a.submittedAtDate);
 
                 renderTable();
-                updateExportButton();
+                updateExportButtons();
             } catch (error) {
                 console.error("Error fetching data:", error);
                 tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-red-500">Error loading data.</td></tr>';
@@ -407,6 +435,8 @@
             
             recordCount.textContent = surveyData.length;
         }
+
+        // --- Export Functions ---
 
         window.downloadCSV = () => {
             if (surveyData.length === 0) return;
@@ -438,15 +468,36 @@
             document.body.removeChild(link);
         };
 
-        function updateExportButton() {
+        window.downloadJSON = () => {
+            if (surveyData.length === 0) return;
+            const jsonContent = JSON.stringify(surveyData, null, 2);
+            const blob = new Blob([jsonContent], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `survey_data_${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+        function updateExportButtons() {
             if (surveyData.length > 0) {
-                exportBtn.disabled = false;
-                exportBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
-                exportBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                // Enable CSV
+                exportCsvBtn.disabled = false;
+                exportCsvBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                exportCsvBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                
+                // Enable JSON
+                exportJsonBtn.disabled = false;
+                exportJsonBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                exportJsonBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
             } else {
-                exportBtn.disabled = true;
-                exportBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
-                exportBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                // Disable Both
+                [exportCsvBtn, exportJsonBtn].forEach(btn => {
+                    btn.disabled = true;
+                    btn.className = "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-white bg-gray-400 cursor-not-allowed transition-colors";
+                });
             }
         }
 
@@ -460,9 +511,6 @@
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
         }
-
-        // Start Auth
-        initAuth();
 
         // Icons
         lucide.createIcons();
