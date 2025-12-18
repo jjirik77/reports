@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI in Academia: Pre-Workshop Survey</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // Expose to window for the React app
+        window.firebaseModules = {
+            initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged,
+            getFirestore, collection, addDoc, getDocs, query, orderBy, Timestamp
+        };
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel" data-type="module">
+        const { useState, useEffect } = React;
+        
+        // --- Firebase Initialization ---
+        const { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged,
+                getFirestore, collection, addDoc, getDocs, query, orderBy, Timestamp } = window.firebaseModules;
+
+        const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = window.__app_id || 'default-app-id';
+
+        // --- Components ---
+
+        const Spinner = () => (
+            <svg className="animate-spin h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        );
+
+        const SuccessMessage = ({ onReset }) => (
+            <div className="text-center py-12 px-6 animate-fade-in">
+                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
+                    <i data-lucide="check" className="h-8 w-8 text-green-600"></i>
+                </div>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-2">Submission Received</h3>
+                <p className="text-gray-600 mb-8 max-w-md mx-auto">
+                    Thank you for contributing to our research. Your input helps us tailor the workshop to your specific needs.
+                </p>
+                <button 
+                    onClick={onReset}
+                    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 transition-colors"
+                >
+                    Submit Another Response
+                </button>
+            </div>
+        );
+
+        const ResearcherDashboard = ({ user }) => {
+            const [data, setData] = useState([]);
+            const [loading, setLoading] = useState(false);
+
+            const fetchData = async () => {
+                if (!user) return;
+                setLoading(true);
+                try {
+                    // Rule 2: Simple collection query, filter in memory
+                    const q = collection(db, 'artifacts', appId, 'public', 'data', 'survey_responses');
+                    const querySnapshot = await getDocs(q);
+                    const responses = querySnapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data(),
+                        // Convert Firestore timestamp to JS Date if present
+                        submittedAt: doc.data().submittedAt?.toDate().toLocaleString() || 'N/A'
+                    }));
+                    // Sort in memory
+                    responses.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+                    setData(responses);
+                } catch (error) {
+                    console.error("Error fetching data:", error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            useEffect(() => {
+                fetchData();
+            }, [user]);
+
+            const downloadCSV = () => {
+                if (data.length === 0) return;
+
+                const headers = ["Name", "Discipline", "Courses", "AI_Experience", "Challenges", "Goals", "Assignment_Text", "Submitted_At"];
+                const csvContent = [
+                    headers.join(","),
+                    ...data.map(row => {
+                        return headers.map(fieldName => {
+                            let value = row[fieldName] || "";
+                            // Escape quotes and wrap in quotes for CSV safety
+                            value = value.toString().replace(/"/g, '""');
+                            return `"${value}"`;
+                        }).join(",");
+                    })
+                ].join("\n");
+
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', `survey_export_${new Date().toISOString().slice(0,10)}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
+
+            return (
+                <div className="mt-12 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                    <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                        <div>
+                            <h2 className="text-lg font-semibold text-gray-800">Researcher Dashboard</h2>
+                            <p className="text-sm text-gray-500">View and analyze collected survey data</p>
+                        </div>
+                        <div className="flex gap-3">
+                            <button onClick={fetchData} className="p-2 text-gray-500 hover:text-indigo-600 transition-colors" title="Refresh Data">
+                                <i data-lucide="refresh-cw" className="w-5 h-5"></i>
+                            </button>
+                            <button 
+                                onClick={downloadCSV}
+                                disabled={data.length === 0}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-white transition-colors ${data.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
+                            >
+                                <i data-lucide="download" className="w-4 h-4"></i>
+                                Export CSV
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div className="overflow-x-auto">
+                        {loading ? (
+                            <div className="p-12 flex justify-center text-gray-400">Loading data...</div>
+                        ) : data.length === 0 ? (
+                            <div className="p-12 text-center text-gray-500">No submissions found yet.</div>
+                        ) : (
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dept</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Experience</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {data.map((row) => (
+                                        <tr key={row.id} className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{row.Name}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.Discipline}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.AI_Experience}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.submittedAt}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
+                    <div className="px-6 py-3 bg-gray-50 border-t border-gray-200 text-xs text-gray-400">
+                        Showing {data.length} records from Firestore
+                    </div>
+                </div>
+            );
+        };
+
+        const SurveyForm = () => {
+            const [user, setUser] = useState(null);
+            const [status, setStatus] = useState('idle'); // idle, submitting, success, error
+            const [showResearcher, setShowResearcher] = useState(false);
+            
+            const [formData, setFormData] = useState({
+                Name: '',
+                Discipline: '',
+                Courses: '',
+                AI_Experience: '',
+                Challenges: '',
+                Goals: '',
+                Assignment_Text: ''
+            });
+
+            // Auth Effect
+            useEffect(() => {
+                const initAuth = async () => {
+                    // Rule 3: Auth First
+                    try {
+                        if (typeof window.__initial_auth_token !== 'undefined' && window.__initial_auth_token) {
+                            await signInWithCustomToken(auth, window.__initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (err) {
+                        console.error("Auth failed:", err);
+                    }
+                };
+                initAuth();
+                
+                const unsubscribe = onAuthStateChanged(auth, (u) => {
+                    setUser(u);
+                    if (u) {
+                        // Initialize icons when UI loads
+                        setTimeout(() => lucide.createIcons(), 100);
+                    }
+                });
+                return () => unsubscribe();
+            }, []);
+
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({ ...prev, [name]: value }));
+            };
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                if (!user) return;
+                
+                setStatus('submitting');
+                
+                try {
+                    // Rule 1: Correct Path
+                    const collectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'survey_responses');
+                    
+                    await addDoc(collectionRef, {
+                        ...formData,
+                        submittedAt: Timestamp.now(),
+                        userId: user.uid
+                    });
+                    
+                    setStatus('success');
+                    window.scrollTo(0, 0);
+                } catch (error) {
+                    console.error("Submission error:", error);
+                    setStatus('error');
+                }
+            };
+
+            const resetForm = () => {
+                setFormData({
+                    Name: '',
+                    Discipline: '',
+                    Courses: '',
+                    AI_Experience: '',
+                    Challenges: '',
+                    Goals: '',
+                    Assignment_Text: ''
+                });
+                setStatus('idle');
+            };
+
+            if (status === 'success') {
+                return <SuccessMessage onReset={resetForm} />;
+            }
+
+            return (
+                <div className="max-w-4xl mx-auto pb-12">
+                    {/* Header */}
+                    <div className="text-center py-12">
+                        <h1 className="text-4xl font-bold text-slate-800 tracking-tight mb-4">
+                            AI in the Classroom
+                        </h1>
+                        <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                            Pre-Workshop Survey
+                        </p>
+                        <p className="text-sm text-slate-400 mt-2">Estimated time: 10-15 minutes</p>
+                    </div>
+
+                    {/* Form Card */}
+                    <div className="glass-panel rounded-2xl shadow-xl overflow-hidden relative">
+                        {/* Decorative Top Bar */}
+                        <div className="h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+
+                        <form onSubmit={handleSubmit} className="p-8 md:p-12 space-y-10">
+                            
+                            {/* Section 1: Demographics */}
+                            <section>
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="bg-indigo-100 p-2 rounded-lg">
+                                        <i data-lucide="user" className="w-6 h-6 text-indigo-600"></i>
+                                    </div>
+                                    <h2 className="text-xl font-semibold text-gray-800">About You</h2>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                                        <input 
+                                            required
+                                            type="text" 
+                                            name="Name"
+                                            value={formData.Name}
+                                            onChange={handleChange}
+                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/50"
+                                            placeholder="Dr. Jane Doe"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Discipline / Department</label>
+                                        <input 
+                                            required
+                                            type="text" 
+                                            name="Discipline"
+                                            value={formData.Discipline}
+                                            onChange={handleChange}
+                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/50"
+                                            placeholder="e.g., Biology, English Lit"
+                                        />
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Courses Currently Taught</label>
+                                        <textarea 
+                                            required
+                                            rows="2"
+                                            name="Courses"
+                                            value={formData.Courses}
+                                            onChange={handleChange}
+                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/50"
+                                            placeholder="List the main courses you are teaching this semester..."
+                                        ></textarea>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <hr className="border-gray-200" />
+
+                            {/* Section 2: AI Experience */}
+                            <section>
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="bg-purple-100 p-2 rounded-lg">
+                                        <i data-lucide="cpu" className="w-6 h-6 text-purple-600"></i>
+                                    </div>
+                                    <h2 className="text-xl font-semibold text-gray-800">AI Experience</h2>
+                                </div>
+                                
+                                <div className="space-y-4">
+                                    <label className="block text-sm font-medium text-gray-700">How would you rate your experience with AI tools (ChatGPT, Claude, Gemini, etc.)?</label>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        {[
+                                            { val: "Novice", desc: "I've never used them or only tried once." },
+                                            { val: "Intermediate", desc: "I use them occasionally for basic tasks." },
+                                            { val: "Advanced", desc: "I use them regularly and understand prompts." }
+                                        ].map((option) => (
+                                            <label key={option.val} className={`
+                                                relative border-2 rounded-xl p-4 cursor-pointer transition-all hover:bg-gray-50
+                                                ${formData.AI_Experience === option.val ? 'border-indigo-600 bg-indigo-50' : 'border-gray-200'}
+                                            `}>
+                                                <input 
+                                                    type="radio" 
+                                                    name="AI_Experience" 
+                                                    value={option.val} 
+                                                    checked={formData.AI_Experience === option.val}
+                                                    onChange={handleChange}
+                                                    className="absolute opacity-0 w-full h-full top-0 left-0 cursor-pointer" 
+                                                />
+                                                <div className="font-semibold text-gray-900 mb-1">{option.val}</div>
+                                                <div className="text-xs text-gray-500">{option.desc}</div>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                            </section>
+
+                            <hr className="border-gray-200" />
+
+                            {/* Section 3: Goals & Challenges */}
+                            <section>
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="bg-pink-100 p-2 rounded-lg">
+                                        <i data-lucide="target" className="w-6 h-6 text-pink-600"></i>
+                                    </div>
+                                    <h2 className="text-xl font-semibold text-gray-800">Goals & Challenges</h2>
+                                </div>
+                                
+                                <div className="space-y-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">What is your biggest challenge or concern related to AI and student assignments?</label>
+                                        <textarea 
+                                            required
+                                            name="Challenges"
+                                            value={formData.Challenges}
+                                            onChange={handleChange}
+                                            rows="3"
+                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/50"
+                                            placeholder="e.g., Academic integrity, loss of critical thinking skills..."
+                                        ></textarea>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">What do you hope to accomplish in this workshop?</label>
+                                        <textarea 
+                                            required
+                                            name="Goals"
+                                            value={formData.Goals}
+                                            onChange={handleChange}
+                                            rows="3"
+                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/50"
+                                            placeholder="e.g., Learn how to design AI-resistant assignments..."
+                                        ></textarea>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <hr className="border-gray-200" />
+
+                            {/* Section 4: Assignment Upload */}
+                            <section>
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="bg-amber-100 p-2 rounded-lg">
+                                        <i data-lucide="file-text" className="w-6 h-6 text-amber-600"></i>
+                                    </div>
+                                    <h2 className="text-xl font-semibold text-gray-800">Assignment Upload</h2>
+                                </div>
+                                
+                                <div className="bg-amber-50 border border-amber-200 rounded-lg p-6">
+                                    <label className="block text-sm font-medium text-gray-800 mb-3">
+                                        Please provide the text of 1-2 assignments you would like to test.
+                                    </label>
+                                    <p className="text-xs text-gray-500 mb-4">
+                                        We recommend copy-pasting the text directly so it can be easily processed by AI tools during the workshop.
+                                    </p>
+                                    <textarea 
+                                        name="Assignment_Text"
+                                        value={formData.Assignment_Text}
+                                        onChange={handleChange}
+                                        rows="8"
+                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white font-mono text-sm"
+                                        placeholder="Paste assignment instructions here..."
+                                    ></textarea>
+                                </div>
+                            </section>
+
+                            {/* Footer Actions */}
+                            <div className="pt-6 flex justify-end">
+                                <button 
+                                    type="submit" 
+                                    disabled={!user || status === 'submitting'}
+                                    className="flex items-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-xl font-semibold shadow-lg hover:bg-slate-800 hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-1"
+                                >
+                                    {status === 'submitting' ? <Spinner /> : <i data-lucide="send" className="w-5 h-5"></i>}
+                                    {status === 'submitting' ? 'Submitting...' : 'Submit Survey'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    {/* Footer / Researcher Toggle */}
+                    <div className="mt-12 text-center text-sm text-gray-400">
+                        <p>© 2024 University Workshop Series. All rights reserved.</p>
+                        <button 
+                            onClick={() => setShowResearcher(!showResearcher)}
+                            className="mt-4 text-xs text-gray-300 hover:text-gray-500 underline"
+                        >
+                            {showResearcher ? "Hide Researcher Dashboard" : "Researcher Login"}
+                        </button>
+                    </div>
+
+                    {/* Researcher Dashboard (Conditional Render) */}
+                    {showResearcher && <ResearcherDashboard user={user} />}
+                    
+                </div>
+            );
+        };
+
+        const App = () => {
+            return <SurveyForm />;
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
