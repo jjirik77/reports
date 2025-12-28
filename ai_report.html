@@ -11,13 +11,13 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc; /* Lighter gray background */
+            background-color: #f8fafc;
         }
         .card {
             background-color: white;
             transition: transform 0.4s ease-out, box-shadow 0.4s ease-out;
             border: 1px solid #e2e8f0;
-            border-radius: 1rem; /* Consistent rounded corners */
+            border-radius: 1rem;
         }
         .card:hover {
             transform: translateY(-5px);
@@ -59,9 +59,6 @@
         .fade-in-delay-4 { animation-delay: 0.4s; }
         .fade-in-delay-5 { animation-delay: 0.5s; }
         .fade-in-delay-6 { animation-delay: 0.6s; }
-        .fade-in-delay-7 { animation-delay: 0.7s; }
-        .fade-in-delay-8 { animation-delay: 0.8s; }
-        .fade-in-delay-9 { animation-delay: 0.9s; }
         
         .nav-button {
             display: flex;
@@ -91,6 +88,7 @@
     <div class="flex flex-col md:flex-row min-h-screen">
         <!-- Left Side Navigation -->
         <nav class="md:w-64 bg-slate-900 text-white px-4 py-6 space-y-2 flex-shrink-0 flex flex-col">
+            <!-- pt-40 aligns the top of the menu with the main content headline -->
             <div class="flex-grow pt-40">
                 <button class="nav-button active" data-target="overview">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
@@ -174,25 +172,26 @@
                         <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">Participant Dashboard</h2>
                         <p class="mt-2 text-xl text-slate-500">A snapshot of our diverse group of attendees.</p>
                     </header>
+                    <!-- 5 Column grid for the statistics -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-8 mb-12">
                         <div class="card p-4 sm:p-6 text-center border-t-4 border-blue-600 fade-in fade-in-delay-1 flex flex-col">
-                            <h3 class="h-10 flex items-center justify-center font-semibold text-slate-500 uppercase text-xs tracking-wider">Total Participants</h3>
-                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-extrabold text-blue-600" data-target="703">0</p>
+                            <h3 class="h-12 flex items-center justify-center font-semibold text-slate-500 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">Total Participants</h3>
+                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-extrabold text-blue-600" data-target="797">0</p>
                         </div>
                         <div class="card p-4 sm:p-6 text-center border-t-4 border-blue-600 fade-in fade-in-delay-2 flex flex-col">
-                            <h3 class="h-10 flex items-center justify-center font-semibold text-slate-500 uppercase text-xs tracking-wider">Institutions</h3>
-                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-extrabold text-blue-600" data-target="92">0</p>
+                            <h3 class="h-12 flex items-center justify-center font-semibold text-slate-500 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">Institutions</h3>
+                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-extrabold text-blue-600" data-target="95">0</p>
                         </div>
                         <div class="card p-4 sm:p-6 text-center border-t-4 border-blue-600 fade-in fade-in-delay-3 flex flex-col">
-                            <h3 class="h-10 flex items-center justify-center font-semibold text-slate-500 uppercase text-xs tracking-wider">States & Territories</h3>
-                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-extrabold text-blue-600" data-target="17">0</p>
+                            <h3 class="h-12 flex items-center justify-center font-semibold text-slate-500 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">States & Territories</h3>
+                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-extrabold text-blue-600" data-target="18">0</p>
                         </div>
                         <div class="card p-4 sm:p-6 text-center border-t-4 border-blue-600 fade-in fade-in-delay-4 flex flex-col">
-                            <h3 class="h-10 flex items-center justify-center font-semibold text-slate-500 uppercase text-xs tracking-wider">International & Online</h3>
+                            <h3 class="h-12 flex items-center justify-center font-semibold text-slate-500 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">International & Online</h3>
                             <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-extrabold text-blue-600" data-target="64">0</p>
                         </div>
                         <div class="card p-4 sm:p-6 text-center border-t-4 border-teal-500 fade-in fade-in-delay-5 flex flex-col">
-                            <h3 class="h-10 flex items-center justify-center font-semibold text-slate-500 uppercase text-xs tracking-wider">Estimated Student Impact</h3>
+                            <h3 class="h-12 flex items-center justify-center font-semibold text-slate-500 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">Estimated Student Impact</h3>
                             <p class="text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-extrabold text-teal-600">~100k</p>
                         </div>
                     </div>
@@ -250,16 +249,16 @@
         
         // --- DATA ---
         const participantData = {
-            total: 703,
-            institutions: 92,
-            states: 17,
+            total: 797,
+            institutions: 95,
+            states: 18,
             onlineAndIntl: 64,
             studentImpact: 100000,
-            activeStates: new Set(['AL', 'AZ', 'CO', 'FL', 'HI', 'IL', 'IN', 'LA', 'MD', 'MN', 'NC', 'NJ', 'NY', 'OH', 'PR', 'TX', 'WA']),
+            activeStates: new Set(['AL', 'AZ', 'CO', 'FL', 'HI', 'IL', 'IN', 'LA', 'MD', 'MN', 'NC', 'NJ', 'NY', 'OH', 'PR', 'TX', 'WA', 'CA']),
             attendeeData: {
-                'AL': 24, 'AZ': 30, 'CO': 36, 'FL': 58, 'HI': 16, 'IL': 41, 'IN': 42, 
+                'AL': 24, 'AZ': 30, 'CO': 36, 'FL': 91, 'HI': 16, 'IL': 75, 'IN': 42, 
                 'LA': 17, 'MD': 18, 'MN': 35, 'NC': 32, 'NJ': 38, 'NY': 43, 'OH': 51, 
-                'PR': 67, 'TX': 47, 'WA': 44
+                'PR': 67, 'TX': 47, 'WA': 44, 'CA': 27
             }
         };
 
