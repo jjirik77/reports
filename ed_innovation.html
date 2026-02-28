@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybersecurity Education Innovation</title>
+    <!-- Frameworks & Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/topojson@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .main-content-section { display: none; }
+        .main-content-section.active { display: block; }
+
+        .card {
+            background: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #f1f5f9;
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            border-color: #3b82f6;
+        }
+
+        .nav-button {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            color: #94a3b8;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .nav-button:hover {
+            background: #1e293b;
+            color: white;
+        }
+        .nav-button.active {
+            background: #2563eb;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.4);
+        }
+
+        #map-tooltip {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.95);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 100;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Modal Styles */
+        #objective-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #objective-modal.active { display: flex; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f8fafc; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .pulse-active { animation: pulse-slow 2s infinite; }
+    </style>
+</head>
+<body class="bg-[#fcfdfe] text-slate-900">
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <!-- Sidebar -->
+        <aside class="md:w-72 bg-slate-900 text-white p-6 flex-shrink-0 flex flex-col sticky top-0 h-screen overflow-y-auto">
+            <div class="mb-10 mt-2">
+                <div class="flex items-center space-x-3 text-blue-500 mb-1">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    <span class="text-2xl font-extrabold tracking-tighter text-white">EPNC</span>
+                </div>
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Midwest Cybersecurity Hub</p>
+            </div>
+
+            <nav class="flex-grow space-y-2">
+                <button class="nav-button active" data-target="overview">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    Executive Summary
+                </button>
+                <button class="nav-button" data-target="pillars">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    Strategic Objectives
+                </button>
+                <button class="nav-button" data-target="state-analysis">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                    Impact
+                </button>
+                <button class="nav-button" data-target="deliverables">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    Resources & Links
+                </button>
+            </nav>
+
+            <div class="mt-auto pt-6 border-t border-slate-800">
+                <div class="bg-blue-600/10 rounded-xl p-4 border border-blue-500/20">
+                    <p class="text-[10px] text-blue-400 font-bold uppercase mb-1">Grant Period</p>
+                    <p class="text-sm font-semibold text-white">2021 - 2025</p>
+                    <div class="w-full bg-slate-700 h-1.5 rounded-full mt-3 overflow-hidden">
+                        <div class="bg-blue-500 h-full w-[100%]"></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Content -->
+        <main class="flex-1 overflow-x-hidden">
+            <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30 px-8 py-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-xl font-bold text-slate-900" id="current-section-title">Cybersecurity Education Innovation</h1>
+                        <p class="text-xs text-slate-500 font-medium">Moraine Valley Community College</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded-full border border-emerald-100 uppercase">Final Report</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="p-8 max-w-7xl mx-auto">
+                
+                <!-- 1. OVERVIEW -->
+                <section id="overview" class="main-content-section active space-y-10">
+                    <div class="max-w-5xl mx-auto space-y-10">
+                        <div class="card p-8 rounded-3xl relative overflow-hidden bg-white">
+                            <div class="absolute top-0 right-0 p-8 opacity-5">
+                                <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"></path></svg>
+                            </div>
+                            <h2 class="text-3xl font-black text-slate-900 mb-4 leading-tight">Project Summary</h2>
+                            <p class="text-slate-600 leading-relaxed text-lg mb-8">
+                                This initiative created comprehensive systems across four interconnected areas to build sustainable cybersecurity education pathways: high school pathways, articulation agreements, concurrent enrollment, and transfer programs.
+                            </p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="p-5 bg-blue-50 rounded-2xl border border-blue-100 objective-info-trigger" data-type="pathways">
+                                    <p class="font-bold text-blue-900 mb-1">High School Pathways</p>
+                                    <p class="text-xs text-blue-700">Standards-aligned curriculum for CS, IT, and Business.</p>
+                                </div>
+                                <div class="p-5 bg-indigo-50 rounded-2xl border border-indigo-100 objective-info-trigger" data-type="articulation">
+                                    <p class="font-bold text-indigo-900 mb-1">Articulation Agreements</p>
+                                    <p class="text-xs text-indigo-700">Seamless transitions between community colleges and 4-year institutions.</p>
+                                </div>
+                                <div class="p-5 bg-emerald-50 rounded-2xl border border-emerald-100 objective-info-trigger" data-type="concurrent">
+                                    <p class="font-bold text-emerald-900 mb-1">Concurrent Enrollment</p>
+                                    <p class="text-xs text-emerald-700">Accelerated early college credit accumulation for secondary students.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 px-2">Engaged Midwest States & Host Institutions</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                                <!-- IL -->
+                                <div class="card p-4 rounded-2xl border-l-4 border-l-blue-500">
+                                    <p class="text-xs font-bold text-slate-400">IL</p>
+                                    <p class="font-bold text-slate-900 text-sm">Rock Valley College</p>
+                                </div>
+                                <!-- IN -->
+                                <div class="card p-4 rounded-2xl border-l-4 border-l-blue-500">
+                                    <p class="text-xs font-bold text-slate-400">IN</p>
+                                    <p class="font-bold text-slate-900 text-sm">Ivy Tech CC</p>
+                                </div>
+                                <!-- IA -->
+                                <div class="card p-4 rounded-2xl border-l-4 border-l-blue-500">
+                                    <p class="text-xs font-bold text-slate-400">IA</p>
+                                    <p class="font-bold text-slate-900 text-sm">Iowa State Univ.</p>
+                                </div>
+                                <!-- KS -->
+                                <div class="card p-4 rounded-2xl border-l-4 border-l-blue-500">
+                                    <p class="text-xs font-bold text-slate-400">KS</p>
+                                    <p class="font-bold text-slate-900 text-sm">Johnson County CC</p>
+                                </div>
+                                <!-- MI -->
+                                <div class="card p-4 rounded-2xl border-l-4 border-l-blue-500">
+                                    <p class="text-xs font-bold text-slate-400">MI</p>
+                                    <p class="font-bold text-slate-900 text-sm">Henry Ford College</p>
+                                </div>
+                                <!-- MN -->
+                                <div class="card p-4 rounded-2xl border-l-4 border-l-blue-500">
+                                    <p class="text-xs font-bold text-slate-400">MN</p>
+                                    <p class="font-bold text-slate-900 text-sm">Metropolitan State</p>
+                                </div>
+                                <!-- MO -->
+                                <div class="card p-4 rounded-2xl border-l-4 border-l-blue-500">
+                                    <p class="text-xs font-bold text-slate-400">MO</p>
+                                    <p class="font-bold text-slate-900 text-sm">SE Missouri State</p>
+                                </div>
+                                <!-- NE -->
+                                <div class="card p-4 rounded-2xl border-l-4 border-l-blue-500">
+                                    <p class="text-xs font-bold text-slate-400">NE</p>
+                                    <p class="font-bold text-slate-900 text-sm">Bellevue University</p>
+                                </div>
+                                <!-- OH -->
+                                <div class="card p-4 rounded-2xl border-l-4 border-l-blue-500">
+                                    <p class="text-xs font-bold text-slate-400">OH</p>
+                                    <p class="font-bold text-slate-900 text-sm">Sinclair College</p>
+                                </div>
+                                <!-- WI -->
+                                <div class="card p-4 rounded-2xl border-l-4 border-l-blue-500">
+                                    <p class="text-xs font-bold text-slate-400">WI</p>
+                                    <p class="font-bold text-slate-900 text-sm">Madison Area Tech</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. STRATEGIC OBJECTIVES -->
+                <section id="pillars" class="main-content-section space-y-8">
+                    <div class="mb-10">
+                        <h2 class="text-3xl font-black text-slate-900">Strategic Objectives</h2>
+                        <p class="text-slate-500">Click each objective to explore designated tasks and assessment measures.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Objective 1 -->
+                        <div class="card p-6 rounded-3xl border-t-4 border-t-blue-500 objective-card" data-obj="1">
+                            <span class="text-[10px] font-black text-blue-500 uppercase">Objective 1</span>
+                            <h3 class="text-lg font-bold mt-2 mb-3">High School Pathways</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">Developing and disseminating formal frameworks for high school study tracks.</p>
+                        </div>
+                        <!-- Objective 2 -->
+                        <div class="card p-6 rounded-3xl border-t-4 border-t-indigo-500 objective-card" data-obj="2">
+                            <span class="text-[10px] font-black text-indigo-500 uppercase">Objective 2</span>
+                            <h3 class="text-lg font-bold mt-2 mb-3">NCAE-C Articulation</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">Promoting documentation between community colleges and 4-year institutions.</p>
+                        </div>
+                        <!-- Objective 3 -->
+                        <div class="card p-6 rounded-3xl border-t-4 border-t-emerald-500 objective-card" data-obj="3">
+                            <span class="text-[10px] font-black text-emerald-500 uppercase">Objective 3</span>
+                            <h3 class="text-lg font-bold mt-2 mb-3">K-12 Articulation</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">Enabling early credit accumulation through school district agreements.</p>
+                        </div>
+                        <!-- Objective 4 -->
+                        <div class="card p-6 rounded-3xl border-t-4 border-t-orange-500 objective-card" data-obj="4">
+                            <span class="text-[10px] font-black text-orange-500 uppercase">Objective 4</span>
+                            <h3 class="text-lg font-bold mt-2 mb-3">Concurrent Enrollment</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">Cataloging and analyzing successful models across the Chicago area and Midwest.</p>
+                        </div>
+                        <!-- Objective 5 -->
+                        <div class="card p-6 rounded-3xl border-t-4 border-t-purple-500 objective-card" data-obj="5">
+                            <span class="text-[10px] font-black text-purple-500 uppercase">Objective 5</span>
+                            <h3 class="text-lg font-bold mt-2 mb-3">RING Model Lessons</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">Integrating RING curriculum with NCAE-C program competencies.</p>
+                        </div>
+                        <!-- Objective 6 -->
+                        <div class="card p-6 rounded-3xl border-t-4 border-t-pink-500 objective-card" data-obj="6">
+                            <span class="text-[10px] font-black text-pink-500 uppercase">Objective 6</span>
+                            <h3 class="text-lg font-bold mt-2 mb-3">Competency Alignment</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">Promoting adoption of program-level standards across all educational levels.</p>
+                        </div>
+                    </div>
+
+                    <div class="card p-8 rounded-3xl mt-10 overflow-hidden relative">
+                        <div class="flex flex-col md:flex-row items-center gap-12">
+                            <div class="md:w-1/2 space-y-6">
+                                <span class="px-4 py-1.5 bg-blue-600 text-white text-[10px] font-black rounded-full uppercase">National Center</span>
+                                <h2 class="text-4xl font-black text-slate-900 leading-tight">EPNC Stewardship</h2>
+                                <p class="text-slate-600 text-lg">Lead for the Education Pathway National Center (EPNC), coordinating across all CAE Regional Hubs.</p>
+                            </div>
+                            <div class="md:w-1/2 grid grid-cols-2 gap-4">
+                                <div class="p-6 bg-slate-50 rounded-2xl text-center">
+                                    <p class="text-4xl font-black text-blue-600">170</p>
+                                    <p class="text-xs font-bold text-slate-500 uppercase mt-2">Lesson Plan Hours</p>
+                                </div>
+                                <div class="p-6 bg-slate-50 rounded-2xl text-center">
+                                    <p class="text-4xl font-black text-blue-600">143+</p>
+                                    <p class="text-xs font-bold text-slate-500 uppercase mt-2">EMATES Activities</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. IMPACT (MAP) -->
+                <section id="state-analysis" class="main-content-section space-y-8">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-3xl font-black text-slate-900">Impact</h2>
+                            <p class="text-slate-500">Interactive analysis of statewide course tracking and institutional participation.</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <span class="flex items-center text-xs font-bold text-slate-600"><span class="w-3 h-3 bg-blue-600 rounded-full mr-1.5"></span> Project Hub</span>
+                            <span class="flex items-center text-xs font-bold text-slate-600"><span class="w-3 h-3 bg-slate-200 rounded-full mr-1.5"></span> Partner Reach</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                        <div class="lg:col-span-3 card rounded-3xl p-6 relative bg-white h-[600px] flex items-center justify-center overflow-hidden">
+                            <div id="map-container" class="w-full h-full"></div>
+                            <div id="map-tooltip"></div>
+                        </div>
+
+                        <div class="space-y-6" id="state-detail-panel">
+                            <div class="card p-6 rounded-2xl bg-blue-50 border-blue-100 flex items-center justify-center h-full text-center">
+                                <div>
+                                    <svg class="w-12 h-12 text-blue-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
+                                    <p class="text-blue-900 font-bold">Select a state on the map</p>
+                                    <p class="text-sm text-blue-700 mt-1">Click a state to see enrollment data and host details.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. DELIVERABLES -->
+                <section id="deliverables" class="main-content-section space-y-12">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-6">
+                            <h3 class="text-2xl font-black text-slate-900">Interactive Resources</h3>
+                            <p class="text-slate-600">Direct access to curriculum, exploration environments, and guidance toolkits.</p>
+                            
+                            <div class="space-y-4">
+                                <a href="https://myemates.org" target="_blank" class="card p-5 rounded-2xl flex items-center justify-between group hover:bg-slate-900 transition-colors">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-10 h-10 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center font-bold group-hover:bg-orange-500 group-hover:text-white">EM</div>
+                                        <div>
+                                            <p class="font-bold group-hover:text-white">EMATES Repository</p>
+                                            <p class="text-xs text-slate-400">143+ interactive activities</p>
+                                        </div>
+                                    </div>
+                                    <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                </a>
+                                <a href="https://caeepnc.org/ring/" target="_blank" class="card p-5 rounded-2xl flex items-center justify-between group hover:bg-slate-900 transition-colors">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center font-bold group-hover:bg-purple-500 group-hover:text-white">RI</div>
+                                        <div>
+                                            <p class="font-bold group-hover:text-white">RING Curriculum</p>
+                                            <p class="text-xs text-slate-400">National Dissemination</p>
+                                        </div>
+                                    </div>
+                                    <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                </a>
+                                <a href="https://jjirik77.github.io/ccaei/toolkit.html" target="_blank" class="card p-5 rounded-2xl flex items-center justify-between group hover:bg-slate-900 transition-colors">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center font-bold group-hover:bg-emerald-500 group-hover:text-white">TK</div>
+                                        <div>
+                                            <p class="font-bold group-hover:text-white">Counselors Toolkit</p>
+                                            <p class="text-xs text-slate-400">Guidance Resources</p>
+                                        </div>
+                                    </div>
+                                    <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-slate-50 rounded-3xl p-8 border border-slate-100">
+                            <h3 class="text-2xl font-black text-slate-900 mb-6">Program Reach</h3>
+                            <div class="space-y-8">
+                                <div class="relative">
+                                    <div class="flex justify-between text-sm font-bold mb-2"><span>Midwest States Engaged</span><span>100%</span></div>
+                                    <div class="w-full bg-slate-200 h-2 rounded-full"><div class="bg-blue-600 h-full rounded-full w-[100%]"></div></div>
+                                </div>
+                                <div class="relative">
+                                    <div class="flex justify-between text-sm font-bold mb-2"><span>Pathway Adoption</span><span>High</span></div>
+                                    <div class="w-full bg-slate-200 h-2 rounded-full"><div class="bg-emerald-600 h-full rounded-full w-[92%]"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Objective Modal -->
+    <div id="objective-modal">
+        <div class="bg-white rounded-[2rem] w-full max-w-2xl max-h-[90vh] overflow-y-auto p-10 shadow-2xl relative">
+            <button id="close-modal" class="absolute top-6 right-6 text-slate-400 hover:text-slate-900">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div id="modal-content-area"></div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        // --- DATA FROM TECHNICAL REPORT ---
+        const statesData = {
+            'IL': { name: 'Illinois', host: 'Rock Valley College', coordinator: 'Stephanie Wascher', course: '10020A001 — Cybersecurity', schools: '142 High Schools/Career Centers', focus: 'Dual Credit, RAMPS' },
+            'IN': { name: 'Indiana', host: 'Ivy Tech Community College', coordinator: 'Jiri Jirik, Pam Schmelz', course: '5245 — Cybersecurity Capstone', schools: '200+ Active Programs', focus: 'NLPS Framework' },
+            'IA': { name: 'Iowa', host: 'Iowa State University', coordinator: 'Doug Jacobson, Ally Frickel', course: '10020 — Cybersecurity', enrollment: '42,896 Joint Enrollment', focus: 'Rural Access' },
+            'KS': { name: 'Kansas', host: 'Johnson County Community College', coordinator: 'Andrew Lutz', course: '10020 (Cyber I), 10900 (Cyber II)', schools: '84 High Schools', focus: 'Workforce Alignment' },
+            'MI': { name: 'Michigan', host: 'Henry Ford College', coordinator: 'Marrci Conner', course: 'CIP 11.1003 — Computer & Info Security', enrollment: '6,948 IT students', focus: 'K-12 Partnerships' },
+            'MN': { name: 'Minnesota', host: 'Metropolitan State University', coordinator: 'Faisal Kaleem', course: '10020 or 10015 — Cybersecurity', schools: '42 High Schools, 6 Centers', focus: 'Diverse Access' },
+            'MO': { name: 'Missouri', host: 'Southeast Missouri State University', coordinator: 'Mario Garcia', course: '034402 — Cybersecurity', enrollment: '310k+ CTE students', focus: 'Science Credit (HB 1576)' },
+            'NE': { name: 'Nebraska', host: 'Bellevue University', coordinator: 'Doug Rausch', course: '270707 — Cybersecurity', schools: '34 High Schools', focus: 'Rural underserved' },
+            'OH': { name: 'Ohio', host: 'Sinclair College', coordinator: 'Kyle Jones, Eric Renegar', course: '146005 (CTE), 290200 (Non-CTE)', schools: '185-210 Buildings', focus: 'Virtual Labs' },
+            'WI': { name: 'Wisconsin', host: 'Madison Area Technical College', coordinator: 'Ken McCullough', course: '10020 — Cybersecurity', schools: '140-160 High Schools', focus: 'Statewide Frameworks' }
+        };
+
+        const objectiveData = {
+            '1': { title: "High School Cybersecurity Pathways", tasks: ["1A: Create comprehensive formal frameworks encompassing CS, IT, Business, and dedicated Cybersecurity.", "1B: Document successful pathway models aligned with NCAE-C requirements.", "1C: Disseminate frameworks through state and regional educational networks."], measures: ["Completion of framework documentation", "Adoption rates among regional institutions", "Integration into state CTE pathways"] },
+            '2': { title: "NCAE-C Articulation Agreements", tasks: ["2A: Systematically identify and document existing agreements between CCs and 4-year institutions.", "2B: Facilitate new articulation agreement development to expand transfer pathways.", "2C: Create a comprehensive publicly accessible directory."], measures: ["Number of agreements documented", "New agreements established", "Student utilization of documented pathways"] },
+            '3': { title: "K-12 Articulation Agreements", tasks: ["3A: Document existing agreements enabling early credit.", "3B: Support development of new district-to-college agreements.", "3C: Establish best practices for implementation and maintenance."], measures: ["Number of K-12 agreements documented", "Student participation in early credit programs", "Sustainability plans for partnerships"] },
+            '4': { title: "Concurrent Enrollment Programs", tasks: ["4A: Catalog existing concurrent programs across the region.", "4B: Analyze successful models for scalable approaches.", "4C: Develop implementation guides for new programs."], measures: ["Cataloged regional programs", "Student enrollment in cybersecurity dual-credit", "Faculty development participation rates"] },
+            '5': { title: "RING Curriculum Lesson Plans", tasks: ["5A: Develop model lesson plans integrating RING with NCAE-C competencies.", "5B: Create implementation frameworks for K-12 educator adoption.", "5C: Disseminate through regional meetings and online repositories."], measures: ["Number of lesson plans developed", "Educator adoption rates", "Alignment with NCAE-C knowledge units"] },
+            '6': { title: "Competency Adoption", tasks: ["6A: Develop strategic implementation roadmaps for K-12 and College levels.", "6B: Conduct faculty development workshops to promote competency adoption.", "6C: Create assessment tools to measure program-level integration."], measures: ["Institutions adopting competency frameworks", "Faculty workshop participation", "Program alignment with national standards"] }
+        };
+
+        const interactionData = {
+            'pathways': { title: "Pathway Details", content: "The frameworks prioritize flexibility for state requirements while maintaining NCAE-C knowledge unit alignment. Tracks include: Secure coding (CS), System Admin (IT), and Governance (Business)." },
+            'articulation': { title: "Articulation Progress", content: "Documentation revealed significant variation in agreement structures. The goal is standardized, competency-based assessments to facilitate seamless credit transfer." },
+            'concurrent': { title: "Concurrent Success", content: "Key success drivers identified include sustained communication between HS and college faculty, and clear articulation of rigor levels." }
+        };
+
+        const midwestStates = new Set(Object.keys(statesData));
+
+        // --- NAVIGATION LOGIC ---
+        const navButtons = document.querySelectorAll('.nav-button');
+        const sections = document.querySelectorAll('.main-content-section');
+        const titleEl = document.getElementById('current-section-title');
+
+        navButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.dataset.target;
+                navButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                sections.forEach(s => {
+                    s.classList.remove('active');
+                    if (s.id === target) s.classList.add('active');
+                });
+                titleEl.innerText = btn.innerText;
+                if (target === 'state-analysis') setTimeout(drawMap, 100);
+            });
+        });
+
+        // --- MODAL LOGIC ---
+        const modal = document.getElementById('objective-modal');
+        const modalContent = document.getElementById('modal-content-area');
+        
+        document.querySelectorAll('.objective-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const id = card.dataset.obj;
+                const d = objectiveData[id];
+                modalContent.innerHTML = `
+                    <h2 class="text-2xl font-black text-slate-900 mb-6">${d.title}</h2>
+                    <div class="space-y-6">
+                        <div>
+                            <p class="text-xs font-bold text-blue-600 uppercase tracking-widest mb-3">Key Tasks</p>
+                            <ul class="space-y-3">
+                                ${d.tasks.map(t => `<li class="text-sm text-slate-600 flex items-start"><span class="text-blue-500 mr-2">•</span>${t}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="pt-6 border-t border-slate-100">
+                            <p class="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-3">Assessment Measures</p>
+                            <ul class="space-y-3">
+                                ${d.measures.map(m => `<li class="text-sm text-slate-600 flex items-start"><span class="text-emerald-500 mr-2">•</span>${m}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+                modal.classList.add('active');
+            });
+        });
+
+        document.querySelectorAll('.objective-info-trigger').forEach(trigger => {
+            trigger.addEventListener('click', () => {
+                const type = trigger.dataset.type;
+                const d = interactionData[type];
+                modalContent.innerHTML = `
+                    <h2 class="text-2xl font-black text-slate-900 mb-4">${d.title}</h2>
+                    <p class="text-slate-600 leading-relaxed">${d.content}</p>
+                `;
+                modal.classList.add('active');
+            });
+        });
+
+        document.getElementById('close-modal').addEventListener('click', () => modal.classList.remove('active'));
+        modal.addEventListener('click', (e) => { if(e.target === modal) modal.classList.remove('active'); });
+
+        // --- MAP LOGIC ---
+        function drawMap() {
+            const container = document.getElementById('map-container');
+            if (container.innerHTML !== "") return;
+            const width = container.clientWidth, height = container.clientHeight;
+            const svg = d3.select("#map-container").append("svg").attr("viewBox", `0 0 ${width} ${height}`).attr("preserveAspectRatio", "xMidYMid meet");
+            const projection = d3.geoAlbersUsa().scale(width * 1.5).translate([width / 2, height / 2]);
+            const path = d3.geoPath().projection(projection);
+            const tooltip = d3.select("#map-tooltip");
+
+            fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json').then(res => res.json()).then(us => {
+                const states = topojson.feature(us, us.objects.states).features;
+                svg.append("g").selectAll("path").data(states).enter().append("path").attr("d", path).attr("fill", d => {
+                    const abbr = stateAbbrMap[d.properties.name];
+                    return midwestStates.has(abbr) ? "#2563eb" : "#f1f5f9";
+                }).attr("stroke", "white").attr("stroke-width", 1).style("cursor", d => midwestStates.has(stateAbbrMap[d.properties.name]) ? "pointer" : "default")
+                .on("mouseover", function(event, d) {
+                    const abbr = stateAbbrMap[d.properties.name];
+                    if (midwestStates.has(abbr)) {
+                        d3.select(this).transition().duration(200).attr("fill", "#1d4ed8");
+                        tooltip.style("opacity", 1).html(`<strong>${d.properties.name}</strong>`).style("left", (event.offsetX + 20) + "px").style("top", (event.offsetY - 40) + "px");
+                    }
+                }).on("mouseout", function(event, d) {
+                    const abbr = stateAbbrMap[d.properties.name];
+                    if (midwestStates.has(abbr)) { d3.select(this).transition().duration(200).attr("fill", "#2563eb"); tooltip.style("opacity", 0); }
+                }).on("click", function(event, d) {
+                    const abbr = stateAbbrMap[d.properties.name];
+                    if (midwestStates.has(abbr)) updateStateDetail(abbr);
+                });
+            });
+        }
+
+        function updateStateDetail(abbr) {
+            const data = statesData[abbr];
+            document.getElementById('state-detail-panel').innerHTML = `
+                <div class="card p-8 rounded-3xl bg-white border-blue-100 border-2 animate-in fade-in slide-in-from-right duration-500">
+                    <h3 class="text-3xl font-black text-slate-900">${data.name}</h3>
+                    <p class="text-[10px] font-bold text-blue-600 uppercase mt-1 mb-6">EPNC Hub Partner</p>
+                    <div class="space-y-5">
+                        <div><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Host Institution</p><p class="font-bold text-slate-800">${data.host}</p><p class="text-xs text-slate-500">${data.coordinator}</p></div>
+                        <div><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Course Tracking</p><p class="font-mono text-xs bg-slate-50 p-2 rounded-lg border border-slate-100">${data.course}</p></div>
+                        <div class="pt-4 border-t border-slate-100"><p class="text-sm font-semibold text-slate-700">${data.schools || data.enrollment}</p><p class="text-xs text-slate-500 mt-1">${data.focus}</p></div>
+                    </div>
+                </div>`;
+        }
+
+        const stateAbbrMap = {"Alabama":"AL","Alaska":"AK","Arizona":"AZ","Arkansas":"AR","California":"CA","Colorado":"CO","Connecticut":"CT","Delaware":"DE","Florida":"FL","Georgia":"GA","Hawaii":"HI","Idaho":"ID","Illinois":"IL","Indiana":"IN","Iowa":"IA","Kansas":"KS","Kentucky":"KY","Louisiana":"LA","Maine":"ME","Maryland":"MD","Massachusetts":"MA","Michigan":"MI","Minnesota":"MN","Mississippi":"MS","Missouri":"MO","Montana":"MT","Nebraska":"NE","Nevada":"NV","New Hampshire":"NH","New Jersey":"NJ","New Mexico":"NM","New York":"NY","North Carolina":"NC","North Dakota":"ND","Ohio":"OH","Oklahoma":"OK","Oregon":"OR","Pennsylvania":"PA","Rhode Island":"RI","South Carolina":"SC","South Dakota":"SD","Tennessee":"TN","Texas":"TX","Utah":"UT","Vermont":"VT","Virginia":"VA","Washington":"WA","West Virginia":"WV","Wisconsin":"WI","Wyoming":"WY","Puerto Rico":"PR"};
+    });
+    </script>
+</body>
+</html>
