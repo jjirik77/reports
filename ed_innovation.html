@@ -326,7 +326,7 @@
                                 <div>
                                     <svg class="w-12 h-12 text-blue-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
                                     <p class="text-blue-900 font-bold">Select a state on the map</p>
-                                    <p class="text-sm text-blue-700 mt-1">Click a state to see detailed course codes, school stats, and legislative impacts.</p>
+                                    <p class="text-sm text-blue-700 mt-1">Click a state to see detailed leading bodies, initiatives, course codes, and legislative impacts.</p>
                                 </div>
                             </div>
                         </div>
@@ -429,6 +429,8 @@
         const statesData = {
             'IL': { 
                 name: 'Illinois', 
+                leadingBody: 'Illinois State Board of Education (ISBE)',
+                initiative: 'Illinois State Course System (ISCS)',
                 host: 'Rock Valley College', 
                 coordinator: 'Stephanie Wascher', 
                 course: '10011A001 — Cybersecurity (Primary)', 
@@ -440,6 +442,8 @@
             },
             'IN': { 
                 name: 'Indiana', 
+                leadingBody: 'Indiana Department of Education (IDOE)',
+                initiative: 'Next Level Programs of Study (NLPS)',
                 host: 'Ivy Tech Community College', 
                 coordinator: 'Jiri Jirik, Pam Schmelz', 
                 course: '5245 — Networking II: Cybersecurity Capstone', 
@@ -451,6 +455,8 @@
             },
             'IA': { 
                 name: 'Iowa', 
+                leadingBody: 'Iowa Department of Education',
+                initiative: 'Secondary School Courses Classification System (SCED)',
                 host: 'Iowa State University', 
                 coordinator: 'Doug Jacobson, Ally Frickel', 
                 course: '10020 — Cybersecurity', 
@@ -462,6 +468,8 @@
             },
             'KS': { 
                 name: 'Kansas', 
+                leadingBody: 'Kansas State Department of Education (KSDE)',
+                initiative: 'Kansas Course Code Management System (KCCMS)',
                 host: 'Johnson County Community College', 
                 coordinator: 'Andrew Lutz', 
                 course: '10020 — Cybersecurity I', 
@@ -473,6 +481,8 @@
             },
             'MI': { 
                 name: 'Michigan', 
+                leadingBody: 'Michigan Department of Education (MDE) / Office of CTE',
+                initiative: 'Office of Career and Technical Education (OCTE)',
                 host: 'Henry Ford College', 
                 coordinator: 'Marrci Conner', 
                 course: 'CIP 11.1003 — Computer & Info Security', 
@@ -483,6 +493,8 @@
             },
             'MN': { 
                 name: 'Minnesota', 
+                leadingBody: 'Minnesota Department of Education (MDE)',
+                initiative: 'Minnesota Common Course Catalogue (MCCC)',
                 host: 'Metropolitan State University', 
                 coordinator: 'Faisal Kaleem', 
                 course: '10020 — Cybersecurity or 10015', 
@@ -493,6 +505,8 @@
             },
             'MO': { 
                 name: 'Missouri', 
+                leadingBody: 'Missouri Department of Elementary and Secondary Education (DESE)',
+                initiative: 'Missouri Department of Elementary and Secondary Education (DESE)',
                 host: 'Southeast Missouri State University', 
                 coordinator: 'Mario Garcia', 
                 course: '034402 — Cybersecurity', 
@@ -503,6 +517,8 @@
             },
             'NE': { 
                 name: 'Nebraska', 
+                leadingBody: 'Nebraska Department of Education (NDE)',
+                initiative: 'Career and Technical Education (CTE)',
                 host: 'Bellevue University', 
                 coordinator: 'Doug Rausch', 
                 course: '270707 — Cybersecurity', 
@@ -513,6 +529,8 @@
             },
             'OH': { 
                 name: 'Ohio', 
+                leadingBody: 'Ohio Department of Education and Workforce (ODEW)',
+                initiative: 'Education Management Information System (EMIS)',
                 host: 'Sinclair College', 
                 coordinator: 'Kyle Jones, Eric Renegar', 
                 course: '146005 (CTE); 290200 (Non-CTE)', 
@@ -523,6 +541,8 @@
             },
             'WI': { 
                 name: 'Wisconsin', 
+                leadingBody: 'Wisconsin Department of Public Instruction (DPI)',
+                initiative: 'School Courses for the Exchange of Data (SCED)',
                 host: 'Madison Area Technical College', 
                 coordinator: 'Ken McCullough', 
                 course: '10020 — Cybersecurity', 
@@ -536,11 +556,11 @@
 
         const objectiveData = {
             '1': { title: "High School Cybersecurity Pathways", tasks: ["1A: Create comprehensive formal frameworks encompassing CS, IT, Business, and dedicated Cybersecurity.", "1B: Document successful pathway models aligned with NCAE-C requirements.", "1C: Disseminate frameworks through state and regional educational networks."], measures: ["Completion of framework documentation", "Adoption rates among regional institutions", "Integration into state CTE pathways"] },
-            '2': { title: "NCAE-C Articulation Agreements", tasks: ["2A: Systematically identify and document existing agreements between CCs and 4-year institutions.", "2B: Facilitate new articulation agreement development to expand student transfer pathways.", "2C: Create a comprehensive publicly accessible directory."], measures: ["Number of agreements documented", "New agreements established", "Student utilization of documented pathways"] },
+            '2': { title: "NCAE-C Articulation Agreements", tasks: ["2A: Systematically identify and document existing agreements between CCs and 4-year institutions.", "2B: Facilitate new articulation agreement development to expand student transfer pathways.", "2C: Create a comprehensive publicly accessible directory."], measures: ["Number of articulation agreements documented", "New agreements established", "Student utilization of documented pathways"] },
             '3': { title: "K-12 Articulation Agreements", tasks: ["3A: Document existing agreements enabling early credit.", "3B: Support development of new district-to-college agreements.", "3C: Establish best practices for implementation and maintenance."], measures: ["Number of K-12 agreements documented", "Student participation in early credit programs", "Sustainability plans for partnerships"] },
             '4': { title: "Concurrent Enrollment Programs", tasks: ["4A: Catalog existing concurrent programs across the region.", "4B: Analyze successful models for scalable approaches.", "4C: Develop implementation guides for new programs."], measures: ["Cataloged regional programs", "Student enrollment in cybersecurity dual-credit", "Faculty development participation rates"] },
             '5': { title: "RING Curriculum Lesson Plans", tasks: ["5A: Develop model lesson plans integrating RING with NCAE-C competencies.", "5B: Create implementation frameworks for K-12 educator adoption.", "5C: Disseminate through regional meetings and online repositories."], measures: ["Number of lesson plans developed", "Educator adoption rates", "Student engagement metrics"] },
-            '6': { title: "Competency Adoption", tasks: ["6A: Develop strategic implementation roadmaps for K-12 and College levels.", "6B: Conduct faculty development workshops to promote competency adoption.", "6C: Create assessment tools to measure program-level integration."], measures: ["Institutions adopting competency frameworks", "Faculty workshop participation", "Program alignment with national standards"] }
+            '6': { title: "Program-Level Competencies", tasks: ["6A: Develop strategic implementation roadmaps for K-12, community college, and four-year institutions.", "6B: Conduct faculty development workshops to promote competency adoption.", "6C: Create assessment tools to measure program-level competency integration."], measures: ["Institutions adopting competency frameworks", "Faculty workshop participation", "Program alignment with NCAE-C standards"] }
         };
 
         const interactionData = {
@@ -657,6 +677,16 @@
                     </div>
 
                     <div class="space-y-6">
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Leading Body</p>
+                            <p class="text-sm font-bold text-slate-800">${data.leadingBody}</p>
+                        </div>
+                        
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">State Initiative</p>
+                            <p class="text-sm font-medium text-slate-700">${data.initiative}</p>
+                        </div>
+
                         <div class="grid grid-cols-2 gap-4">
                             <div><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Host Institution</p><p class="font-bold text-slate-800 text-sm leading-tight">${data.host}</p><p class="text-xs text-slate-500 mt-1">${data.coordinator}</p></div>
                             <div><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Impact Scale</p><p class="text-sm font-semibold text-slate-700">${data.stats}</p></div>
