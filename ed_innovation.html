@@ -316,17 +316,17 @@
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                        <div class="lg:col-span-3 card rounded-3xl p-6 relative bg-white h-[600px] flex items-center justify-center overflow-hidden">
+                        <div class="lg:col-span-2 card rounded-3xl p-6 relative bg-white h-[600px] flex items-center justify-center overflow-hidden">
                             <div id="map-container" class="w-full h-full"></div>
                             <div id="map-tooltip"></div>
                         </div>
 
-                        <div class="space-y-6" id="state-detail-panel">
+                        <div class="lg:col-span-2 space-y-6" id="state-detail-panel">
                             <div class="card p-6 rounded-2xl bg-blue-50 border-blue-100 flex items-center justify-center h-full text-center">
                                 <div>
                                     <svg class="w-12 h-12 text-blue-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
                                     <p class="text-blue-900 font-bold">Select a state on the map</p>
-                                    <p class="text-sm text-blue-700 mt-1">Click a state to see enrollment data and host details.</p>
+                                    <p class="text-sm text-blue-700 mt-1">Click a state to see detailed course codes, school stats, and legislative impacts.</p>
                                 </div>
                             </div>
                         </div>
@@ -425,26 +425,121 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         
-        // --- DATA FROM TECHNICAL REPORT ---
+        // --- DATA FROM TECHNICAL REPORT & STATE DETAILS ---
         const statesData = {
-            'IL': { name: 'Illinois', host: 'Rock Valley College', coordinator: 'Stephanie Wascher', course: '10020A001 — Cybersecurity', schools: '142 High Schools/Career Centers', focus: 'Dual Credit, RAMPS' },
-            'IN': { name: 'Indiana', host: 'Ivy Tech Community College', coordinator: 'Jiri Jirik, Pam Schmelz', course: '5245 — Cybersecurity Capstone', schools: '200+ Active Programs', focus: 'NLPS Framework' },
-            'IA': { name: 'Iowa', host: 'Iowa State University', coordinator: 'Doug Jacobson, Ally Frickel', course: '10020 — Cybersecurity', enrollment: '42,896 Joint Enrollment', focus: 'Rural Access' },
-            'KS': { name: 'Kansas', host: 'Johnson County Community College', coordinator: 'Andrew Lutz', course: '10020 (Cyber I), 10900 (Cyber II)', schools: '84 High Schools', focus: 'Workforce Alignment' },
-            'MI': { name: 'Michigan', host: 'Henry Ford College', coordinator: 'Marrci Conner', course: 'CIP 11.1003 — Computer & Info Security', enrollment: '6,948 IT students', focus: 'K-12 Partnerships' },
-            'MN': { name: 'Minnesota', host: 'Metropolitan State University', coordinator: 'Faisal Kaleem', course: '10020 or 10015 — Cybersecurity', schools: '42 High Schools, 6 Centers', focus: 'Diverse Access' },
-            'MO': { name: 'Missouri', host: 'Southeast Missouri State University', coordinator: 'Mario Garcia', course: '034402 — Cybersecurity', enrollment: '310k+ CTE students', focus: 'Science Credit (HB 1576)' },
-            'NE': { name: 'Nebraska', host: 'Bellevue University', coordinator: 'Doug Rausch', course: '270707 — Cybersecurity', schools: '34 High Schools', focus: 'Rural underserved' },
-            'OH': { name: 'Ohio', host: 'Sinclair College', coordinator: 'Kyle Jones, Eric Renegar', course: '146005 (CTE), 290200 (Non-CTE)', schools: '185-210 Buildings', focus: 'Virtual Labs' },
-            'WI': { name: 'Wisconsin', host: 'Madison Area Technical College', coordinator: 'Ken McCullough', course: '10020 — Cybersecurity', schools: '140-160 High Schools', focus: 'Statewide Frameworks' }
+            'IL': { 
+                name: 'Illinois', 
+                host: 'Rock Valley College', 
+                coordinator: 'Stephanie Wascher', 
+                course: '10011A001 — Cybersecurity (Primary)', 
+                advanced: '10108A000 — Computer Systems Security',
+                stats: '142 Schools Reporting (SY 25-26)', 
+                focus: 'Runway 606 Systemwide Dual-Enrollment',
+                centers: 'Technology Center of DuPage (TCD), Lake County Tech Campus, Chicago Public Schools (CPS), Bloomington Area Career Center, Southern IL Career Prep Center',
+                notes: 'Specific code established in direct response to this grant initiative.'
+            },
+            'IN': { 
+                name: 'Indiana', 
+                host: 'Ivy Tech Community College', 
+                coordinator: 'Jiri Jirik, Pam Schmelz', 
+                course: '5245 — Networking II: Cybersecurity Capstone', 
+                advanced: 'NETII (Next Level Programs of Study)',
+                stats: '200+ Active Programs', 
+                focus: 'Workforce Credentialing & Virtual/Online bridging',
+                centers: 'Southern IN Career & Tech Center (SICTC), Greater Lafayette Career Academy (GLCA), Carmel High School, Elkhart Area Career Center',
+                notes: 'Indiana Online option enables 5245 for rural schools without on-site instructors.'
+            },
+            'IA': { 
+                name: 'Iowa', 
+                host: 'Iowa State University', 
+                coordinator: 'Doug Jacobson, Ally Frickel', 
+                course: '10020 — Cybersecurity', 
+                advanced: 'PLTW Cybersecurity',
+                stats: '42,896 Joint Enrollment students (+5% YOY)', 
+                focus: 'Rural access & "Offer and Teach" mandate',
+                centers: 'Des Moines Central Campus, Cedar Rapids Regional Partnerships, Waukee APEX',
+                notes: 'IRC List (2025-26) now includes CompTIA Security+ and CySA+.'
+            },
+            'KS': { 
+                name: 'Kansas', 
+                host: 'Johnson County Community College', 
+                coordinator: 'Andrew Lutz', 
+                course: '10020 — Cybersecurity I', 
+                advanced: '10900 — Cybersecurity II',
+                stats: '84 High Schools and Area Centers', 
+                focus: 'Networking & Telecommunications Pathway design',
+                centers: 'Olathe West Academy, Wichita (WSU Tech), Broadmoor Signature Programs, Blue Valley CAPS',
+                notes: 'Strand design follows Intro (10004), Technical (10020), and Application (10900) levels.'
+            },
+            'MI': { 
+                name: 'Michigan', 
+                host: 'Henry Ford College', 
+                coordinator: 'Marrci Conner', 
+                course: 'CIP 11.1003 — Computer & Info Security', 
+                stats: '6,948 IT Cluster students; 84 PSN Approved Programs', 
+                focus: 'Intermediate School Districts (ISD) hubs',
+                centers: 'Oakland Schools Tech (OSTC), Washtenaw ISD (Skyline/Huron), Kent Career Tech Center (KCTC)',
+                notes: 'Cybersecurity is the fastest-growing sub-sector within the IT cluster.'
+            },
+            'MN': { 
+                name: 'Minnesota', 
+                host: 'Metropolitan State University', 
+                coordinator: 'Faisal Kaleem', 
+                course: '10020 — Cybersecurity or 10015', 
+                stats: '42 High Schools, 6 Regional CTE Centers', 
+                focus: 'Transition to "Digital Technology" cluster',
+                centers: 'Intermediate District 917 (Rosemount), Wright Technical Center, Minneapolis/Saint Paul Districts',
+                notes: '18% YOY increase as districts shift to specific Cybersecurity codes for Perkins V.'
+            },
+            'MO': { 
+                name: 'Missouri', 
+                host: 'Southeast Missouri State University', 
+                coordinator: 'Mario Garcia', 
+                course: '034402 — Cybersecurity', 
+                stats: '310,087 total CTE students', 
+                focus: 'HB 1576 Graduation Credit (Science or Practical Arts)',
+                centers: 'Cape Girardeau Career & Tech, Springfield R-XII (SPS), Northwest MO State Early College',
+                notes: 'New mandate requires all public high schools to offer at least one computer science course.'
+            },
+            'NE': { 
+                name: 'Nebraska', 
+                host: 'Bellevue University', 
+                coordinator: 'Doug Rausch', 
+                course: '270707 — Cybersecurity', 
+                stats: '34 High Schools (+25% Growth YOY)', 
+                focus: 'Rural & Underserved adult learners',
+                centers: 'Omaha Public Schools academies, TCA (Lincoln), Metropolitan Community College (Omaha)',
+                notes: 'Computer Science and Technology Education Act (2024) mandates graduation credits.'
+            },
+            'OH': { 
+                name: 'Ohio', 
+                host: 'Sinclair College', 
+                coordinator: 'Kyle Jones, Eric Renegar', 
+                course: '146005 (CTE); 290200 (Non-CTE)', 
+                stats: '185–210 Secondary Buildings; 141k+ CTE students', 
+                focus: 'Weighted CTE funding & Ohio Cyber Range',
+                centers: 'Greene County (Range Hub), Butler Tech, Columbus City Schools (Fort Hayes), Great Oaks',
+                notes: 'Advanced courses include Defense & Reinforcement (146010) and Testing & Response (146015).'
+            },
+            'WI': { 
+                name: 'Wisconsin', 
+                host: 'Madison Area Technical College', 
+                coordinator: 'Ken McCullough', 
+                course: '10020 — Cybersecurity', 
+                advanced: '10020E (Advanced equivalent)',
+                stats: '140–160 Public High Schools', 
+                focus: 'WISEdata snapshot tracking for Perkins V accuracy',
+                centers: 'Milwaukee PS, Green Bay Area Schools, Madison Metropolitan, Eau Claire Schools',
+                notes: 'Statewide Frameworks prioritize industry certifications like Security+ and CCNA.'
+            }
         };
 
         const objectiveData = {
             '1': { title: "High School Cybersecurity Pathways", tasks: ["1A: Create comprehensive formal frameworks encompassing CS, IT, Business, and dedicated Cybersecurity.", "1B: Document successful pathway models aligned with NCAE-C requirements.", "1C: Disseminate frameworks through state and regional educational networks."], measures: ["Completion of framework documentation", "Adoption rates among regional institutions", "Integration into state CTE pathways"] },
-            '2': { title: "NCAE-C Articulation Agreements", tasks: ["2A: Systematically identify and document existing agreements between CCs and 4-year institutions.", "2B: Facilitate new articulation agreement development to expand transfer pathways.", "2C: Create a comprehensive publicly accessible directory."], measures: ["Number of agreements documented", "New agreements established", "Student utilization of documented pathways"] },
+            '2': { title: "NCAE-C Articulation Agreements", tasks: ["2A: Systematically identify and document existing agreements between CCs and 4-year institutions.", "2B: Facilitate new articulation agreement development to expand student transfer pathways.", "2C: Create a comprehensive publicly accessible directory."], measures: ["Number of agreements documented", "New agreements established", "Student utilization of documented pathways"] },
             '3': { title: "K-12 Articulation Agreements", tasks: ["3A: Document existing agreements enabling early credit.", "3B: Support development of new district-to-college agreements.", "3C: Establish best practices for implementation and maintenance."], measures: ["Number of K-12 agreements documented", "Student participation in early credit programs", "Sustainability plans for partnerships"] },
             '4': { title: "Concurrent Enrollment Programs", tasks: ["4A: Catalog existing concurrent programs across the region.", "4B: Analyze successful models for scalable approaches.", "4C: Develop implementation guides for new programs."], measures: ["Cataloged regional programs", "Student enrollment in cybersecurity dual-credit", "Faculty development participation rates"] },
-            '5': { title: "RING Curriculum Lesson Plans", tasks: ["5A: Develop model lesson plans integrating RING with NCAE-C competencies.", "5B: Create implementation frameworks for K-12 educator adoption.", "5C: Disseminate through regional meetings and online repositories."], measures: ["Number of lesson plans developed", "Educator adoption rates", "Alignment with NCAE-C knowledge units"] },
+            '5': { title: "RING Curriculum Lesson Plans", tasks: ["5A: Develop model lesson plans integrating RING with NCAE-C competencies.", "5B: Create implementation frameworks for K-12 educator adoption.", "5C: Disseminate through regional meetings and online repositories."], measures: ["Number of lesson plans developed", "Educator adoption rates", "Student engagement metrics"] },
             '6': { title: "Competency Adoption", tasks: ["6A: Develop strategic implementation roadmaps for K-12 and College levels.", "6B: Conduct faculty development workshops to promote competency adoption.", "6C: Create assessment tools to measure program-level integration."], measures: ["Institutions adopting competency frameworks", "Faculty workshop participation", "Program alignment with national standards"] }
         };
 
@@ -459,7 +554,6 @@
         // --- NAVIGATION LOGIC ---
         const navButtons = document.querySelectorAll('.nav-button');
         const sections = document.querySelectorAll('.main-content-section');
-        const titleEl = document.getElementById('current-section-title');
 
         navButtons.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -470,7 +564,6 @@
                     s.classList.remove('active');
                     if (s.id === target) s.classList.add('active');
                 });
-                // titleEl.innerText = btn.innerText; // Users requested removal of duplicate subtitles in header
                 if (target === 'state-analysis') setTimeout(drawMap, 100);
             });
         });
@@ -554,13 +647,38 @@
         function updateStateDetail(abbr) {
             const data = statesData[abbr];
             document.getElementById('state-detail-panel').innerHTML = `
-                <div class="card p-8 rounded-3xl bg-white border-blue-100 border-2 animate-in fade-in slide-in-from-right duration-500">
-                    <h3 class="text-3xl font-black text-slate-900">${data.name}</h3>
-                    <p class="text-[10px] font-bold text-blue-600 uppercase mt-1 mb-6">Hub Partner</p>
-                    <div class="space-y-5">
-                        <div><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Host Institution</p><p class="font-bold text-slate-800">${data.host}</p><p class="text-xs text-slate-500">${data.coordinator}</p></div>
-                        <div><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Course Tracking</p><p class="font-mono text-xs bg-slate-50 p-2 rounded-lg border border-slate-100">${data.course}</p></div>
-                        <div class="pt-4 border-t border-slate-100"><p class="text-sm font-semibold text-slate-700">${data.schools || data.enrollment}</p><p class="text-xs text-slate-500 mt-1">${data.focus}</p></div>
+                <div class="card p-8 rounded-3xl bg-white border-blue-100 border-2 animate-in fade-in slide-in-from-right duration-500 overflow-y-auto max-h-[600px]">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h3 class="text-3xl font-black text-slate-900">${data.name}</h3>
+                            <p class="text-[10px] font-bold text-blue-600 uppercase mt-1">EPNC Impact Region</p>
+                        </div>
+                        <span class="px-3 py-1 bg-slate-100 rounded-lg text-xs font-bold text-slate-500">${abbr}</span>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Host Institution</p><p class="font-bold text-slate-800 text-sm leading-tight">${data.host}</p><p class="text-xs text-slate-500 mt-1">${data.coordinator}</p></div>
+                            <div><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Impact Scale</p><p class="text-sm font-semibold text-slate-700">${data.stats}</p></div>
+                        </div>
+
+                        <div><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Primary Course Code(s)</p><p class="font-mono text-xs bg-slate-50 p-2 rounded-lg border border-slate-100">${data.course}</p></div>
+                        
+                        ${data.advanced ? `<div><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Advanced Pathway</p><p class="text-xs text-slate-700">${data.advanced}</p></div>` : ''}
+
+                        <div><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Legislative / Framework Focus</p><p class="text-xs text-slate-600 leading-relaxed">${data.focus}</p></div>
+
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">Primary Offering Districts/Centers</p>
+                            <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                                <p class="text-[11px] text-slate-600 leading-relaxed">${data.centers}</p>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-slate-100">
+                            <p class="text-[10px] font-bold text-blue-600 uppercase mb-1 italic">Project Insight</p>
+                            <p class="text-xs text-slate-500 italic">"${data.notes}"</p>
+                        </div>
                     </div>
                 </div>`;
         }
