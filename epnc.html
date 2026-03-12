@@ -662,6 +662,12 @@
                     s.classList.remove('active');
                     if (s.id === target) s.classList.add('active');
                 });
+
+                // Refocused fix for Top Growth Areas (Explicit Render on Click)
+                if (target === 'dashboard') {
+                    initGrowthBars();
+                }
+
                 initAnimations();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
