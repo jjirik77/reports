@@ -180,6 +180,15 @@
                     Testimonials
                 </button>
             </div>
+
+            <div class="pt-6 border-t border-slate-800">
+                <div class="bg-slate-800 rounded-lg p-4">
+                    <p class="text-xs text-slate-400 mb-1">Status</p>
+                    <p class="text-sm font-semibold text-emerald-400 flex items-center">
+                        <span class="w-2 h-2 bg-emerald-400 rounded-full mr-2 animate-pulse"></span> DCWF Aligned
+                    </p>
+                </div>
+            </div>
         </nav>
 
         <!-- Main Content -->
@@ -327,10 +336,10 @@
                     <!-- KPI Cards -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div class="card kpi-card p-6 rounded-2xl border-l-4 border-blue-600 cursor-pointer fade-in" 
-                             data-metric="Student Completions" 
+                             data-metric="Student Completions / RING Online" 
                              data-values='[{"year": 2023, "value": 42}, {"year": 2024, "value": 193}]' 
                              data-color="#2563eb">
-                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Completions</p>
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Completions / RING Online</p>
                             <div class="flex items-end justify-between">
                                 <p class="text-4xl font-black kpi-value" data-target="193">0</p>
                                 <span class="text-emerald-500 font-bold text-sm bg-emerald-50 px-2 py-1 rounded">+360%</span>
@@ -347,10 +356,10 @@
                             </div>
                         </div>
                         <div class="card kpi-card p-6 rounded-2xl border-l-4 border-blue-600 cursor-pointer fade-in fade-in-delay-2" 
-                             data-metric="Virtual Lab Sessions" 
+                             data-metric="Virtual Lab Completion" 
                              data-values='[{"year": 2023, "value": 1780}, {"year": 2024, "value": 3080}]' 
                              data-color="#2563eb">
-                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Virtual Labs</p>
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Virtual Labs Completion</p>
                             <div class="flex items-end justify-between">
                                 <p class="text-4xl font-black kpi-value" data-target="3080">0</p>
                                 <span class="text-emerald-500 font-bold text-sm bg-emerald-50 px-2 py-1 rounded">+73%</span>
@@ -443,7 +452,7 @@
                         <div class="card p-6 rounded-2xl fade-in flex flex-col items-center text-center">
                             <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg></div>
                             <h4 class="font-bold mb-2 text-slate-800 text-sm">AI & DCWF Integration</h4>
-                            <p class="text-[10px] text-slate-500 leading-relaxed">Integrate AI competencies and map all curriculum modules to DCWF work roles for DoD 8140 focus.</p>
+                            <p class="text-[10px] text-slate-500 leading-relaxed">Integrate AI competencies and map all curriculum modules to DCWF work roles for <b>DoD 8140</b> focus.</p>
                         </div>
                         <div class="card p-6 rounded-2xl fade-in fade-in-delay-1 flex flex-col items-center text-center">
                             <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mb-4"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3" /></svg></div>
@@ -488,7 +497,7 @@
                         <div class="card p-6 rounded-2xl fade-in fade-in-delay-9 flex flex-col items-center text-center">
                             <div class="w-12 h-12 bg-gray-50 text-gray-600 rounded-full flex items-center justify-center mb-4"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8" /></svg></div>
                             <h4 class="font-bold mb-2 text-slate-800 text-sm">Adaptive DoD Needs</h4>
-                            <p class="text-[10px] text-slate-500 leading-relaxed">Continuous improvement cycle to keep programs responsive to evolving DoD 8140 directives.</p>
+                            <p class="text-[10px] text-slate-500 leading-relaxed">Continuous improvement cycle to keep programs responsive to evolving <b>DoD 8140</b> directives.</p>
                         </div>
                     </div>
                 </section>
@@ -797,12 +806,31 @@
             const container = document.getElementById(id);
             const data = [{y: '23', v: v23}, {y: '24', v: v24}];
             const width = container.clientWidth, height = container.clientHeight;
-            const margin = {top: 15, right: 10, bottom: 20, left: 30};
+            const margin = {top: 25, right: 10, bottom: 20, left: 35};
             const svg = d3.select(container).append("svg").attr("width", width).attr("height", height)
                 .append("g").attr("transform", `translate(${margin.left},${margin.top})`);
             const x = d3.scaleBand().domain(['23', '24']).range([0, width - margin.left - margin.right]).padding(0.4);
-            const y = d3.scaleLinear().domain([0, 80]).range([height - margin.top - margin.bottom, 0]);
+            const y = d3.scaleLinear().domain([0, 100]).range([height - margin.top - margin.bottom, 0]);
+            
             svg.append("g").attr("transform", `translate(0,${y.range()[0]})`).call(d3.axisBottom(x).tickSize(0));
+            
+            // Percentage labels for each year
+            svg.selectAll("text.label").data(data).enter().append("text")
+                .text(d => d.v + '%')
+                .attr("x", d => x(d.y) + x.bandwidth()/2)
+                .attr("y", d => y(d.v) - 5)
+                .attr("text-anchor", "middle")
+                .attr("class", "text-[10px] font-bold fill-slate-500");
+
+            // Growth label
+            const growth = v24 - v23;
+            svg.append("text")
+                .text('Growth: +' + growth + '%')
+                .attr("x", (width - margin.left - margin.right) / 2)
+                .attr("y", -10)
+                .attr("text-anchor", "middle")
+                .attr("class", "text-[11px] font-black fill-emerald-500");
+
             svg.selectAll("rect").data(data).enter().append("rect").attr("x", d => x(d.y)).attr("y", y(0)).attr("width", x.bandwidth())
                 .attr("fill", d => d.y === '24' ? "#14b8a6" : "#ccf2ee").attr("rx", 2).transition().duration(800).attr("y", d => y(d.v)).attr("height", d => y(0) - y(d.v));
         };
