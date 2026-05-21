@@ -356,7 +356,7 @@
                             <h3 class="font-extrabold text-lg text-slate-900 mb-2">Navigating Ethical Dilemmas</h3>
                             <p class="text-slate-600 text-sm leading-relaxed">Prepare to navigate the intricacies and ethical considerations of integrating AI tools into your work.</p>
                         </div>
-                    </div>
+                     </div>
                 </section>
 
                 <!-- Participant Dashboard Section -->
@@ -365,12 +365,12 @@
                         <span class="text-xs font-bold uppercase tracking-widest text-blue-600 block mb-2">Statistics & Reach</span>
                         <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Participant Dashboard</h2>
                         <p class="mt-2 text-slate-500">A snapshot of our diverse group of attendees.</p>
-                    </header>
+                     </header>
                     <!-- 5 Column grid for the statistics -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-8 mb-12">
                         <div class="premium-card p-4 sm:p-6 text-center border-t-4 border-blue-600 fade-in fade-in-delay-1 flex flex-col justify-between">
                             <h3 class="h-12 flex items-center justify-center font-bold text-slate-400 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">Total Participants</h3>
-                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-blue-600" data-target="1017">0</p>
+                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-blue-600" data-target="1034">0</p>
                         </div>
                         <div class="premium-card p-4 sm:p-6 text-center border-t-4 border-blue-600 fade-in fade-in-delay-2 flex flex-col justify-between">
                             <h3 class="h-12 flex items-center justify-center font-bold text-slate-400 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">Institutions</h3>
@@ -382,11 +382,11 @@
                         </div>
                         <div class="premium-card p-4 sm:p-6 text-center border-t-4 border-blue-600 fade-in fade-in-delay-4 flex flex-col justify-between">
                             <h3 class="h-12 flex items-center justify-center font-bold text-slate-400 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">International & Online</h3>
-                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-blue-600" data-target="64">0</p>
+                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-blue-600" data-target="81">0</p>
                         </div>
                         <div class="premium-card p-4 sm:p-6 text-center border-t-4 border-teal-500 fade-in fade-in-delay-5 flex flex-col justify-between">
                             <h3 class="h-12 flex items-center justify-center font-bold text-slate-400 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">Estimated Student Impact</h3>
-                            <p class="text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-teal-600">~100k</p>
+                            <p class="text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-teal-600">~150k</p>
                         </div>
                     </div>
                      <div class="grid grid-cols-1 gap-8">
@@ -548,10 +548,10 @@
         
         // --- DATA ---
         const participantData = {
-            total: 1017,
+            total: 1034,
             institutions: 100,
             states: 23,
-            onlineAndIntl: 64,
+            onlineAndIntl: 81,
             studentImpact: 100000,
             activeStates: new Set(['AL', 'AZ', 'CO', 'FL', 'HI', 'IL', 'IN', 'LA', 'MD', 'MN', 'NC', 'NJ', 'NY', 'OH', 'PR', 'TX', 'WA', 'CA', 'WY', 'TN', 'MA', 'KY']),
             attendeeData: {
@@ -634,7 +634,13 @@
             .then(response => response.json())
             .then(us => {
                 const states = topojson.feature(us, us.objects.states);
-                const projection = d3.geoIdentity().fitSize([mapContainer.clientWidth, mapContainer.clientHeight], states);
+                
+                // Separate Puerto Rico out of the main state features to prevent it from shrinking the main map bounds
+                const mainStatesFeatures = states.features.filter(d => d.properties.name !== "Puerto Rico");
+                const mainStates = { type: "FeatureCollection", features: mainStatesFeatures };
+                
+                // Fit standard projection strictly to mainland, Alaska, and Hawaii boundaries
+                const projection = d3.geoIdentity().fitSize([mapContainer.clientWidth, mapContainer.clientHeight], mainStates);
                 const path = d3.geoPath().projection(projection);
                 
                 // Clear any previous map renders before rendering again
@@ -679,10 +685,10 @@
                     return participantData.activeStates.has(stateAbbr) ? 'url(#azureStateGradient)' : '#e2e8f0';
                 }
 
-                // Render standard map boundaries
+                // Render standard map boundaries (Mainland, Alaska, Hawaii)
                 mapSvg.append("g")
                     .selectAll("path")
-                    .data(states.features)
+                    .data(mainStatesFeatures)
                     .join("path")
                     .attr("d", path)
                     .attr("class", "state")
@@ -723,74 +729,121 @@
                         tooltip.style.opacity = 0;
                     });
 
-                // --- PREMIUM PUERTO RICO CUSTOM CARTOGRAPHIC INSET ---
-                const insetWidth = 110;
-                const insetHeight = 60;
-                const insetX = mapContainer.clientWidth - insetWidth - 10;
-                const insetY = mapContainer.clientHeight - insetHeight - 10;
+                // --- PREMIUM PUERTO RICO DETAILED GEOGRAPHIC INSET ---
+                let prFeature = states.features.find(d => d.properties.name === "Puerto Rico");
+                
+                const insetWidth = 130;
+                const insetHeight = 85;
+                const insetX = mapContainer.clientWidth - insetWidth - 15;
+                const insetY = mapContainer.clientHeight - insetHeight - 15;
 
                 const insetGroup = mapSvg.append("g")
-                    .attr("transform", `translate(${insetX}, ${insetY})`)
-                    .attr("class", "pr-inset")
-                    .style("cursor", "pointer");
+                    .attr("class", "pr-inset-group");
 
-                // Inset border frame
+                // Inset Glass Box Frame
                 insetGroup.append("rect")
+                    .attr("x", insetX)
+                    .attr("y", insetY)
                     .attr("width", insetWidth)
                     .attr("height", insetHeight)
-                    .attr("rx", 10)
+                    .attr("rx", 12)
                     .attr("fill", "rgba(255, 255, 255, 0.95)")
                     .attr("stroke", "#e2e8f0")
-                    .attr("stroke-width", 1.5);
+                    .attr("stroke-width", 1.5)
+                    .style("backdrop-filter", "blur(8px)");
 
-                // Puerto Rico shape island pill
-                insetGroup.append("rect")
-                    .attr("x", 12)
-                    .attr("y", 22)
-                    .attr("width", 86)
-                    .attr("height", 26)
-                    .attr("rx", 6)
-                    .attr("fill", getColor('PR'))
-                    .attr("filter", "url(#shadowState)")
-                    .on("mousemove", function(event) {
-                        d3.select(this).attr('fill', 'url(#azureHoverGradient)');
-                        tooltip.style.opacity = 1;
+                if (prFeature) {
+                    // Extract exact bounding parameters of Puerto Rico's projected geometry
+                    const bounds = path.bounds(prFeature);
+                    const dx = bounds[1][0] - bounds[0][0];
+                    const dy = bounds[1][1] - bounds[0][1];
+                    const cx = (bounds[0][0] + bounds[1][0]) / 2;
+                    const cy = (bounds[0][1] + bounds[1][1]) / 2;
 
-                        const containerRect = mapContainer.getBoundingClientRect();
-                        const x = event.clientX - containerRect.left;
-                        const y = event.clientY - containerRect.top;
+                    // Centering calculation relative to inset frame padding (offset slightly down for title)
+                    const targetX = insetX + insetWidth / 2;
+                    const targetY = insetY + insetHeight / 2 + 5;
 
-                        tooltip.style.left = `${x + 15}px`;
-                        tooltip.style.top = `${y}px`;
+                    // Calculate translation scaling matrix strictly tailored to fit Puerto Rico's dimensions
+                    const scaleX = (insetWidth * 0.75) / dx;
+                    const scaleY = (insetHeight * 0.55) / dy;
+                    const scale = Math.min(scaleX, scaleY);
 
-                        const count = participantData.attendeeData['PR'];
-                        const status = `<span class="font-extrabold text-yellow-300">Attendees: ${count}</span>`;
-                        tooltip.innerHTML = `<strong class="text-sm font-semibold">Puerto Rico</strong><br>${status}`;
-                    })
-                    .on("mouseout", function() {
-                        d3.select(this).attr("fill", getColor('PR'));
-                        tooltip.style.opacity = 0;
-                    });
+                    // Build D3 inline transform matrix: Center shape, apply scale, translate back
+                    const transformStr = `translate(${targetX}, ${targetY}) scale(${scale}) translate(${-cx}, ${-cy})`;
 
-                // Island label inside the pill
+                    // Render Scaled-Up Exact Coastline Path of Puerto Rico
+                    insetGroup.append("path")
+                        .datum(prFeature)
+                        .attr("d", path)
+                        .attr("transform", transformStr)
+                        .attr("fill", getColor('PR'))
+                        .attr("filter", "url(#shadowState)")
+                        .style("stroke", "#ffffff")
+                        .style("stroke-width", `${1.5 / scale}px`) // Keeps standard stroke-width crisp and scale-independent
+                        .style("cursor", "pointer")
+                        .on("mousemove", function(event) {
+                            d3.select(this).attr('fill', 'url(#azureHoverGradient)');
+                            tooltip.style.opacity = 1;
+
+                            const containerRect = mapContainer.getBoundingClientRect();
+                            const mx = event.clientX - containerRect.left;
+                            const my = event.clientY - containerRect.top;
+
+                            tooltip.style.left = `${mx + 15}px`;
+                            tooltip.style.top = `${my}px`;
+
+                            const count = participantData.attendeeData['PR'];
+                            const status = `<span class="font-extrabold text-yellow-300">Attendees: ${count}</span>`;
+                            tooltip.innerHTML = `<strong class="text-sm font-semibold">Puerto Rico</strong><br>${status}`;
+                        })
+                        .on("mouseout", function() {
+                            d3.select(this).attr("fill", getColor('PR'));
+                            tooltip.style.opacity = 0;
+                        });
+                } else {
+                    // Fallback: If Puerto Rico is not in the loaded TopoJSON, inject precise coastline coordinates manually
+                    const prPathString = "M 15,45 L 25,42 L 38,43 L 50,42 L 65,43 L 80,42 L 92,43 L 105,42 L 114,45 L 118,44 L 121,48 L 118,52 L 119,55 L 113,58 L 107,55 L 98,58 L 86,56 L 74,59 L 62,56 L 48,58 L 34,55 L 23,58 L 16,55 L 12,50 Z";
+                    
+                    insetGroup.append("path")
+                        .attr("d", prPathString)
+                        .attr("transform", `translate(${insetX}, ${insetY})`)
+                        .attr("fill", getColor('PR'))
+                        .attr("filter", "url(#shadowState)")
+                        .style("stroke", "#ffffff")
+                        .style("stroke-width", "1.25px")
+                        .style("cursor", "pointer")
+                        .on("mousemove", function(event) {
+                            d3.select(this).attr('fill', 'url(#azureHoverGradient)');
+                            tooltip.style.opacity = 1;
+
+                            const containerRect = mapContainer.getBoundingClientRect();
+                            const mx = event.clientX - containerRect.left;
+                            const my = event.clientY - containerRect.top;
+
+                            tooltip.style.left = `${mx + 15}px`;
+                            tooltip.style.top = `${my}px`;
+
+                            const count = participantData.attendeeData['PR'];
+                            const status = `<span class="font-extrabold text-yellow-300">Attendees: ${count}</span>`;
+                            tooltip.innerHTML = `<strong class="text-sm font-semibold">Puerto Rico</strong><br>${status}`;
+                        })
+                        .on("mouseout", function() {
+                            d3.select(this).attr("fill", getColor('PR'));
+                            tooltip.style.opacity = 0;
+                        });
+                }
+
+                // Inset Label Header Text (Present in both live and fallback rendering)
                 insetGroup.append("text")
-                    .attr("x", insetWidth / 2)
-                    .attr("y", 38)
+                    .attr("x", insetX + insetWidth / 2)
+                    .attr("y", insetY + 16)
                     .attr("text-anchor", "middle")
-                    .style("font-size", "11px")
+                    .style("font-size", "10px")
                     .style("font-weight", "800")
-                    .style("fill", "#ffffff")
-                    .style("pointer-events", "none")
-                    .text("PR");
-
-                // Inset Title
-                insetGroup.append("text")
-                    .attr("x", insetWidth / 2)
-                    .attr("y", 14)
-                    .attr("text-anchor", "middle")
-                    .style("font-size", "9px")
-                    .style("font-weight", "700")
                     .style("fill", "#94a3b8")
+                    .style("letter-spacing", "0.05em")
+                    .style("pointer-events", "none")
                     .text("PUERTO RICO");
 
             }).catch(error => {
