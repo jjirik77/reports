@@ -3,39 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Azure AI Workshop - Interactive Dashboard</title>
+    <title>AI for Educators Workshop - Interactive Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/topojson@3"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
+            overflow-x: hidden;
         }
-        .card {
-            background-color: white;
-            transition: transform 0.4s ease-out, box-shadow 0.4s ease-out;
-            border: 1px solid #e2e8f0;
-            border-radius: 1rem;
+        
+        /* Premium Card styling with high-fidelity soft border shadows */
+        .premium-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(226, 232, 240, 0.7);
+            box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.03), 0 2px 4px -2px rgba(15, 23, 42, 0.02);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            border-radius: 1.25rem;
         }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.07);
+        .premium-card:hover {
+            transform: translateY(-4px);
+            background: #ffffff;
+            box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.06), 0 10px 10px -5px rgba(15, 23, 42, 0.02);
+            border-color: rgba(0, 120, 212, 0.35);
         }
+
+        /* Ambient Glow Mesh Orbs in Background */
+        .ambient-glow-1 {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 9999px;
+            background: radial-gradient(circle, rgba(0, 120, 212, 0.06) 0%, rgba(255,255,255,0) 70%);
+            top: -10%;
+            right: -10%;
+            pointer-events: none;
+            z-index: 0;
+            filter: blur(40px);
+        }
+        .ambient-glow-2 {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 9999px;
+            background: radial-gradient(circle, rgba(13, 148, 136, 0.04) 0%, rgba(255,255,255,0) 70%);
+            bottom: 10%;
+            left: -5%;
+            pointer-events: none;
+            z-index: 0;
+            filter: blur(50px);
+        }
+
         #map-tooltip {
             position: absolute;
-            background-color: rgba(17, 24, 39, 0.9);
+            background-color: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             color: white;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 14px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
             pointer-events: none;
             opacity: 0;
-            transition: opacity 0.2s ease-in-out;
-            z-index: 10;
+            transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 100;
             max-width: 250px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
         }
+
         .main-content-section {
             display: none;
         }
@@ -44,107 +82,225 @@
         }
         
         .fade-in {
-            animation: fadeIn 0.6s ease-in-out forwards;
+            animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             opacity: 0;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .fade-in-delay-1 { animation-delay: 0.1s; }
-        .fade-in-delay-2 { animation-delay: 0.2s; }
-        .fade-in-delay-3 { animation-delay: 0.3s; }
-        .fade-in-delay-4 { animation-delay: 0.4s; }
-        .fade-in-delay-5 { animation-delay: 0.5s; }
-        .fade-in-delay-6 { animation-delay: 0.6s; }
+        .fade-in-delay-1 { animation-delay: 0.08s; }
+        .fade-in-delay-2 { animation-delay: 0.16s; }
+        .fade-in-delay-3 { animation-delay: 0.24s; }
+        .fade-in-delay-4 { animation-delay: 0.32s; }
+        .fade-in-delay-5 { animation-delay: 0.4s; }
+        .fade-in-delay-6 { animation-delay: 0.48s; }
         
         .nav-button {
+            position: relative;
             display: flex;
             align-items: center;
             width: 100%;
             text-align: left;
-            padding: 0.85rem 1rem;
-            border-radius: 0.5rem;
+            padding: 0.85rem 1.25rem;
+            border-radius: 0.75rem;
             font-weight: 500;
-            color: #d1d5db;
-            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+            color: #94a3b8;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid transparent;
         }
         .nav-button:hover {
-            background-color: #374151;
-            color: white;
-            transform: translateX(3px);
+            background-color: rgba(255, 255, 255, 0.04);
+            color: #f1f5f9;
+            transform: translateX(4px);
         }
         .nav-button.active {
-            background-color: #0078D4; /* Azure Blue */
+            background: linear-gradient(135deg, #0078D4 0%, #005a9e 100%);
             color: white;
             font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 120, 212, 0.25);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        /* High-fidelity active rail dot indicator */
+        .nav-button.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 25%;
+            height: 50%;
+            width: 4px;
+            background-color: #50E6FF;
+            border-radius: 99px;
+        }
+        
+        /* Testimonial Quote Graphic stylings */
+        .quote-icon {
+            font-family: Georgia, serif;
+            font-size: 5rem;
+            line-height: 1;
+            color: rgba(0, 120, 212, 0.08);
+            position: absolute;
+            top: 0.5rem;
+            left: 1.5rem;
+            pointer-events: none;
         }
     </style>
 </head>
-<body class="text-slate-700">
+<body class="text-slate-800 relative min-h-screen">
 
-    <div class="flex flex-col md:flex-row min-h-screen">
+    <!-- Ambient Glow Backdrops -->
+    <div class="ambient-glow-1"></div>
+    <div class="ambient-glow-2"></div>
+
+    <div class="flex flex-col md:flex-row min-h-screen relative z-10">
+        
         <!-- Left Side Navigation -->
-        <nav class="md:w-64 bg-slate-900 text-white px-4 py-6 space-y-2 flex-shrink-0 flex flex-col">
-            <!-- pt-40 aligns the top of the menu with the main content headline -->
-            <div class="flex-grow pt-40">
-                <button class="nav-button active" data-target="overview">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-                    Workshop Overview
-                </button>
-                <button class="nav-button" data-target="curriculum">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v11.494m-9-5.747h18" /></svg>
-                    Curriculum
-                </button>
-                <button class="nav-button" data-target="dashboard">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-                    Participant Dashboard
-                </button>
-                <button class="nav-button" data-target="outcomes">
-                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
-                    Learning Outcomes
-                </button>
-                <button class="nav-button" data-target="testimonials">
-                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-                    Testimonials
-                </button>
+        <nav class="md:w-64 bg-slate-950 text-white px-4 py-6 flex-shrink-0 flex flex-col border-r border-slate-900 shadow-xl justify-between animate-fade-in">
+            <div>
+                <!-- Top Brand Icon (Mathematical Baseline matching main header) -->
+                <div class="h-28 md:h-[113px] flex items-center justify-center border-b border-slate-900/50">
+                    <div class="relative group">
+                        <div class="absolute -inset-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl blur opacity-25 group-hover:opacity-60 transition duration-500"></div>
+                        <div class="relative w-12 h-12 rounded-xl bg-slate-900 border border-slate-800/80 flex items-center justify-center shadow-2xl">
+                            <!-- Bilateral Brain Circuit AI Network Node Icon -->
+                            <svg class="w-6 h-6 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3-4-3-6.5c0 .4 0 .8-.1 1.2C12.4 6 11 8.5 11 11c0 2.2 1.8 4 4 4a2 2 0 0 1 2 2 5 5 0 0 1-5 5h-.2" />
+                                <path d="M12 22a7 7 0 0 1-7-7c0-2 1-3.9 3-5.5s3-4 3-6.5c0 .4 0 .8.1 1.2C11.6 6 13 8.5 13 11c0 2.2-1.8 4-4 4a2 2 0 0 0-2 2 5 5 0 0 0 5 5h.2" />
+                                <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main navigation links offset aligned with content padding -->
+                <div class="pt-10 space-y-1.5">
+                    <button class="nav-button active" data-target="overview">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                            <polyline points="9 22 9 12 15 12 15 22"/>
+                        </svg>
+                        Workshop Overview
+                    </button>
+                    <button class="nav-button" data-target="curriculum">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+                            <path d="M6 6h10"/>
+                            <path d="M6 10h10"/>
+                        </svg>
+                        Curriculum
+                    </button>
+                    <button class="nav-button" data-target="dashboard">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect width="7" height="9" x="3" y="3" rx="1"/>
+                            <rect width="7" height="5" x="14" y="3" rx="1"/>
+                            <rect width="7" height="9" x="14" y="12" rx="1"/>
+                            <rect width="7" height="5" x="3" y="16" rx="1"/>
+                        </svg>
+                        Participant Dashboard
+                    </button>
+                    <button class="nav-button" data-target="outcomes">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="m9 12 2 2 4-4"/>
+                        </svg>
+                        Learning Outcomes
+                    </button>
+                    <button class="nav-button" data-target="testimonials">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        Testimonials
+                    </button>
+                </div>
             </div>
+            
+            <!-- Bottom Space alignment padding replacing baseline text -->
+            <div class="h-10"></div>
         </nav>
 
         <!-- Main Content Area -->
-        <main class="flex-1 bg-slate-50 overflow-y-auto">
-             <header class="bg-white border-b border-slate-200">
-                <div class="px-6 sm:px-8 lg:px-10 py-8 text-center">
-                    <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight">Microsoft Azure AI Workshop</h1>
-                    <p class="text-xl text-slate-500 mt-2">Empowering Educators with Artificial Intelligence</p>
+        <main class="flex-1 overflow-y-auto">
+             <header class="bg-white/80 backdrop-blur-md border-b border-slate-200/60 sticky top-0 z-30">
+                <div class="px-6 sm:px-8 lg:px-10 py-6 text-center md:text-left flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                        <h1 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">AI for Educators Workshop</h1>
+                        <p class="text-slate-500 font-medium mt-1">Empowering Educators with Artificial Intelligence</p>
+                    </div>
                 </div>
-            </header>
+             </header>
 
             <div class="p-6 sm:p-8 lg:p-10">
+                
                 <!-- Workshop Overview Section -->
                 <section id="overview" class="main-content-section active">
                     <div class="fade-in">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                            <div>
-                                <h2 class="text-3xl font-bold text-slate-800 mb-4">About the Workshop</h2>
-                                <p class="text-slate-600 leading-relaxed mb-6">This workshop is specifically designed for educators, staff, academic advisors, and career counselors who want to integrate AI technologies into their academic programs and work processes. Participants will delve into a comprehensive exploration of the current state of Artificial Intelligence and its expanding role in education, offering insights into the latest advancements and challenges in the domain.</p>
-                            </div>
-                            <div class="card p-8 border-t-4 border-blue-600 fade-in fade-in-delay-1">
-                                <div class="flex items-center mb-4">
-                                     <div class="bg-blue-100 p-3 rounded-full flex-shrink-0">
-                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                                     </div>
-                                    <h3 class="text-2xl font-bold text-slate-800 ml-4">Workshop Goals</h3>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-stretch">
+                            <div class="flex flex-col justify-center space-y-6">
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-widest text-blue-600 block mb-2">Program Overview</span>
+                                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 leading-tight">About the Workshop</h2>
                                 </div>
-                                <ul class="space-y-3 text-slate-600 list-disc list-inside">
-                                    <li>Expand knowledge of AI and its practical applications.</li>
-                                    <li>Explore how AI can create content and redesign work processes.</li>
-                                    <li>Customize individualized student learning experiences.</li>
-                                    <li>Train students for the ethical use of AI.</li>
-                                    <li>Improve learning outcomes without compromising academic integrity.</li>
-                                </ul>
+                                <p class="text-slate-600 leading-relaxed text-lg">This workshop is specifically designed for educators, staff, academic advisors, and career counselors who want to integrate AI technologies into their academic programs and work processes. Participants will delve into a comprehensive exploration of the current state of Artificial Intelligence and its expanding role in education, offering insights into the latest advancements and challenges in the domain.</p>
+                            </div>
+                            <div class="premium-card p-8 border-t-2 border-blue-500 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center mb-6">
+                                         <!-- Target / Goals Duotone Upgrade -->
+                                         <div class="bg-gradient-to-tr from-blue-500 to-indigo-600 p-3 rounded-2xl flex-shrink-0 shadow-lg shadow-blue-500/10 text-white">
+                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                 <circle cx="12" cy="12" r="10"/>
+                                                 <circle cx="12" cy="12" r="6"/>
+                                                 <circle cx="12" cy="12" r="2"/>
+                                             </svg>
+                                         </div>
+                                        <h3 class="text-2xl font-bold text-slate-900 ml-4">Workshop Goals</h3>
+                                    </div>
+                                    <ul class="space-y-4 text-slate-600 text-sm">
+                                        <li class="flex items-start">
+                                            <span class="text-blue-500 mr-3 mt-0.5">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </span>
+                                            <span>Expand knowledge of AI and its practical applications.</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <span class="text-blue-500 mr-3 mt-0.5">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </span>
+                                            <span>Explore how AI can create content and redesign work processes.</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <span class="text-blue-500 mr-3 mt-0.5">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </span>
+                                            <span>Customize individualized student learning experiences.</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <span class="text-blue-500 mr-3 mt-0.5">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </span>
+                                            <span>Train students for the ethical use of AI.</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <span class="text-blue-500 mr-3 mt-0.5">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </span>
+                                            <span>Improve learning outcomes without compromising academic integrity.</span>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -152,92 +308,235 @@
                 
                 <!-- Curriculum Section -->
                 <section id="curriculum" class="main-content-section">
-                    <header class="mb-12 text-center fade-in">
-                        <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">Workshop Curriculum</h2>
-                        <p class="mt-2 text-xl text-slate-500 max-w-3xl mx-auto">A deep dive into the practical applications of AI across various disciplines.</p>
+                    <header class="mb-12 text-center md:text-left fade-in">
+                        <span class="text-xs font-bold uppercase tracking-widest text-blue-600 block mb-2">Curriculum Tracks</span>
+                        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Workshop Agenda & Syllabus</h2>
+                        <p class="mt-2 text-slate-500 max-w-3xl">A deep dive into the practical applications of AI across various disciplines.</p>
                     </header>
                      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <div class="card p-6 border-t-4 border-sky-500 fade-in fade-in-delay-1"><h3 class="font-bold text-lg text-sky-800 mb-2">State of AI in Education</h3><p class="text-slate-600 text-sm">Explore the latest advancements, challenges, and the expanding role of AI in the academic domain.</p></div>
-                        <div class="card p-6 border-t-4 border-sky-500 fade-in fade-in-delay-2"><h3 class="font-bold text-lg text-sky-800 mb-2">Machine Learning for Academia</h3><p class="text-slate-600 text-sm">Hands-on activities focusing on using machine learning to develop learning materials and enhance student engagement.</p></div>
-                        <div class="card p-6 border-t-4 border-sky-500 fade-in fade-in-delay-3"><h3 class="font-bold text-lg text-sky-800 mb-2">Re-designing College Processes</h3><p class="text-slate-600 text-sm">Discuss how AI can be used to innovate and improve administrative and academic processes in higher education.</p></div>
-                        <div class="card p-6 border-t-4 border-indigo-500 fade-in fade-in-delay-4"><h3 class="font-bold text-lg text-indigo-800 mb-2">Effective Use of AI</h3><p class="text-slate-600 text-sm">Applying AI tools and techniques to solve problems and drive innovation in diverse professional fields.</p></div>
-                        <div class="card p-6 border-t-4 border-indigo-500 fade-in fade-in-delay-5"><h3 class="font-bold text-lg text-indigo-800 mb-2">AI for Decision Making</h3><p class="text-slate-600 text-sm">Learn how AI can enhance decision-making, problem-solving, and data analysis across disciplines.</p></div>
-                        <div class="card p-6 border-t-4 border-indigo-500 fade-in fade-in-delay-6"><h3 class="font-bold text-lg text-indigo-800 mb-2">Navigating Ethical Dilemmas</h3><p class="text-slate-600 text-sm">Prepare to navigate the intricacies and ethical considerations of integrating AI tools into your work.</p></div>
+                        <div class="premium-card p-6 border-l-4 border-sky-500 fade-in fade-in-delay-1">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 ring-1 ring-inset ring-sky-700/10 mb-3">
+                                MODULE 01
+                            </span>
+                            <h3 class="font-extrabold text-lg text-slate-900 mb-2">State of AI in Education</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed">Explore the latest advancements, challenges, and the expanding role of AI in the academic domain.</p>
+                        </div>
+                        <div class="premium-card p-6 border-l-4 border-sky-500 fade-in fade-in-delay-2">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 ring-1 ring-inset ring-sky-700/10 mb-3">
+                                MODULE 02
+                            </span>
+                            <h3 class="font-extrabold text-lg text-slate-900 mb-2">Machine Learning for Academia</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed">Hands-on activities focusing on using machine learning to develop learning materials and enhance student engagement.</p>
+                        </div>
+                        <div class="premium-card p-6 border-l-4 border-sky-500 fade-in fade-in-delay-3">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 ring-1 ring-inset ring-sky-700/10 mb-3">
+                                MODULE 03
+                            </span>
+                            <h3 class="font-extrabold text-lg text-slate-900 mb-2">Re-designing College Processes</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed">Discuss how AI can be used to innovate and improve administrative and academic processes in higher education.</p>
+                        </div>
+                        <div class="premium-card p-6 border-l-4 border-indigo-500 fade-in fade-in-delay-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 ring-1 ring-inset ring-indigo-700/10 mb-3">
+                                MODULE 04
+                            </span>
+                            <h3 class="font-extrabold text-lg text-slate-900 mb-2">Effective Use of AI</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed">Applying AI tools and techniques to solve problems and drive innovation in diverse professional fields.</p>
+                        </div>
+                        <div class="premium-card p-6 border-l-4 border-indigo-500 fade-in fade-in-delay-5">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 ring-1 ring-inset ring-indigo-700/10 mb-3">
+                                MODULE 05
+                            </span>
+                            <h3 class="font-extrabold text-lg text-slate-900 mb-2">AI for Decision Making</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed">Learn how AI can enhance decision-making, problem-solving, and data analysis across disciplines.</p>
+                        </div>
+                        <div class="premium-card p-6 border-l-4 border-indigo-500 fade-in fade-in-delay-6">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 ring-1 ring-inset ring-indigo-700/10 mb-3">
+                                MODULE 06
+                            </span>
+                            <h3 class="font-extrabold text-lg text-slate-900 mb-2">Navigating Ethical Dilemmas</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed">Prepare to navigate the intricacies and ethical considerations of integrating AI tools into your work.</p>
+                        </div>
                     </div>
                 </section>
 
                 <!-- Participant Dashboard Section -->
                 <section id="dashboard" class="main-content-section">
-                     <header class="mb-12 text-center fade-in">
-                        <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">Participant Dashboard</h2>
-                        <p class="mt-2 text-xl text-slate-500">A snapshot of our diverse group of attendees.</p>
+                     <header class="mb-12 text-center md:text-left fade-in">
+                        <span class="text-xs font-bold uppercase tracking-widest text-blue-600 block mb-2">Statistics & Reach</span>
+                        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Participant Dashboard</h2>
+                        <p class="mt-2 text-slate-500">A snapshot of our diverse group of attendees.</p>
                     </header>
                     <!-- 5 Column grid for the statistics -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-8 mb-12">
-                        <div class="card p-4 sm:p-6 text-center border-t-4 border-blue-600 fade-in fade-in-delay-1 flex flex-col">
-                            <h3 class="h-12 flex items-center justify-center font-semibold text-slate-500 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">Total Participants</h3>
-                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-extrabold text-blue-600" data-target="833">0</p>
+                        <div class="premium-card p-4 sm:p-6 text-center border-t-4 border-blue-600 fade-in fade-in-delay-1 flex flex-col justify-between">
+                            <h3 class="h-12 flex items-center justify-center font-bold text-slate-400 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">Total Participants</h3>
+                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-blue-600" data-target="950">0</p>
                         </div>
-                        <div class="card p-4 sm:p-6 text-center border-t-4 border-blue-600 fade-in fade-in-delay-2 flex flex-col">
-                            <h3 class="h-12 flex items-center justify-center font-semibold text-slate-500 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">Institutions</h3>
-                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-extrabold text-blue-600" data-target="95">0</p>
+                        <div class="premium-card p-4 sm:p-6 text-center border-t-4 border-blue-600 fade-in fade-in-delay-2 flex flex-col justify-between">
+                            <h3 class="h-12 flex items-center justify-center font-bold text-slate-400 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">Institutions</h3>
+                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-blue-600" data-target="99">0</p>
                         </div>
-                        <div class="card p-4 sm:p-6 text-center border-t-4 border-blue-600 fade-in fade-in-delay-3 flex flex-col">
-                            <h3 class="h-12 flex items-center justify-center font-semibold text-slate-500 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">States & Territories</h3>
-                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-extrabold text-blue-600" data-target="19">0</p>
+                        <div class="premium-card p-4 sm:p-6 text-center border-t-4 border-blue-600 fade-in fade-in-delay-3 flex flex-col justify-between">
+                            <h3 class="h-12 flex items-center justify-center font-bold text-slate-400 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">States & Territories</h3>
+                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-blue-600" data-target="22">0</p>
                         </div>
-                        <div class="card p-4 sm:p-6 text-center border-t-4 border-blue-600 fade-in fade-in-delay-4 flex flex-col">
-                            <h3 class="h-12 flex items-center justify-center font-semibold text-slate-500 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">International & Online</h3>
-                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-extrabold text-blue-600" data-target="64">0</p>
+                        <div class="premium-card p-4 sm:p-6 text-center border-t-4 border-blue-600 fade-in fade-in-delay-4 flex flex-col justify-between">
+                            <h3 class="h-12 flex items-center justify-center font-bold text-slate-400 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">International & Online</h3>
+                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-blue-600" data-target="64">0</p>
                         </div>
-                        <div class="card p-4 sm:p-6 text-center border-t-4 border-teal-500 fade-in fade-in-delay-5 flex flex-col">
-                            <h3 class="h-12 flex items-center justify-center font-semibold text-slate-500 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">Estimated Student Impact</h3>
-                            <p class="text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-extrabold text-teal-600">~100k</p>
+                        <div class="premium-card p-4 sm:p-6 text-center border-t-4 border-teal-500 fade-in fade-in-delay-5 flex flex-col justify-between">
+                            <h3 class="h-12 flex items-center justify-center font-bold text-slate-400 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">Estimated Student Impact</h3>
+                            <p class="text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-teal-600">~100k</p>
                         </div>
                     </div>
                      <div class="grid grid-cols-1 gap-8">
-                        <div class="card p-6 relative fade-in fade-in-delay-6"><h2 class="text-2xl font-bold text-center mb-4 text-slate-800">Geographic Reach</h2><div id="map-container" class="h-[32rem]"></div><div id="map-tooltip"></div></div>
+                        <div class="premium-card p-6 relative fade-in fade-in-delay-6">
+                            <h2 class="text-2xl font-extrabold text-center mb-6 text-slate-900">Geographic Reach</h2>
+                            <div id="map-container" class="h-[32rem]"></div>
+                            <div id="map-tooltip"></div>
+                        </div>
                     </div>
                 </section>
                 
                 <!-- Learning Outcomes Section -->
                 <section id="outcomes" class="main-content-section">
-                    <header class="mb-12 text-center fade-in">
-                        <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">Key Learning Outcomes</h2>
-                        <p class="mt-2 text-xl text-slate-500 max-w-3xl mx-auto">By the end of the workshop, participants will be equipped with new knowledge and tools.</p>
+                    <header class="mb-12 text-center md:text-left fade-in">
+                        <span class="text-xs font-bold uppercase tracking-widest text-blue-600 block mb-2">Program Value</span>
+                        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Key Learning Outcomes</h2>
+                        <p class="mt-2 text-slate-500 max-w-3xl">By the end of the workshop, participants will be equipped with new knowledge and tools.</p>
                     </header>
                     <div class="max-w-4xl mx-auto space-y-8">
-                        <div class="card p-6 flex items-start space-x-6 fade-in fade-in-delay-1">
-                             <div class="bg-emerald-100 p-3 rounded-full flex-shrink-0 mt-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v11.494m-9-5.747h18" /></svg></div>
-                            <div><h3 class="font-bold text-lg text-emerald-800">Thorough Understanding of AI</h3><p class="text-slate-600 text-sm mt-1">Gain a comprehensive understanding of the current state of AI and its significant impact on the education sector.</p></div>
+                        <div class="premium-card p-6 flex items-start space-x-6 fade-in fade-in-delay-1 border-l-4 border-emerald-500">
+                             <!-- Sparkles outcome icon upgrade -->
+                             <div class="bg-emerald-50 p-4 rounded-2xl flex-shrink-0 text-emerald-600 shadow-md">
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                     <path d="M12 2v2"/>
+                                     <path d="M12 20v2"/>
+                                     <path d="M4.93 4.93l1.41 1.41"/>
+                                     <path d="M17.66 17.66l1.41 1.41"/>
+                                     <path d="M2 12h2"/>
+                                     <path d="M20 12h2"/>
+                                     <path d="M6.34 17.66l-1.41 1.41"/>
+                                     <path d="M19.07 4.93l-1.41 1.41"/>
+                                     <circle cx="12" cy="12" r="4"/>
+                                 </svg>
+                             </div>
+                            <div>
+                                <h3 class="font-extrabold text-lg text-slate-900">Thorough Understanding of AI</h3>
+                                <p class="text-slate-600 text-sm mt-1 leading-relaxed">Gain a comprehensive understanding of the current state of AI and its significant impact on the education sector.</p>
+                            </div>
                         </div>
-                         <div class="card p-6 flex items-start space-x-6 fade-in fade-in-delay-2">
-                             <div class="bg-emerald-100 p-3 rounded-full flex-shrink-0 mt-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m0-4l-2 2m2 2l-2-2" /></svg></div>
-                            <div><h3 class="font-bold text-lg text-emerald-800">Effective Leverage of AI Tools</h3><p class="text-slate-600 text-sm mt-1">Acquire the knowledge and tools to effectively leverage and teach AI concepts within your discipline.</p></div>
+                         <div class="premium-card p-6 flex items-start space-x-6 fade-in fade-in-delay-2 border-l-4 border-emerald-500">
+                             <!-- Custom leverage wrench/key tool icon upgrade -->
+                             <div class="bg-emerald-50 p-4 rounded-2xl flex-shrink-0 text-emerald-600 shadow-md">
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                     <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                                 </svg>
+                             </div>
+                            <div>
+                                <h3 class="font-extrabold text-lg text-slate-900">Effective Leverage of AI Tools</h3>
+                                <p class="text-slate-600 text-sm mt-1 leading-relaxed">Acquire the knowledge and tools to effectively leverage and teach AI concepts within your discipline.</p>
+                            </div>
                         </div>
-                        <div class="card p-6 flex items-start space-x-6 fade-in fade-in-delay-3">
-                             <div class="bg-emerald-100 p-3 rounded-full flex-shrink-0 mt-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2a4 4 0 00-4-4H3V7h2a4 4 0 004-4v-2m12 14v2a4 4 0 01-4 4h-2v-2h2a2 2 0 002-2v-2m-4-4h2a4 4 0 014 4v2m-6-14v2a4 4 0 014 4h2V7h-2a4 4 0 01-4-4v-2" /></svg></div>
-                            <div><h3 class="font-bold text-lg text-emerald-800">Prepare the Next Generation</h3><p class="text-slate-600 text-sm mt-1">Be prepared to train the next generation of students to face the evolving needs of the modern workforce in an AI-driven world.</p></div>
+                        <div class="premium-card p-6 flex items-start space-x-6 fade-in fade-in-delay-3 border-l-4 border-emerald-500">
+                             <!-- People icon upgrade -->
+                             <div class="bg-emerald-50 p-4 rounded-2xl flex-shrink-0 text-emerald-600 shadow-md">
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                     <circle cx="9" cy="7" r="4"/>
+                                     <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                     <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                 </svg>
+                             </div>
+                            <div>
+                                <h3 class="font-extrabold text-lg text-slate-900">Prepare the Next Generation</h3>
+                                <p class="text-slate-600 text-sm mt-1 leading-relaxed">Be prepared to train the next generation of students to face the evolving needs of the modern workforce in an AI-driven world.</p>
+                            </div>
                         </div>
                     </div>
                 </section>
                 
                 <!-- Testimonials Section -->
                 <section id="testimonials" class="main-content-section">
-                    <header class="mb-12 text-center fade-in">
-                        <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">What Participants Are Saying</h2>
-                        <p class="mt-2 text-xl text-slate-500">Feedback from educators who attended the workshop.</p>
+                    <header class="mb-12 text-center md:text-left fade-in">
+                        <span class="text-xs font-bold uppercase tracking-widest text-blue-600 block mb-2">Participant Stories</span>
+                        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">What Participants Are Saying</h2>
+                        <p class="mt-2 text-slate-500">Feedback from educators who attended the workshop.</p>
                     </header>
-                    <div class="space-y-8 max-w-4xl mx-auto">
-                        <div class="card p-8 border-l-4 border-blue-500 fade-in fade-in-delay-1">
-                            <blockquote class="text-lg text-slate-600 italic leading-relaxed">"The workshop was terrific. It provided not only lecture material, but showed us how the presenters use AI in their daily work - this was instrumental. It also provided content that could be used in our courses as we return back to the semester."</blockquote>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        
+                        <!-- Testimonial 1 -->
+                        <div class="premium-card p-8 flex flex-col justify-between relative overflow-hidden pt-12">
+                            <span class="quote-icon">“</span>
+                            <div class="flex space-x-1 mb-4 text-amber-400">
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                            </div>
+                            <p class="text-slate-600 text-sm leading-relaxed italic relative z-10 mb-6">
+                                "The workshop was terrific. It provided not only lecture material, but showed us how the presenters use AI in their daily work - this was instrumental. It also provided content that could be used in our courses as we return back to the semester."
+                            </p>
+                            <div class="flex items-center space-x-3 mt-auto">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-black shadow-md border-2 border-white">
+                                    AM
+                                </div>
+                                <div>
+                                    <div class="text-xs font-bold text-slate-900 block">Faculty Member</div>
+                                    <div class="text-[10px] text-slate-400">Higher Education</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card p-8 border-l-4 border-blue-500 fade-in fade-in-delay-2">
-                            <blockquote class="text-lg text-slate-600 italic leading-relaxed">"I learned so much about AI and how to incorporate it effectively (and appropriately) into my work. I definitely feel more comfortable with AI and have begun using it intentionally on a daily basis."</blockquote>
+
+                        <!-- Testimonial 2 -->
+                        <div class="premium-card p-8 flex flex-col justify-between relative overflow-hidden pt-12">
+                            <span class="quote-icon">“</span>
+                            <div class="flex space-x-1 mb-4 text-amber-400">
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                            </div>
+                            <p class="text-slate-600 text-sm leading-relaxed italic relative z-10 mb-6">
+                                "I learned so much about AI and how to incorporate it effectively (and appropriately) into my work. I definitely feel more comfortable with AI and have begun using it intentionally on a daily basis."
+                            </p>
+                            <div class="flex items-center space-x-3 mt-auto">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center text-white text-sm font-black shadow-md border-2 border-white">
+                                    RD
+                                </div>
+                                <div>
+                                    <div class="text-xs font-bold text-slate-900 block">Academic Advisor</div>
+                                    <div class="text-[10px] text-slate-400">Counseling Services</div>
+                                </div>
+                            </div>
                         </div>
-                         <div class="card p-8 border-l-4 border-blue-500 fade-in fade-in-delay-3">
-                            <blockquote class="text-lg text-slate-600 italic leading-relaxed">"This was one of the best professional development opportunities I have ever experienced. The presenters are experts in this field and have the heart of educators. I highly recommend this workshop for any educator wanting to learn more about AI!"</blockquote>
+
+                        <!-- Testimonial 3 -->
+                        <div class="premium-card p-8 flex flex-col justify-between relative overflow-hidden pt-12">
+                            <span class="quote-icon">“</span>
+                            <div class="flex space-x-1 mb-4 text-amber-400">
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                            </div>
+                            <p class="text-slate-600 text-sm leading-relaxed italic relative z-10 mb-6">
+                                "This was one of the best professional development opportunities I have ever experienced. The presenters are experts in this field and have the heart of educators. I highly recommend this workshop for any educator wanting to learn more about AI!"
+                            </p>
+                            <div class="flex items-center space-x-3 mt-auto">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white text-sm font-black shadow-md border-2 border-white">
+                                    KH
+                                </div>
+                                <div>
+                                    <div class="text-xs font-bold text-slate-900 block">Assistant Professor</div>
+                                    <div class="text-[10px] text-slate-400">Liberal Arts</div>
+                                </div>
+                            </div>
                         </div>
+
                     </div>
                 </section>
             </div>
@@ -249,16 +548,16 @@
         
         // --- DATA ---
         const participantData = {
-            total: 833,
-            institutions: 95,
-            states: 19,
+            total: 950,
+            institutions: 99,
+            states: 22,
             onlineAndIntl: 64,
             studentImpact: 100000,
-            activeStates: new Set(['AL', 'AZ', 'CO', 'FL', 'HI', 'IL', 'IN', 'LA', 'MD', 'MN', 'NC', 'NJ', 'NY', 'OH', 'PR', 'TX', 'WA', 'CA', 'WY']),
+            activeStates: new Set(['AL', 'AZ', 'CO', 'FL', 'HI', 'IL', 'IN', 'LA', 'MD', 'MN', 'NC', 'NJ', 'NY', 'OH', 'PR', 'TX', 'WA', 'CA', 'WY', 'TN', 'MA', 'KY']),
             attendeeData: {
                 'AL': 24, 'AZ': 30, 'CO': 36, 'FL': 91, 'HI': 16, 'IL': 75, 'IN': 42, 
-                'LA': 17, 'MD': 18, 'MN': 35, 'NC': 32, 'NJ': 38, 'NY': 43, 'OH': 51, 
-                'PR': 67, 'TX': 47, 'WA': 44, 'CA': 27, 'WY': 36
+                'LA': 17, 'MD': 18, 'MN': 35, 'NC': 32, 'NJ': 38, 'NY': 77, 'OH': 51, 
+                'PR': 67, 'TX': 47, 'WA': 44, 'CA': 27, 'WY': 36, 'TN': 42, 'MA': 21, 'KY': 20
             }
         };
 
@@ -337,16 +636,62 @@
                 const states = topojson.feature(us, us.objects.states);
                 const projection = d3.geoIdentity().fitSize([mapContainer.clientWidth, mapContainer.clientHeight], states);
                 const path = d3.geoPath().projection(projection);
-                const mapSvg = d3.select("#map-container").append("svg").attr("viewBox", `0 0 ${mapContainer.clientWidth} ${mapContainer.clientHeight}`);
                 
+                // Clear any previous map renders before rendering again
+                mapContainer.innerHTML = '';
+                
+                const mapSvg = d3.select("#map-container").append("svg")
+                    .attr("viewBox", `0 0 ${mapContainer.clientWidth} ${mapContainer.clientHeight}`)
+                    .attr("width", "100%")
+                    .attr("height", "100%");
+                
+                // Define drop-shadow filters and high-fidelity gradients in SVG defs
+                const defs = mapSvg.append("defs");
+                
+                // Active State base gradient fill
+                const stateGrad = defs.append("linearGradient")
+                    .attr("id", "azureStateGradient")
+                    .attr("x1", "0%").attr("y1", "0%")
+                    .attr("x2", "100%").attr("y2", "100%");
+                stateGrad.append("stop").attr("offset", "0%").attr("stop-color", "#0078D4");
+                stateGrad.append("stop").attr("offset", "100%").attr("stop-color", "#005394");
+
+                // Inactive State subtle hover glow
+                const hoverGrad = defs.append("linearGradient")
+                    .attr("id", "azureHoverGradient")
+                    .attr("x1", "0%").attr("y1", "0%")
+                    .attr("x2", "100%").attr("y2", "100%");
+                hoverGrad.append("stop").attr("offset", "0%").attr("stop-color", "#50E6FF");
+                hoverGrad.append("stop").attr("offset", "100%").attr("stop-color", "#0078D4");
+
+                // Drop-shadow filter for interactive states
+                const dropShadow = defs.append("filter")
+                    .attr("id", "shadowState")
+                    .attr("height", "130%");
+                dropShadow.append("feDropShadow")
+                    .attr("dx", "0")
+                    .attr("dy", "3")
+                    .attr("stdDeviation", "2.5")
+                    .attr("flood-color", "#022e54")
+                    .attr("flood-opacity", "0.22");
+
                 const getColor = (stateAbbr) => {
-                    return participantData.activeStates.has(stateAbbr) ? '#0078D4' : '#cbd5e1';
+                    return participantData.activeStates.has(stateAbbr) ? 'url(#azureStateGradient)' : '#e2e8f0';
                 }
 
-                mapSvg.append("g").selectAll("path").data(states.features).join("path")
+                mapSvg.append("g")
+                    .selectAll("path")
+                    .data(states.features)
+                    .join("path")
                     .attr("d", path)
                     .attr("class", "state")
                     .style("cursor", "pointer")
+                    .style("stroke", "#ffffff")
+                    .style("stroke-width", "1.25px")
+                    .attr("filter", d => {
+                        const stateAbbr = stateNameMap[d.properties.name]?.abbr;
+                        return participantData.activeStates.has(stateAbbr) ? 'url(#shadowState)' : 'none';
+                    })
                     .attr("fill", d => getColor(stateNameMap[d.properties.name]?.abbr))
                     .on("mousemove", function(event, d) {
                         const containerRect = mapContainer.getBoundingClientRect();
@@ -354,19 +699,23 @@
                         const y = event.clientY - containerRect.top;
                         
                         const stateAbbr = stateNameMap[d.properties.name]?.abbr;
-                        d3.select(this).attr('fill', '#50E6FF');
-                        tooltip.style.opacity = 1;
-                        tooltip.style.left = `${x + 15}px`;
-                        tooltip.style.top = `${y}px`;
                         
-                        let status;
                         if (participantData.activeStates.has(stateAbbr)) {
+                            d3.select(this).attr('fill', 'url(#azureHoverGradient)');
+                            tooltip.style.opacity = 1;
+                            tooltip.style.left = `${x + 15}px`;
+                            tooltip.style.top = `${y}px`;
+                            
                             const count = participantData.attendeeData[stateAbbr];
-                            status = `<span class="font-bold text-yellow-300">Attendees: ${count}</span>`;
+                            const status = `<span class="font-extrabold text-yellow-300">Attendees: ${count}</span>`;
+                            tooltip.innerHTML = `<strong class="text-sm font-semibold">${d.properties.name}</strong><br>${status}`;
                         } else {
-                            status = `<span class="text-xs text-slate-300">No Participants</span>`;
+                            d3.select(this).attr('fill', '#cbd5e1');
+                            tooltip.style.opacity = 1;
+                            tooltip.style.left = `${x + 15}px`;
+                            tooltip.style.top = `${y}px`;
+                            tooltip.innerHTML = `<strong class="text-sm font-semibold text-slate-300">${d.properties.name}</strong><br><span class="text-xs text-slate-400">No Participants</span>`;
                         }
-                        tooltip.innerHTML = `${d.properties.name}<br>${status}`;
                     })
                     .on("mouseout", function(event, d) {
                         d3.select(this).attr("fill", getColor(stateNameMap[d.properties.name]?.abbr));
@@ -377,6 +726,17 @@
                 mapContainer.innerHTML = `<p class="text-center text-red-500">Could not load map data.</p>`;
             });
         }
+        
+        // --- RESPONSIVE ADAPTATION ON RESIZE ---
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (document.getElementById('dashboard').classList.contains('active')) {
+                    drawMap();
+                }
+            }, 250);
+        });
         
         // --- INITIALIZATION ---
         triggerSectionAnimations(document.querySelector('.main-content-section.active'));
