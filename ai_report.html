@@ -1,873 +1,1353 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI for Educators Workshop - Interactive Dashboard</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI for Educators Workshop Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://unpkg.com/topojson@3"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            }
+          }
+        }
+      }
+    </script>
+    <!-- D3.js and TopoJSON library CDNs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom styling refinements -->
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-            overflow-x: hidden;
-        }
-        
-        /* Premium Card styling with high-fidelity soft border shadows */
-        .premium-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(226, 232, 240, 0.7);
-            box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.03), 0 2px 4px -2px rgba(15, 23, 42, 0.02);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            border-radius: 1.25rem;
-        }
-        .premium-card:hover {
-            transform: translateY(-4px);
-            background: #ffffff;
-            box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.06), 0 10px 10px -5px rgba(15, 23, 42, 0.02);
-            border-color: rgba(0, 120, 212, 0.35);
-        }
-
-        /* Ambient Glow Mesh Orbs in Background */
-        .ambient-glow-1 {
-            position: absolute;
-            width: 500px;
-            height: 500px;
-            border-radius: 9999px;
-            background: radial-gradient(circle, rgba(0, 120, 212, 0.06) 0%, rgba(255,255,255,0) 70%);
-            top: -10%;
-            right: -10%;
-            pointer-events: none;
-            z-index: 0;
-            filter: blur(40px);
-        }
-        .ambient-glow-2 {
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            border-radius: 9999px;
-            background: radial-gradient(circle, rgba(13, 148, 136, 0.04) 0%, rgba(255,255,255,0) 70%);
-            bottom: 10%;
-            left: -5%;
-            pointer-events: none;
-            z-index: 0;
-            filter: blur(50px);
-        }
-
-        #map-tooltip {
-            position: absolute;
-            background-color: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 100;
-            max-width: 250px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-        }
-
-        .main-content-section {
-            display: none;
-        }
-        .main-content-section.active {
-            display: block;
-        }
-        
-        .fade-in {
-            animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            opacity: 0;
-        }
-
-        @keyframes slideUpFade {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .fade-in-delay-1 { animation-delay: 0.08s; }
-        .fade-in-delay-2 { animation-delay: 0.16s; }
-        .fade-in-delay-3 { animation-delay: 0.24s; }
-        .fade-in-delay-4 { animation-delay: 0.32s; }
-        .fade-in-delay-5 { animation-delay: 0.4s; }
-        .fade-in-delay-6 { animation-delay: 0.48s; }
-        
-        .nav-button {
-            position: relative;
-            display: flex;
-            align-items: center;
-            width: 100%;
-            text-align: left;
-            padding: 0.85rem 1.25rem;
-            border-radius: 0.75rem;
-            font-weight: 500;
-            color: #94a3b8;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            border: 1px solid transparent;
-        }
-        .nav-button:hover {
-            background-color: rgba(255, 255, 255, 0.04);
-            color: #f1f5f9;
-            transform: translateX(4px);
-        }
-        .nav-button.active {
-            background: linear-gradient(135deg, #0078D4 0%, #005a9e 100%);
-            color: white;
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(0, 120, 212, 0.25);
-            border-color: rgba(255, 255, 255, 0.15);
-        }
-        
-        /* High-fidelity active rail dot indicator */
-        .nav-button.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 25%;
-            height: 50%;
-            width: 4px;
-            background-color: #50E6FF;
-            border-radius: 99px;
-        }
-        
-        /* Testimonial Quote Graphic stylings */
-        .quote-icon {
-            font-family: Georgia, serif;
-            font-size: 5rem;
-            line-height: 1;
-            color: rgba(0, 120, 212, 0.08);
-            position: absolute;
-            top: 0.5rem;
-            left: 1.5rem;
-            pointer-events: none;
-        }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-in {
+        animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+      /* Custom scrollbars */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 9px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+      /* Map styling overlays */
+      .state-path {
+        transition: fill 0.2s ease, stroke-width 0.2s ease, stroke 0.2s ease;
+      }
     </style>
-</head>
-<body class="text-slate-800 relative min-h-screen">
+  </head>
+  <body class="bg-[#f8fafc] text-slate-800 font-sans overflow-x-hidden min-h-screen relative flex flex-col md:flex-row">
+    
+    <!-- Decorative Blur Background Mesh -->
+    <div class="absolute top-[-10%] right-[-10%] w-[35rem] h-[35rem] rounded-full bg-gradient-to-r from-blue-300/10 to-indigo-300/5 blur-3xl pointer-events-none z-0"></div>
+    <div class="absolute bottom-[10%] left-[-5%] w-[40rem] h-[40rem] rounded-full bg-gradient-to-r from-teal-200/5 to-cyan-300/10 blur-3xl pointer-events-none z-0"></div>
 
-    <!-- Ambient Glow Backdrops -->
-    <div class="ambient-glow-1"></div>
-    <div class="ambient-glow-2"></div>
+    <!-- --- SIDEBAR WORKSPACE NAVIGATION (Desktop Only) --- -->
+    <nav id="sidebar-navigation" class="hidden md:flex md:w-66 bg-slate-950 text-white flex-shrink-0 flex-col justify-between border-r border-slate-900 shadow-xl z-20 md:sticky md:top-0 md:h-screen overflow-y-auto">
+      <div class="p-5 flex flex-col h-full justify-between">
+        <div>
+          <!-- Header / Brand visualizer -->
+          <div class="h-28 flex items-center justify-center border-b border-slate-900/50">
+            <div class="relative group cursor-pointer" onclick="switchTab('overview')">
+              <div class="absolute -inset-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-teal-400 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-500"></div>
+              <div class="relative w-16 h-16 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center shadow-lg transition-all duration-300 group-hover:scale-105">
+                <i data-lucide="brain" class="w-9 h-9 text-blue-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.4)]"></i>
+              </div>
+            </div>
+          </div>
 
-    <div class="flex flex-col md:flex-row min-h-screen relative z-10">
+          <!-- Main Tabs List -->
+          <div class="pt-10 space-y-2">
+            <button
+              id="nav-tab-overview"
+              onclick="switchTab('overview')"
+              class="relative w-full flex items-center px-4 py-3.5 rounded-xl transition duration-300 font-medium text-sm text-left bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-600/10"
+            >
+              <i data-lucide="book-open" class="w-5 h-5 mr-3"></i>
+              Initiative Overview
+            </button>
+            <button
+              id="nav-tab-curriculum"
+              onclick="switchTab('curriculum')"
+              class="relative w-full flex items-center px-4 py-3.5 rounded-xl transition duration-300 font-medium text-sm text-left text-slate-400 hover:text-slate-200 hover:bg-white/5"
+            >
+              <i data-lucide="school" class="w-5 h-5 mr-3"></i>
+              Project Workshops
+            </button>
+            <button
+              id="nav-tab-dashboard"
+              onclick="switchTab('dashboard')"
+              class="relative w-full flex items-center px-4 py-3.5 rounded-xl transition duration-300 font-medium text-sm text-left text-slate-400 hover:text-slate-200 hover:bg-white/5"
+            >
+              <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3"></i>
+              Project Reach
+            </button>
+            <button
+              id="nav-tab-outcomes"
+              onclick="switchTab('outcomes')"
+              class="relative w-full flex items-center px-4 py-3.5 rounded-xl transition duration-300 font-medium text-sm text-left text-slate-400 hover:text-slate-200 hover:bg-white/5"
+            >
+              <i data-lucide="award" class="w-5 h-5 mr-3"></i>
+              Learning Outcomes
+            </button>
+            <button
+              id="nav-tab-testimonials"
+              onclick="switchTab('testimonials')"
+              class="relative w-full flex items-center px-4 py-3.5 rounded-xl transition duration-300 font-medium text-sm text-left text-slate-400 hover:text-slate-200 hover:bg-white/5"
+            >
+              <i data-lucide="message-square" class="w-5 h-5 mr-3"></i>
+              Feedback Stories
+            </button>
+          </div>
+        </div>
+
+        <div class="h-6"></div>
+      </div>
+    </nav>
+
+    <!-- --- MOUNTED WORKSPACE HEADER (Mobile Only Navbar) --- -->
+    <nav id="mobile-navigation" class="md:hidden bg-slate-950 text-white px-5 py-4 flex items-center justify-between border-b border-slate-900 shadow-md sticky top-0 z-50">
+      <div class="flex items-center gap-3 cursor-pointer hover:opacity-90 active:scale-[0.98] transition duration-150" onclick="switchTab('overview')">
+        <div class="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center">
+          <i data-lucide="brain" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <span class="font-extrabold text-sm block tracking-tight">AI for Educators</span>
+          <span class="text-[10px] text-slate-400 block -mt-0.5">Workshop Dashboard</span>
+        </div>
+      </div>
+      <button 
+        id="hamburger-menu-btn"
+        onclick="toggleMobileDrawer()"
+        class="p-2 rounded-lg bg-slate-900 hover:bg-slate-800 focus:outline-none cursor-pointer"
+      >
+        <i data-lucide="menu" id="hamburger-icon" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Mobile menu modal drawer container -->
+      <div id="mobile-drawer" class="hidden absolute left-0 top-full right-0 bg-slate-950 border-b border-slate-900 shadow-xl overflow-hidden p-4 space-y-2">
+        <button
+          id="m-nav-tab-overview"
+          onclick="switchTab('overview')"
+          class="w-full flex items-center px-4 py-3 rounded-lg text-sm font-semibold text-left transition bg-blue-600 text-white"
+        >
+          <i data-lucide="book-open" class="w-5 h-5 mr-3"></i>
+          Initiative Overview
+        </button>
+        <button
+          id="m-nav-tab-curriculum"
+          onclick="switchTab('curriculum')"
+          class="w-full flex items-center px-4 py-3 rounded-lg text-sm font-semibold text-left transition text-slate-400 hover:text-white hover:bg-slate-900"
+        >
+          <i data-lucide="school" class="w-5 h-5 mr-3"></i>
+          Project Workshops
+        </button>
+        <button
+          id="m-nav-tab-dashboard"
+          onclick="switchTab('dashboard')"
+          class="w-full flex items-center px-4 py-3 rounded-lg text-sm font-semibold text-left transition text-slate-400 hover:text-white hover:bg-slate-900"
+        >
+          <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3"></i>
+          Project Reach
+        </button>
+        <button
+          id="m-nav-tab-outcomes"
+          onclick="switchTab('outcomes')"
+          class="w-full flex items-center px-4 py-3 rounded-lg text-sm font-semibold text-left transition text-slate-400 hover:text-white hover:bg-slate-900"
+        >
+          <i data-lucide="award" class="w-5 h-5 mr-3"></i>
+          Learning Outcomes
+        </button>
+        <button
+          id="m-nav-tab-testimonials"
+          onclick="switchTab('testimonials')"
+          class="w-full flex items-center px-4 py-3 rounded-lg text-sm font-semibold text-left transition text-slate-400 hover:text-white hover:bg-slate-900"
+        >
+          <i data-lucide="message-square" class="w-5 h-5 mr-3"></i>
+          Feedback Stories
+        </button>
+      </div>
+    </nav>
+
+    <!-- --- MAIN INTERFACES GRID --- -->
+    <div class="flex-1 flex flex-col min-w-0 z-10 relative">
+      
+      <!-- Dynamic Context Header (Desktop only) -->
+      <header class="bg-white/70 backdrop-blur-md border-b border-slate-200/50 sticky top-0 hidden md:block z-30">
+        <div class="max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">AI for Educators Dashboard</h1>
+          </div>
+        </div>
+      </header>
+
+      <!-- Outer Section Display -->
+      <main class="flex-1 max-w-7xl w-full mx-auto px-5 sm:px-8 py-8 md:py-10">
         
-        <!-- Left Side Navigation -->
-        <nav class="md:w-64 bg-slate-950 text-white px-4 py-6 flex-shrink-0 flex flex-col border-r border-slate-900 shadow-xl justify-between animate-fade-in">
-            <div>
-                <!-- Top Brand Icon (Mathematical Baseline matching main header) -->
-                <div class="h-28 md:h-[113px] flex items-center justify-center border-b border-slate-900/50">
-                    <div class="relative group">
-                        <!-- Glow ring calibrated specifically for the larger icon profile -->
-                        <div class="absolute -inset-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-teal-400 rounded-2xl blur-md opacity-35 group-hover:opacity-75 transition duration-500"></div>
-                        <!-- Masterfully scaled brand container (w-20 h-20) -->
-                        <div class="relative w-20 h-20 rounded-2xl bg-slate-950 border border-slate-800/80 flex items-center justify-center shadow-2xl transition-all duration-300 group-hover:scale-105">
-                            <!-- Ultra-sharp scaled brain circuit node SVG (w-12 h-12) -->
-                            <svg class="w-12 h-12 text-blue-400 drop-shadow-[0_0_12px_rgba(56,189,248,0.4)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3-4-3-6.5c0 .4 0 .8-.1 1.2C12.4 6 11 8.5 11 11c0 2.2 1.8 4 4 4a2 2 0 0 1 2 2 5 5 0 0 1-5 5h-.2" />
-                                <path d="M12 22a7 7 0 0 1-7-7c0-2 1-3.9 3-5.5s3-4 3-6.5c0 .4 0 .8.1 1.2C11.6 6 13 8.5 13 11c0 2.2-1.8 4-4 4a2 2 0 0 0-2 2 5 5 0 0 0 5 5h.2" />
-                                <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
-                            </svg>
-                        </div>
-                    </div>
+        <!-- ======================= TAB 1: OVERVIEW ======================= -->
+        <div id="panel-overview" class="animate-fade-in space-y-8">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+            
+            <!-- Left Frame: Hero details -->
+            <div class="lg:col-span-7 flex flex-col justify-between space-y-6">
+              <div>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-none mb-4">
+                  About the Initiative
+                </h2>
+                <div class="space-y-4 text-slate-600 text-sm md:text-md leading-relaxed font-normal">
+                  <p>
+                    This multi-workshop initiative is designed for educators, staff, advisors, and academic and workforce leaders who are ready to embed robust, modern, and pedagogically sound AI into teaching and learning across disciplines and institutions. Building on NCyTE-aligned offerings such as CISM and Ethical Hacking with AI, OT/IT with AI, Azure cloud administration, Security+, CMMC and C2M2, and Cybersecurity and AI Systems, the initiative develops AI-enabled capacity in both technical content (cloud, security, privacy, governance) and day-to-day educational practice (course design, advising, assessment, and student support).
+                  </p>
+                  <p>
+                    A core aim is to establish a visible presence in every U.S. state and U.S. territory, cultivating local communities of practice where faculty, staff, and industry partners co-develop sharable AI teaching resources, cybersecurity-aligned curricula, and implementation playbooks that can be adapted to regional needs. Through workshops, participants join a growing network of practitioners who learn together, test AI tools in authentic educational contexts, and collectively shape responsible, future-ready AI use in education.
+                  </p>
                 </div>
+              </div>
+            </div>
 
-                <!-- Main navigation links offset aligned with content padding -->
-                <div class="pt-10 space-y-1.5">
-                    <button class="nav-button active" data-target="overview">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                            <polyline points="9 22 9 12 15 12 15 22"/>
-                        </svg>
-                        Workshop Overview
-                    </button>
-                    <button class="nav-button" data-target="curriculum">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 flex-shrink-0" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
-                            <path d="M6 6h10"/>
-                            <path d="M6 10h10"/>
-                        </svg>
-                        Curriculum
-                    </button>
-                    <button class="nav-button" data-target="dashboard">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 flex-shrink-0" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect width="7" height="9" x="3" y="3" rx="1"/>
-                            <rect width="7" height="5" x="14" y="3" rx="1"/>
-                            <rect width="7" height="9" x="14" y="12" rx="1"/>
-                            <rect width="7" height="5" x="3" y="16" rx="1"/>
-                        </svg>
-                        Participant Dashboard
-                    </button>
-                    <button class="nav-button" data-target="outcomes">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 flex-shrink-0" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="m9 12 2 2 4-4"/>
-                        </svg>
-                        Learning Outcomes
-                    </button>
-                    <button class="nav-button" data-target="testimonials">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 flex-shrink-0" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                        </svg>
-                        Testimonials
-                    </button>
+            <!-- Right Frame: Highlight of Workshop Goals inside Premium Card -->
+            <div class="lg:col-span-5 bg-white rounded-2xl p-6 md:p-8 border border-slate-100 shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="flex items-center gap-3.5 mb-6">
+                  <div class="bg-blue-500 text-white p-3 rounded-2xl flex-shrink-0 shadow-md shadow-blue-500/10">
+                    <i data-lucide="check-circle" class="w-5 h-5"></i>
+                  </div>
+                  <h3 class="text-xl font-bold text-slate-900">Program Goals</h3>
                 </div>
+                
+                <ul class="space-y-4">
+                  <li class="flex items-start">
+                    <span class="text-emerald-500 font-bold mr-3 mt-1.5 flex-shrink-0">
+                      <span class="block w-2 h-2 rounded-full bg-emerald-500"></span>
+                    </span>
+                    <span class="text-slate-600 text-xs md:text-sm leading-relaxed">
+                      Build a distributed, national community of practice in which at least one institutional team per state and territory is actively implementing AI-enhanced teaching, learning, and student support aligned with cybersecurity and IT pathways.
+                    </span>
+                  </li>
+                  <li class="flex items-start">
+                    <span class="text-emerald-500 font-bold mr-3 mt-1.5 flex-shrink-0">
+                      <span class="block w-2 h-2 rounded-full bg-emerald-500"></span>
+                    </span>
+                    <span class="text-slate-600 text-xs md:text-sm leading-relaxed">
+                      Equip educators with practical, course-ready skills in areas such as Teaching CISM, Ethical Hacking, and OT/IT Using AI, Azure Cloud Administration with AI services, Security+ and CISA with AI-augmented labs, and CMMC/C2M2-aligned risk and maturity assessments, so they can immediately modernize their curricula.
+                    </span>
+                  </li>
+                  <li class="flex items-start">
+                    <span class="text-emerald-500 font-bold mr-3 mt-1.5 flex-shrink-0">
+                      <span class="block w-2 h-2 rounded-full bg-emerald-500"></span>
+                    </span>
+                    <span class="text-slate-600 text-xs md:text-sm leading-relaxed">
+                      Help institutions design and run AI-infused learning experiences—Foundations of AI, Applied AI, and integrated Cybersecurity and AI Systems—that improve student engagement and outcomes while remaining grounded in evidence-based pedagogy and strong academic integrity practices.
+                    </span>
+                  </li>
+                  <li class="flex items-start">
+                    <span class="text-emerald-500 font-bold mr-3 mt-1.5 flex-shrink-0">
+                      <span class="block w-2 h-2 rounded-full bg-emerald-500"></span>
+                    </span>
+                    <span class="text-slate-600 text-xs md:text-sm leading-relaxed">
+                      Support educators in building sustainable, shareable AI implementation artifacts (templates, rubrics, example prompts, lab guides, and policy language) that lower the barrier for colleagues in their state and region to adopt responsible, effective AI in their own courses and services.
+                    </span>
+                  </li>
+                  <li class="flex items-start">
+                    <span class="text-emerald-500 font-bold mr-3 mt-1.5 flex-shrink-0">
+                      <span class="block w-2 h-2 rounded-full bg-emerald-500"></span>
+                    </span>
+                    <span class="text-slate-600 text-xs md:text-sm leading-relaxed">
+                      Foster ethical, transparent AI use by training educators and students to document AI’s role in their work, critically evaluate AI-generated outputs, and align AI-supported decisions with institutional, regulatory, and professional standards in cybersecurity, privacy, and compliance.
+                    </span>
+                  </li>
+                </ul>
+              </div>
+              
+              <button 
+                onclick="switchTab('curriculum')"
+                class="mt-8 w-full py-4 px-4 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition duration-300 flex items-center justify-center gap-2 active:scale-[0.98] cursor-pointer"
+              >
+                Browse Workshops
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ======================= TAB 2: CURRICULUM ======================= -->
+        <div id="panel-curriculum" class="hidden animate-fade-in space-y-8">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-150 pb-6">
+            <div>
+              <h2 class="text-3xl font-black text-slate-900 tracking-tight">Project Workshops</h2>
+            </div>
+          </div>
+
+          <!-- Dynamic Grid updated via JS -->
+          <div id="workshops-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+
+        <!-- ======================= TAB 3: PROJECT REACH ======================= -->
+        <div id="panel-dashboard" class="hidden animate-fade-in space-y-8">
+          <div>
+            <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest block font-mono">DASHBOARD & STATS</span>
+            <h2 class="text-3xl font-black text-slate-900 mt-0.5 tracking-tight">Project Geographic Reach</h2>
+            <p class="text-slate-500 text-sm mt-1">Real-time statistics mapping active professional educator cohorts throughout the country.</p>
+          </div>
+
+          <!-- Dashboard counts tickers -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <!-- Card 1 -->
+            <div class="relative bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-slate-100 shadow-sm transition-all flex flex-col justify-between group hover:border-blue-300">
+              <div class="absolute top-4 right-4 p-2 rounded-xl bg-slate-50 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors flex-shrink-0">
+                <i data-lucide="globe" class="w-4 h-4"></i>
+              </div>
+              <div class="mb-4 pr-8">
+                <h4 class="font-bold text-slate-400 uppercase text-xs tracking-wider">Total Participants</h4>
+                <p class="text-[11px] text-slate-400 mt-0.5">Educators</p>
+              </div>
+              <div class="text-center">
+                <p id="count-participants" class="text-3xl font-black text-slate-900 tracking-tight">1,425</p>
+              </div>
             </div>
             
-            <!-- Bottom Space alignment padding replacing baseline text -->
-            <div class="h-10"></div>
-        </nav>
-
-        <!-- Main Content Area -->
-        <main class="flex-1 overflow-y-auto">
-             <header class="bg-white/80 backdrop-blur-md border-b border-slate-200/60 sticky top-0 z-30">
-                <div class="px-6 sm:px-8 lg:px-10 py-6 text-center md:text-left flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div>
-                        <h1 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">AI for Educators Workshop</h1>
-                        <p class="text-slate-500 font-medium mt-1">Empowering Educators with Artificial Intelligence</p>
-                    </div>
-                </div>
-             </header>
-
-            <div class="p-6 sm:p-8 lg:p-10">
-                
-                <!-- Workshop Overview Section -->
-                <section id="overview" class="main-content-section active">
-                    <div class="fade-in">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-stretch">
-                            <div class="flex flex-col justify-center space-y-6">
-                                <div>
-                                    <span class="text-xs font-bold uppercase tracking-widest text-blue-600 block mb-2">Program Overview</span>
-                                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 leading-tight">About the Workshop</h2>
-                                </div>
-                                <p class="text-slate-600 leading-relaxed text-lg">This workshop is specifically designed for educators, staff, academic advisors, and career counselors who want to integrate AI technologies into their academic programs and work processes. Participants will delve into a comprehensive exploration of the current state of Artificial Intelligence and its expanding role in education, offering insights into the latest advancements and challenges in the domain.</p>
-                            </div>
-                            <div class="premium-card p-8 border-t-2 border-blue-500 flex flex-col justify-between">
-                                <div>
-                                    <div class="flex items-center mb-6">
-                                         <!-- Target / Goals Duotone Upgrade -->
-                                         <div class="bg-gradient-to-tr from-blue-500 to-indigo-600 p-3 rounded-2xl flex-shrink-0 shadow-lg shadow-blue-500/10 text-white">
-                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                 <circle cx="12" cy="12" r="10"/>
-                                                 <circle cx="12" cy="12" r="6"/>
-                                                 <circle cx="12" cy="12" r="2"/>
-                                             </svg>
-                                         </div>
-                                        <h3 class="text-2xl font-bold text-slate-900 ml-4">Workshop Goals</h3>
-                                    </div>
-                                    <ul class="space-y-4 text-slate-600 text-sm">
-                                        <li class="flex items-start">
-                                            <span class="text-blue-500 mr-3 mt-0.5">
-                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                                </svg>
-                                            </span>
-                                            <span>Expand knowledge of AI and its practical applications.</span>
-                                        </li>
-                                        <li class="flex items-start">
-                                            <span class="text-blue-500 mr-3 mt-0.5">
-                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                                </svg>
-                                            </span>
-                                            <span>Explore how AI can create content and redesign work processes.</span>
-                                        </li>
-                                        <li class="flex items-start">
-                                            <span class="text-blue-500 mr-3 mt-0.5">
-                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                                </svg>
-                                            </span>
-                                            <span>Customize individualized student learning experiences.</span>
-                                        </li>
-                                        <li class="flex items-start">
-                                            <span class="text-blue-500 mr-3 mt-0.5">
-                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                                </svg>
-                                            </span>
-                                            <span>Train students for the ethical use of AI.</span>
-                                        </li>
-                                        <li class="flex items-start">
-                                            <span class="text-blue-500 mr-3 mt-0.5">
-                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                                </svg>
-                                            </span>
-                                            <span>Improve learning outcomes without compromising academic integrity.</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                
-                <!-- Curriculum Section -->
-                <section id="curriculum" class="main-content-section">
-                    <header class="mb-12 text-center md:text-left fade-in">
-                        <span class="text-xs font-bold uppercase tracking-widest text-blue-600 block mb-2">Curriculum Tracks</span>
-                        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Workshop Agenda & Syllabus</h2>
-                        <p class="mt-2 text-slate-500 max-w-3xl">A deep dive into the practical applications of AI across various disciplines.</p>
-                    </header>
-                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <div class="premium-card p-6 border-l-4 border-sky-500 fade-in fade-in-delay-1">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 ring-1 ring-inset ring-sky-700/10 mb-3">
-                                MODULE 01
-                            </span>
-                            <h3 class="font-extrabold text-lg text-slate-900 mb-2">State of AI in Education</h3>
-                            <p class="text-slate-600 text-sm leading-relaxed">Explore the latest advancements, challenges, and the expanding role of AI in the academic domain.</p>
-                        </div>
-                        <div class="premium-card p-6 border-l-4 border-sky-500 fade-in fade-in-delay-2">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 ring-1 ring-inset ring-sky-700/10 mb-3">
-                                MODULE 02
-                            </span>
-                            <h3 class="font-extrabold text-lg text-slate-900 mb-2">Machine Learning for Academia</h3>
-                            <p class="text-slate-600 text-sm leading-relaxed">Hands-on activities focusing on using machine learning to develop learning materials and enhance student engagement.</p>
-                        </div>
-                        <div class="premium-card p-6 border-l-4 border-sky-500 fade-in fade-in-delay-3">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 ring-1 ring-inset ring-sky-700/10 mb-3">
-                                MODULE 03
-                            </span>
-                            <h3 class="font-extrabold text-lg text-slate-900 mb-2">Re-designing College Processes</h3>
-                            <p class="text-slate-600 text-sm leading-relaxed">Discuss how AI can be used to innovate and improve administrative and academic processes in higher education.</p>
-                        </div>
-                        <div class="premium-card p-6 border-l-4 border-indigo-500 fade-in fade-in-delay-4">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 ring-1 ring-inset ring-indigo-700/10 mb-3">
-                                MODULE 04
-                            </span>
-                            <h3 class="font-extrabold text-lg text-slate-900 mb-2">Effective Use of AI</h3>
-                            <p class="text-slate-600 text-sm leading-relaxed">Applying AI tools and techniques to solve problems and drive innovation in diverse professional fields.</p>
-                        </div>
-                        <div class="premium-card p-6 border-l-4 border-indigo-500 fade-in fade-in-delay-5">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 ring-1 ring-inset ring-indigo-700/10 mb-3">
-                                MODULE 05
-                            </span>
-                            <h3 class="font-extrabold text-lg text-slate-900 mb-2">AI for Decision Making</h3>
-                            <p class="text-slate-600 text-sm leading-relaxed">Learn how AI can enhance decision-making, problem-solving, and data analysis across disciplines.</p>
-                        </div>
-                        <div class="premium-card p-6 border-l-4 border-indigo-500 fade-in fade-in-delay-6">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 ring-1 ring-inset ring-indigo-700/10 mb-3">
-                                MODULE 06
-                            </span>
-                            <h3 class="font-extrabold text-lg text-slate-900 mb-2">Navigating Ethical Dilemmas</h3>
-                            <p class="text-slate-600 text-sm leading-relaxed">Prepare to navigate the intricacies and ethical considerations of integrating AI tools into your work.</p>
-                        </div>
-                     </div>
-                </section>
-
-                <!-- Participant Dashboard Section -->
-                <section id="dashboard" class="main-content-section">
-                     <header class="mb-12 text-center md:text-left fade-in">
-                        <span class="text-xs font-bold uppercase tracking-widest text-blue-600 block mb-2">Statistics & Reach</span>
-                        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Participant Dashboard</h2>
-                        <p class="mt-2 text-slate-500">A snapshot of our diverse group of attendees.</p>
-                     </header>
-                    <!-- 5 Column grid for the statistics -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-8 mb-12">
-                        <div class="premium-card p-4 sm:p-6 text-center border-t-4 border-blue-600 fade-in fade-in-delay-1 flex flex-col justify-between">
-                            <h3 class="h-12 flex items-center justify-center font-bold text-slate-400 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">Total Participants</h3>
-                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-blue-600" data-target="1034">0</p>
-                        </div>
-                        <div class="premium-card p-4 sm:p-6 text-center border-t-4 border-blue-600 fade-in fade-in-delay-2 flex flex-col justify-between">
-                            <h3 class="h-12 flex items-center justify-center font-bold text-slate-400 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">Institutions</h3>
-                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-blue-600" data-target="100">0</p>
-                        </div>
-                        <div class="premium-card p-4 sm:p-6 text-center border-t-4 border-blue-600 fade-in fade-in-delay-3 flex flex-col justify-between">
-                            <h3 class="h-12 flex items-center justify-center font-bold text-slate-400 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">States & Territories</h3>
-                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-blue-600" data-target="23">0</p>
-                        </div>
-                        <div class="premium-card p-4 sm:p-6 text-center border-t-4 border-blue-600 fade-in fade-in-delay-4 flex flex-col justify-between">
-                            <h3 class="h-12 flex items-center justify-center font-bold text-slate-400 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">International & Online</h3>
-                            <p class="kpi-value text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-blue-600" data-target="81">0</p>
-                        </div>
-                        <div class="premium-card p-4 sm:p-6 text-center border-t-4 border-teal-500 fade-in fade-in-delay-5 flex flex-col justify-between">
-                            <h3 class="h-12 flex items-center justify-center font-bold text-slate-400 uppercase text-[10px] sm:text-xs tracking-wider leading-tight">Estimated Student Impact</h3>
-                            <p class="text-3xl sm:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-teal-600">~150k</p>
-                        </div>
-                    </div>
-                     <div class="grid grid-cols-1 gap-8">
-                        <div class="premium-card p-6 relative fade-in fade-in-delay-6">
-                            <h2 class="text-2xl font-extrabold text-center mb-6 text-slate-900">Geographic Reach</h2>
-                            <div id="map-container" class="h-[32rem] relative"></div>
-                            <div id="map-tooltip"></div>
-                        </div>
-                    </div>
-                </section>
-                
-                <!-- Learning Outcomes Section -->
-                <section id="outcomes" class="main-content-section">
-                    <header class="mb-12 text-center md:text-left fade-in">
-                        <span class="text-xs font-bold uppercase tracking-widest text-blue-600 block mb-2">Program Value</span>
-                        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Key Learning Outcomes</h2>
-                        <p class="mt-2 text-slate-500 max-w-3xl">By the end of the workshop, participants will be equipped with new knowledge and tools.</p>
-                    </header>
-                    <div class="max-w-4xl mx-auto space-y-8">
-                        <div class="premium-card p-6 flex items-start space-x-6 fade-in fade-in-delay-1 border-l-4 border-emerald-500">
-                             <!-- Sparkles outcome icon upgrade -->
-                             <div class="bg-emerald-50 p-4 rounded-2xl flex-shrink-0 text-emerald-600 shadow-md">
-                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                     <path d="M12 2v2"/>
-                                     <path d="M12 20v2"/>
-                                     <path d="M4.93 4.93l1.41 1.41"/>
-                                     <path d="M17.66 17.66l1.41 1.41"/>
-                                     <path d="M2 12h2"/>
-                                     <path d="M20 12h2"/>
-                                     <path d="M6.34 17.66l-1.41 1.41"/>
-                                     <path d="M19.07 4.93l-1.41 1.41"/>
-                                     <circle cx="12" cy="12" r="4"/>
-                                 </svg>
-                             </div>
-                            <div>
-                                <h3 class="font-extrabold text-lg text-slate-900">Thorough Understanding of AI</h3>
-                                <p class="text-slate-600 text-sm mt-1 leading-relaxed">Gain a comprehensive understanding of the current state of AI and its significant impact on the education sector.</p>
-                            </div>
-                        </div>
-                         <div class="premium-card p-6 flex items-start space-x-6 fade-in fade-in-delay-2 border-l-4 border-emerald-500">
-                             <!-- Custom leverage wrench/key tool icon upgrade -->
-                             <div class="bg-emerald-50 p-4 rounded-2xl flex-shrink-0 text-emerald-600 shadow-md">
-                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                     <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-                                 </svg>
-                             </div>
-                            <div>
-                                <h3 class="font-extrabold text-lg text-slate-900">Effective Leverage of AI Tools</h3>
-                                <p class="text-slate-600 text-sm mt-1 leading-relaxed">Acquire the knowledge and tools to effectively leverage and teach AI concepts within your discipline.</p>
-                            </div>
-                        </div>
-                        <div class="premium-card p-6 flex items-start space-x-6 fade-in fade-in-delay-3 border-l-4 border-emerald-500">
-                             <!-- People icon upgrade -->
-                             <div class="bg-emerald-50 p-4 rounded-2xl flex-shrink-0 text-emerald-600 shadow-md">
-                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                                     <circle cx="9" cy="7" r="4"/>
-                                     <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                                     <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                                 </svg>
-                             </div>
-                            <div>
-                                <h3 class="font-extrabold text-lg text-slate-900">Prepare the Next Generation</h3>
-                                <p class="text-slate-600 text-sm mt-1 leading-relaxed">Be prepared to train the next generation of students to face the evolving needs of the modern workforce in an AI-driven world.</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                
-                <!-- Testimonials Section -->
-                <section id="testimonials" class="main-content-section">
-                    <header class="mb-12 text-center md:text-left fade-in">
-                        <span class="text-xs font-bold uppercase tracking-widest text-blue-600 block mb-2">Participant Stories</span>
-                        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">What Participants Are Saying</h2>
-                        <p class="mt-2 text-slate-500">Feedback from educators who attended the workshop.</p>
-                    </header>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        
-                        <!-- Testimonial 1 -->
-                        <div class="premium-card p-8 flex flex-col justify-between relative overflow-hidden pt-12">
-                            <span class="quote-icon">“</span>
-                            <div class="flex space-x-1 mb-4 text-amber-400">
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                            </div>
-                            <p class="text-slate-600 text-sm leading-relaxed italic relative z-10 mb-6">
-                                "The workshop was terrific. It provided not only lecture material, but showed us how the presenters use AI in their daily work - this was instrumental. It also provided content that could be used in our courses as we return back to the semester."
-                            </p>
-                            <div class="flex items-center space-x-3 mt-auto">
-                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-black shadow-md border-2 border-white">
-                                    AM
-                                </div>
-                                <div>
-                                    <div class="text-xs font-bold text-slate-900 block">Faculty Member</div>
-                                    <div class="text-[10px] text-slate-400">Higher Education</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Testimonial 2 -->
-                        <div class="premium-card p-8 flex flex-col justify-between relative overflow-hidden pt-12">
-                            <span class="quote-icon">“</span>
-                            <div class="flex space-x-1 mb-4 text-amber-400">
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                            </div>
-                            <p class="text-slate-600 text-sm leading-relaxed italic relative z-10 mb-6">
-                                "I learned so much about AI and how to incorporate it effectively (and appropriately) into my work. I definitely feel more comfortable with AI and have begun using it intentionally on a daily basis."
-                            </p>
-                            <div class="flex items-center space-x-3 mt-auto">
-                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center text-white text-sm font-black shadow-md border-2 border-white">
-                                    RD
-                                </div>
-                                <div>
-                                    <div class="text-xs font-bold text-slate-900 block">Academic Advisor</div>
-                                    <div class="text-[10px] text-slate-400">Counseling Services</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Testimonial 3 -->
-                        <div class="premium-card p-8 flex flex-col justify-between relative overflow-hidden pt-12">
-                            <span class="quote-icon">“</span>
-                            <div class="flex space-x-1 mb-4 text-amber-400">
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                            </div>
-                            <p class="text-slate-600 text-sm leading-relaxed italic relative z-10 mb-6">
-                                "This was one of the best professional development opportunities I have ever experienced. The presenters are experts in this field and have the heart of educators. I highly recommend this workshop for any educator wanting to learn more about AI!"
-                            </p>
-                            <div class="flex items-center space-x-3 mt-auto">
-                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white text-sm font-black shadow-md border-2 border-white">
-                                    KH
-                                </div>
-                                <div>
-                                    <div class="text-xs font-bold text-slate-900 block">Assistant Professor</div>
-                                    <div class="text-[10px] text-slate-400">Liberal Arts</div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </section>
+            <!-- Card 2 -->
+            <div class="relative bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-slate-100 shadow-sm transition-all flex flex-col justify-between group hover:border-blue-300">
+              <div class="absolute top-4 right-4 p-2 rounded-xl bg-slate-50 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors flex-shrink-0">
+                <i data-lucide="school" class="w-4 h-4"></i>
+              </div>
+              <div class="mb-4 pr-8">
+                <h4 class="font-bold text-slate-400 uppercase text-xs tracking-wider">Institutions</h4>
+                <p class="text-[11px] text-slate-400 mt-0.5">Higher-ed & K-12</p>
+              </div>
+              <div class="text-center">
+                <p id="count-institutions" class="text-3xl font-black text-slate-900 tracking-tight">101</p>
+              </div>
             </div>
-        </main>
+
+            <!-- Card 3 -->
+            <div class="relative bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-slate-100 shadow-sm transition-all flex flex-col justify-between group hover:border-blue-300">
+              <div class="absolute top-4 right-4 p-2 rounded-xl bg-slate-50 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors flex-shrink-0">
+                <i data-lucide="map-pin" class="w-4 h-4"></i>
+              </div>
+              <div class="mb-4 pr-8">
+                <h4 class="font-bold text-slate-400 uppercase text-xs tracking-wider">States & Territories</h4>
+                <p class="text-[11px] text-slate-400 mt-0.5">National footprint</p>
+              </div>
+              <div class="text-center">
+                <p id="count-states" class="text-3xl font-black text-slate-900 tracking-tight">24</p>
+              </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="relative bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-slate-100 shadow-sm transition-all flex flex-col justify-between group hover:border-blue-300">
+              <div class="absolute top-4 right-4 p-2 rounded-xl bg-slate-50 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors flex-shrink-0">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+              </div>
+              <div class="mb-4 pr-8">
+                <h4 class="font-bold text-slate-400 uppercase text-xs tracking-wider leading-tight">Online/<br>Synchronous</h4>
+                <p class="text-[11px] text-slate-400 mt-0.5">Global cohorts</p>
+              </div>
+              <div class="text-center">
+                <p id="count-global" class="text-3xl font-black text-slate-900 tracking-tight">81</p>
+              </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="relative bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-slate-100 shadow-sm transition-all flex flex-col justify-between group hover:border-blue-300">
+              <div class="absolute top-4 right-4 p-2 rounded-xl bg-slate-50 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors flex-shrink-0">
+                <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+              </div>
+              <div class="mb-4 pr-8">
+                <h4 class="font-bold text-slate-400 uppercase text-xs tracking-wider">Student Impact</h4>
+                <p class="text-[11px] text-slate-400 mt-0.5">Active enrollment</p>
+              </div>
+              <div class="text-center">
+                <p id="count-student-impact" class="text-3xl font-black text-slate-900 tracking-tight">~150k</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main geographic map workspace with state locator -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+            
+            <!-- Expanded Left block - Interactive D3 canvas occupied full width -->
+            <div class="lg:col-span-12 bg-white/95 rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between relative overflow-hidden min-h-[500px]">
+              <div>
+                <div class="flex items-center justify-between mb-4 border-b border-slate-50 pb-4">
+                  <div>
+                    <h3 class="font-extrabold text-slate-900 text-lg">Interactive Distribution Projection</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Hover on highlighted states to visualize individual professional attendee distributions.</p>
+                  </div>
+                  <button 
+                    id="map-clear-selection-btn"
+                    onclick="clearSelectedState()"
+                    class="hidden text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg flex items-center gap-1 hover:bg-blue-100 hover:text-blue-700"
+                  >
+                    <i data-lucide="chevron-left" class="w-3 h-3"></i> Clear Select
+                  </button>
+                </div>
+
+                <!-- Map Container -->
+                <div id="map-container" class="w-full relative min-h-[420px] flex items-center justify-center"></div>
+              </div>
+
+              <!-- Custom State Detail Box if Selected -->
+              <div id="selected-state-detail" class="hidden mb-4"></div>
+
+              <!-- Quick map status notes -->
+              <div class="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400 pt-4 border-t border-slate-50">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded bg-blue-600 block"></span>
+                  <span class="font-medium text-slate-500">Active State Participants</span>
+                  <span class="w-2.5 h-2.5 rounded bg-[#f1f5f9] border border-slate-200 block ml-3"></span>
+                  <span class="font-medium text-slate-500">Inactive Regions</span>
+                </div>
+                <span class="font-mono text-[10px]">US Albers Spatial Projection</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ======================= TAB 4: LEARNING OUTCOMES ======================= -->
+        <div id="panel-outcomes" class="hidden animate-fade-in space-y-8">
+          <div>
+            <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest block font-mono">PROGRAM METRICS</span>
+            <h2 class="text-3xl font-black text-slate-900 mt-0.5 tracking-tight">Key Learning Outcomes</h2>
+            <p class="text-slate-500 text-sm mt-1">Comprehensive strategic knowledge metrics obtained upon finalizing active workshop phases.</p>
+          </div>
+
+          <div class="max-w-4xl mx-auto space-y-6">
+            <!-- Outcome 1 -->
+            <div class="bg-white rounded-2xl p-6 border-l-4 border-l-blue-600 bg-blue-50/25 shadow-sm flex flex-col sm:flex-row gap-5 items-start">
+              <div class="p-4 bg-white shadow-sm ring-1 ring-slate-100 rounded-xl flex-shrink-0">
+                <i data-lucide="brain" class="w-6 h-6 text-blue-600"></i>
+              </div>
+              <div class="space-y-1">
+                <h3 class="font-extrabold text-slate-950 text-lg tracking-tight">Cybersecurity & Computing Context</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">Gain deep functional comprehension of how the workshop topic and related AI capabilities can enhance teaching and learning in their own cybersecurity or computing context.</p>
+              </div>
+            </div>
+
+            <!-- Outcome 2 -->
+            <div class="bg-white rounded-2xl p-6 border-l-4 border-l-indigo-600 bg-indigo-50/25 shadow-sm flex flex-col sm:flex-row gap-5 items-start">
+              <div class="p-4 bg-white shadow-sm ring-1 ring-slate-100 rounded-xl flex-shrink-0">
+                <i data-lucide="award" class="w-6 h-6 text-indigo-600"></i>
+              </div>
+              <div class="space-y-1">
+                <h3 class="font-extrabold text-slate-950 text-lg tracking-tight">Practical AI-Enabled Workflows</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">Obtain critical hands-on knowledge of at least one practical AI-enabled workflow, tool, or strategy connected to the workshop focus (such as analysis, drafting, feedback, or simulation).</p>
+              </div>
+            </div>
+
+            <!-- Outcome 3 -->
+            <div class="bg-white rounded-2xl p-6 border-l-4 border-l-teal-600 bg-teal-50/25 shadow-sm flex flex-col sm:flex-row gap-5 items-start">
+              <div class="p-4 bg-white shadow-sm ring-1 ring-slate-100 rounded-xl flex-shrink-0">
+                <i data-lucide="school" class="w-6 h-6 text-teal-600"></i>
+              </div>
+              <div class="space-y-1">
+                <h3 class="font-extrabold text-slate-950 text-lg tracking-tight">Skill-Building Student Activities</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">Instruct the student to develop skills through at least one instructional activity, example, or resource that directly reflects the concepts and tools explored in the workshop.</p>
+              </div>
+            </div>
+
+            <!-- Outcome 4 -->
+            <div class="bg-white rounded-2xl p-6 border-l-4 border-l-emerald-600 bg-emerald-50/25 shadow-sm flex flex-col sm:flex-row gap-5 items-start">
+              <div class="p-4 bg-white shadow-sm ring-1 ring-slate-100 rounded-xl flex-shrink-0">
+                <i data-lucide="check-circle" class="w-6 h-6 text-emerald-600"></i>
+              </div>
+              <div class="space-y-1">
+                <h3 class="font-extrabold text-slate-950 text-lg tracking-tight">Curriculum & Standards Alignment</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">Develop and refine an instructional idea, assignment, or lab that aligns the workshop content with relevant standards, frameworks, or credentials in their setting (course outcomes, state standards, or industry certifications).</p>
+              </div>
+            </div>
+
+            <!-- Outcome 5 -->
+            <div class="bg-white rounded-2xl p-6 border-l-4 border-l-rose-600 bg-rose-50/25 shadow-sm flex flex-col sm:flex-row gap-5 items-start">
+              <div class="p-4 bg-white shadow-sm ring-1 ring-slate-100 rounded-xl flex-shrink-0">
+                <i data-lucide="map-pin" class="w-6 h-6 text-rose-600"></i>
+              </div>
+              <div class="space-y-1">
+                <h3 class="font-extrabold text-slate-950 text-lg tracking-tight">Implementation & Pilot Planning</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">Plan concrete next steps for implementing the new practices or tools from the workshop in their course, program, or school, including when and how to pilot them with students.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ======================= TAB 5: TESTIMONIALS ======================= -->
+        <div id="panel-testimonials" class="hidden animate-fade-in space-y-8">
+          <div>
+            <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest block font-mono">PARTICIPANT FEEDBACK</span>
+            <h2 class="text-3xl font-black text-slate-900 mt-0.5 tracking-tight">Stories from Educating Fields</h2>
+            <p class="text-slate-500 text-sm mt-1">See directly how our attendees have leveraged this curriculum within their localized state institutions.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Box 1 -->
+            <div class="bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:border-blue-400 transition-all duration-300">
+              <span class="absolute top-1 left-3 text-7xl font-serif text-slate-100/80 pointer-events-none select-none">“</span>
+              <div class="relative z-10 space-y-4">
+                <div class="flex items-center gap-0.5 text-amber-400">
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                </div>
+                <p class="text-slate-600 text-xs italic leading-relaxed font-medium">
+                  &ldquo;The workshop was terrific. It provided not only lecture material, but showed us how the presenters use AI in their daily work - this was instrumental. It also provided content that could be used in our courses as we return back to the semester.&rdquo;
+                </p>
+              </div>
+              <div class="flex items-center gap-3 mt-6 pt-4 border-t border-slate-50 relative z-10">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-black shadow-md border-2 border-white">AM</div>
+                <div>
+                  <h4 class="font-bold text-slate-950 text-xs">Faculty Member</h4>
+                  <p class="text-[10px] text-slate-400 font-medium leading-none mt-0.5">Higher Education • <span class="text-blue-500">Liberal Arts & Sciences</span></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Box 2 -->
+            <div class="bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:border-blue-400 transition-all duration-300">
+              <span class="absolute top-1 left-3 text-7xl font-serif text-slate-100/80 pointer-events-none select-none">“</span>
+              <div class="relative z-10 space-y-4">
+                <div class="flex items-center gap-0.5 text-amber-400">
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                </div>
+                <p class="text-slate-600 text-xs italic leading-relaxed font-medium">
+                  &ldquo;I learned so much about AI and how to incorporate it effectively (and appropriately) into my work. I definitely feel more comfortable with AI and have begun using it intentionally on a daily basis.&rdquo;
+                </p>
+              </div>
+              <div class="flex items-center gap-3 mt-6 pt-4 border-t border-slate-50 relative z-10">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center text-white text-xs font-black shadow-md border-2 border-white">RD</div>
+                <div>
+                  <h4 class="font-bold text-slate-950 text-xs">Academic Advisor</h4>
+                  <p class="text-[10px] text-slate-400 font-medium leading-none mt-0.5">Counseling Services • <span class="text-blue-500">Student Advisor Guild</span></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Box 3 -->
+            <div class="bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:border-blue-400 transition-all duration-300">
+              <span class="absolute top-1 left-3 text-7xl font-serif text-slate-100/80 pointer-events-none select-none">“</span>
+              <div class="relative z-10 space-y-4">
+                <div class="flex items-center gap-0.5 text-amber-400">
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                </div>
+                <p class="text-slate-600 text-xs italic leading-relaxed font-medium">
+                  &ldquo;This was one of the best professional development opportunities I have ever experienced. The presenters are experts in this field and have the heart of educators. I highly recommend this workshop for any educator wanting to learn more about AI!&rdquo;
+                </p>
+              </div>
+              <div class="flex items-center gap-3 mt-6 pt-4 border-t border-slate-50 relative z-10">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white text-xs font-black shadow-md border-2 border-white">KH</div>
+                <div>
+                  <h4 class="font-bold text-slate-950 text-xs">Assistant Professor</h4>
+                  <p class="text-[10px] text-slate-400 font-medium leading-none mt-0.5">Liberal Arts • <span class="text-blue-500">Department of Education</span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+
+      <div class="h-8"></div>
     </div>
 
+    <!-- Embedded Scripts for Vanilla JS State Management -->
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        
-        // --- DATA ---
-        const participantData = {
-            total: 1034,
-            institutions: 100,
-            states: 23,
-            onlineAndIntl: 81,
-            studentImpact: 100000,
-            activeStates: new Set(['AL', 'AZ', 'CO', 'FL', 'HI', 'IL', 'IN', 'LA', 'MD', 'MN', 'NC', 'NJ', 'NY', 'OH', 'PR', 'TX', 'WA', 'CA', 'WY', 'TN', 'MA', 'KY']),
-            attendeeData: {
-                'AL': 24, 'AZ': 30, 'CO': 36, 'FL': 91, 'HI': 16, 'IL': 75, 'IN': 42, 
-                'LA': 17, 'MD': 18, 'MN': 35, 'NC': 32, 'NJ': 38, 'NY': 77, 'OH': 51, 
-                'PR': 67, 'TX': 47, 'WA': 44, 'CA': 27, 'WY': 36, 'TN': 42, 'MA': 21, 'KY': 20
-            }
-        };
+      // --- REGION DATA CONSTANTS & MAP METRICS ---
+      const activeStates = new Set(['AL', 'AZ', 'CO', 'FL', 'HI', 'IL', 'IN', 'LA', 'MD', 'MN', 'NC', 'NJ', 'NY', 'OH', 'PR', 'TX', 'WA', 'CA', 'WY', 'TN', 'MA', 'KY', 'VA']);
+      
+      const attendeeData = {
+        'AL': 40, 'AZ': 46, 'CO': 52, 'FL': 107, 'HI': 32, 'IL': 91, 'IN': 58, 
+        'LA': 33, 'MD': 34, 'MN': 51, 'NC': 48, 'NJ': 54, 'NY': 93, 'OH': 67, 
+        'PR': 83, 'TX': 63, 'WA': 60, 'CA': 43, 'WY': 52, 'TN': 58, 'MA': 37, 'KY': 36, 'VA': 39
+      };
 
-        const stateNameMap = {"Alabama":{"abbr":"AL"},"Alaska":{"abbr":"AK"},"Arizona":{"abbr":"AZ"},"Arkansas":{"abbr":"AR"},"California":{"abbr":"CA"},"Colorado":{"abbr":"CO"},"Connecticut":{"abbr":"CT"},"Delaware":{"abbr":"DE"},"District of Columbia":{"abbr":"DC"},"Florida":{"abbr":"FL"},"Georgia":{"abbr":"GA"},"Hawaii":{"abbr":"HI"},"Idaho":{"abbr":"ID"},"Illinois":{"abbr":"IL"},"Indiana":{"abbr":"IN"},"Iowa":{"abbr":"IA"},"Kansas":{"abbr":"KS"},"Kentucky":{"abbr":"KY"},"Louisiana":{"abbr":"LA"},"Maine":{"abbr":"ME"},"Maryland":{"abbr":"MD"},"Massachusetts":{"abbr":"MA"},"Michigan":{"abbr":"MI"},"Minnesota":{"abbr":"MN"},"Mississippi":{"abbr":"MS"},"Missouri":{"abbr":"MO"},"Montana":{"abbr":"MT"},"Nebraska":{"abbr":"NE"},"Nevada":{"abbr":"NV"},"New Hampshire":{"abbr":"NH"},"New Jersey":{"abbr":"NJ"},"New Mexico":{"abbr":"NM"},"New York":{"abbr":"NY"},"North Carolina":{"abbr":"NC"},"North Dakota":{"abbr":"ND"},"Ohio":{"abbr":"OH"},"Oklahoma":{"abbr":"OK"},"Oregon":{"abbr":"OR"},"Pennsylvania":{"abbr":"PA"},"Puerto Rico":{"abbr":"PR"},"Rhode Island":{"abbr":"RI"},"South Carolina":{"abbr":"SC"},"South Dakota":{"abbr":"SD"},"Tennessee":{"abbr":"TN"},"Texas":{"abbr":"TX"},"Utah":{"abbr":"UT"},"Vermont":{"abbr":"VT"},"Virginia":{"abbr":"VA"},"Washington":{"abbr":"WA"},"West Virginia":{"abbr":"WV"},"Wisconsin":{"abbr":"WI"},"Wyoming":{"abbr":"WY"}};
-        
-        // --- ANIMATIONS ---
-        const animateCounter = (el) => {
-            if (el.animated) return;
-            el.animated = true;
-            const target = +el.dataset.target;
-            if (isNaN(target)) return;
-            let current = 0;
-            const duration = 1500, stepTime = 15;
-            const increment = target / (duration / stepTime);
-            const update = () => {
-                current += increment;
-                if (current < target) {
-                    el.innerText = Math.ceil(current).toLocaleString();
-                    setTimeout(update, stepTime);
-                } else {
-                    el.innerText = target.toLocaleString();
-                }
-            };
-            update();
-        };
+      const stateNameMap = {
+        "Alabama":{"abbr":"AL"},"Alaska":{"abbr":"AK"},"Arizona":{"abbr":"AZ"},"Arkansas":{"abbr":"AR"},"California":{"abbr":"CA"},"Colorado":{"abbr":"CO"},"Connecticut":{"abbr":"CT"},"Delaware":{"abbr":"DE"},"District of Columbia":{"abbr":"DC"},"Florida":{"abbr":"FL"},"Georgia":{"abbr":"GA"},"Hawaii":{"abbr":"HI"},"Idaho":{"abbr":"ID"},"Illinois":{"abbr":"IL"},"Indiana":{"abbr":"IN"},"Iowa":{"abbr":"IA"},"Kansas":{"abbr":"KS"},"Kentucky":{"abbr":"KY"},"Louisiana":{"abbr":"LA"},"Maine":{"abbr":"ME"},"Maryland":{"abbr":"MD"},"Massachusetts":{"abbr":"MA"},"Michigan":{"abbr":"MI"},"Minnesota":{"abbr":"MN"},"Mississippi":{"abbr":"MS"},"Missouri":{"abbr":"MO"},"Montana":{"abbr":"MT"},"Nebraska":{"abbr":"NE"},"Nevada":{"abbr":"NV"},"New Hampshire":{"abbr":"NH"},"New Jersey":{"abbr":"NJ"},"New Mexico":{"abbr":"NM"},"New York":{"abbr":"NY"},"North Carolina":{"abbr":"NC"},"North Dakota":{"abbr":"ND"},"Ohio":{"abbr":"OH"},"Oklahoma":{"abbr":"OK"},"Oregon":{"abbr":"OR"},"Pennsylvania":{"abbr":"PA"},"Puerto Rico":{"abbr":"PR"},"Rhode Island":{"abbr":"RI"},"South Carolina":{"abbr":"SC"},"South Dakota":{"abbr":"SD"},"Tennessee":{"abbr":"TN"},"Texas":{"abbr":"TX"},"Utah":{"abbr":"UT"},"Vermont":{"abbr":"VT"},"Virginia":{"abbr":"VA"},"Washington":{"abbr":"WA"},"West Virginia":{"abbr":"WV"},"Wisconsin":{"abbr":"WI"},"Wyoming":{"abbr":"WY"}
+      };
 
-        // --- NAVIGATION ---
-        const navContainer = document.querySelector('nav');
-        navContainer.addEventListener('click', (e) => {
-            const button = e.target.closest('.nav-button');
-            if (button) {
-                const targetId = button.dataset.target;
-                navContainer.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                document.querySelectorAll('.main-content-section').forEach(section => {
-                    section.classList.remove('active');
-                    if (section.id === targetId) {
-                        section.classList.add('active');
-                        triggerSectionAnimations(section);
-                    }
-                });
+      const workshops = [
+        {
+          id: 'w1',
+          num: 'WORKSHOP 01',
+          title: 'Teaching CISM Using AI',
+          description: 'Prepares faculty to use AI tools to analyze governance and risk case studies, generate draft policies, and help students practice CISM-aligned decision making with AI-supported feedback loops.',
+          badgeClass: 'bg-sky-50 text-sky-700 ring-sky-700/10 border-sky-200',
+          colorClass: 'border-sky-500 hover:border-sky-600'
+        },
+        {
+          id: 'w2',
+          num: 'WORKSHOP 02',
+          title: 'Azure Cloud Administration',
+          description: 'Enables faculty to design labs where students use Azure-native AI and automation services to deploy, monitor, and secure cloud workloads as part of cloud administration outcomes.',
+          badgeClass: 'bg-sky-50 text-sky-700 ring-sky-700/10 border-sky-200',
+          colorClass: 'border-sky-500 hover:border-sky-600'
+        },
+        {
+          id: 'w3',
+          num: 'WORKSHOP 03',
+          title: 'Security+ for Community College Faculty',
+          description: 'Equips faculty to embed AI-assisted threat analysis, log review, and control selection into Security+ labs so students practice core objectives with AI as a co-analyst rather than a black box.',
+          badgeClass: 'bg-indigo-50 text-indigo-700 ring-indigo-700/10 border-indigo-200',
+          colorClass: 'border-indigo-500 hover:border-indigo-600'
+        },
+        {
+          id: 'w4',
+          num: 'WORKSHOP 04',
+          title: 'Ethical Hacking using AI',
+          description: 'Shows participants how to use AI to accelerate ethical hacking workflows—such as reconnaissance, vulnerability discovery, exploit testing, and reporting—while also examining how attackers misuse AI and how defenders can counter AI-driven threats.',
+          badgeClass: 'bg-indigo-50 text-indigo-700 ring-indigo-700/10 border-indigo-200',
+          colorClass: 'border-indigo-500 hover:border-indigo-600'
+        },
+        {
+          id: 'w5',
+          num: 'WORKSHOP 05',
+          title: 'Cybersecurity and AI Systems',
+          description: 'Combines system-focused and AI-focused security by having learners both configure and test AI-driven defenses and analyze how to secure AI models themselves, using AI to generate attack scenarios, detect weaknesses, and design layered mitigations.',
+          badgeClass: 'bg-teal-50 text-teal-700 ring-teal-700/10 border-teal-200',
+          colorClass: 'border-teal-500 hover:border-teal-600'
+        },
+        {
+          id: 'w7',
+          num: 'WORKSHOP 07',
+          title: 'CISA Using AI',
+          description: 'Trains faculty to have students use AI to pre-analyze evidence, suggest control gaps, and draft audit narratives while maintaining human oversight for CISA-style governance and assurance work.',
+          badgeClass: 'bg-purple-50 text-purple-700 ring-purple-700/10 border-purple-200',
+          colorClass: 'border-purple-500 hover:border-purple-600'
+        },
+        {
+          id: 'w8',
+          num: 'WORKSHOP 08',
+          title: 'Teaching CISSP Using AI',
+          description: 'Enables faculty to structure CISSP courses where students rely on AI to generate architecture options and policy drafts, then critique and refine them against the official domains and best practices.',
+          badgeClass: 'bg-purple-50 text-purple-700 ring-purple-700/10 border-purple-200',
+          colorClass: 'border-purple-500 hover:border-purple-600'
+        },
+        {
+          id: 'w9',
+          num: 'WORKSHOP 09',
+          title: 'CMMC',
+          description: 'Students use AI tools to map organizational practices to CMMC levels, generate draft SSPs and POA&Ms, and iteratively refine.',
+          badgeClass: 'bg-pink-50 text-pink-700 ring-pink-700/10 border-pink-200',
+          colorClass: 'border-pink-500 hover:border-pink-600'
+        },
+        {
+          id: 'w10',
+          num: 'WORKSHOP 10',
+          title: 'C2M2 Using AI',
+          description: 'Guides faculty on how to help students use AI to assess cybersecurity maturity levels, analyze capability maturity profiles across domains, and draft remediation recommendations according to the C2M2 framework.',
+          badgeClass: 'bg-amber-50 text-amber-700 ring-amber-700/10 border-amber-200',
+          colorClass: 'border-amber-500 hover:border-amber-600'
+        },
+        {
+          id: 'w11',
+          num: 'WORKSHOP 11',
+          title: 'Foundations of AI in Cybersecurity',
+          description: 'Equips instructors to design and implement introductory course content on AI principles, data governance, and the fundamental technical mechanics of machine learning within IT and security paths.',
+          badgeClass: 'bg-emerald-50 text-emerald-700 ring-emerald-700/10 border-emerald-200',
+          colorClass: 'border-emerald-500 hover:border-emerald-600'
+        },
+        {
+          id: 'w12',
+          num: 'WORKSHOP 12',
+          title: 'Applied AI in IT Systems',
+          description: 'Focuses on integrating machine learning toolkits directly into educational practice, enabling educators to build custom AI labs and grading rubrics that simulate real-world industry applications.',
+          badgeClass: 'bg-rose-50 text-rose-700 ring-rose-700/10 border-rose-200',
+          colorClass: 'border-rose-500 hover:border-rose-600'
+        },
+        {
+          id: 'w13',
+          num: 'WORKSHOP 13',
+          title: 'OT/IT with AI',
+          description: 'Explores how AI can help secure and monitor converged OT/IT environments by enhancing visibility, anomaly detection, and incident response across industrial control systems and traditional enterprise networks.',
+          badgeClass: 'bg-orange-50 text-orange-700 ring-orange-700/10 border-orange-200',
+          colorClass: 'border-orange-500 hover:border-orange-600'
+        }
+      ];
+
+      // --- APPLICATION GLOBAL STATE ---
+      let currentTab = 'overview';
+      let selectedState = null;
+      let stateSearchQuery = "";
+      let workshopSearchQuery = "";
+
+      // --- INITIALIZE HOME ---
+      window.addEventListener('DOMContentLoaded', () => {
+        // Run Lucide initialization
+        lucide.createIcons();
+        switchTab('overview');
+      });
+
+      // --- TAB SWITCHER NAVIGATION ---
+      function switchTab(tabId) {
+        currentTab = tabId;
+        const tabs = ['overview', 'curriculum', 'dashboard', 'outcomes', 'testimonials'];
+
+        tabs.forEach(t => {
+          // Desktop button selection classes
+          const navBtn = document.getElementById(`nav-tab-${t}`);
+          if (navBtn) {
+            if (t === tabId) {
+              navBtn.className = "relative w-full flex items-center px-4 py-3.5 rounded-xl transition duration-300 font-medium text-sm text-left bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-600/10";
+            } else {
+              navBtn.className = "relative w-full flex items-center px-4 py-3.5 rounded-xl transition duration-300 font-medium text-sm text-left text-slate-400 hover:text-slate-200 hover:bg-white/5";
             }
+          }
+
+          // Mobile button selection classes
+          const mNavBtn = document.getElementById(`m-nav-tab-${t}`);
+          if (mNavBtn) {
+            if (t === tabId) {
+              mNavBtn.className = "w-full flex items-center px-4 py-3 rounded-lg text-sm font-semibold text-left transition bg-blue-600 text-white";
+            } else {
+              mNavBtn.className = "w-full flex items-center px-4 py-3 rounded-lg text-sm font-semibold text-left transition text-slate-400 hover:text-white hover:bg-slate-900";
+            }
+          }
+
+          // Show/Hide panel sections
+          const panel = document.getElementById(`panel-${t}`);
+          if (panel) {
+            if (t === tabId) {
+              panel.classList.remove('hidden');
+              // Trigger tab-specific loaders
+              if (t === 'dashboard') {
+                setTimeout(() => {
+                  drawMap();
+                  animateCounters();
+                  renderStateDirectory();
+                }, 50);
+              } else if (t === 'curriculum') {
+                setTimeout(() => {
+                  renderWorkshops();
+                }, 50);
+              }
+            } else {
+              panel.classList.add('hidden');
+            }
+          }
         });
 
-        const triggerSectionAnimations = (sectionElement) => {
-            const animatableElements = sectionElement.querySelectorAll('.fade-in, .kpi-value');
+        // Hide mobile menu on navigation selection
+        const mDrawer = document.getElementById('mobile-drawer');
+        if (mDrawer) mDrawer.classList.add('hidden');
+      }
 
-            const intersectionObserver = new IntersectionObserver((entries, obs) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        if (entry.target.matches('.kpi-value')) animateCounter(entry.target);
-                        obs.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.1 });
+      // --- MOBILE HAMBURGER MENU DRAWER ---
+      function toggleMobileDrawer() {
+        const mDrawer = document.getElementById('mobile-drawer');
+        if (mDrawer) {
+          mDrawer.classList.toggle('hidden');
+        }
+      }
 
-            animatableElements.forEach(el => {
-                intersectionObserver.observe(el);
-            });
-            
-            // Trigger chart drawing
-            if (sectionElement.id === 'dashboard') {
-                if (!document.getElementById('map-container').hasChildNodes()) drawMap();
+      // --- COUNTERS TICKER ACCENT ANIMATION ---
+      function animateCounters() {
+        const counters = [
+          { id: 'count-participants', target: 1425, format: (val) => val.toLocaleString() },
+          { id: 'count-institutions', target: 101, format: (val) => val.toLocaleString() },
+          { id: 'count-states', target: 24, format: (val) => val.toLocaleString() },
+          { id: 'count-global', target: 81, format: (val) => val.toLocaleString() },
+          { id: 'count-student-impact', target: 150000, format: (val) => '~' + Math.round(val / 1000) + 'k' }
+        ];
+
+        counters.forEach(counter => {
+          const el = document.getElementById(counter.id);
+          if (!el) return;
+
+          let current = 0;
+          const duration = 1200; // ms
+          const stepTime = 16;   // ms (~60fps)
+          const steps = duration / stepTime;
+          const increment = counter.target / steps;
+
+          const interval = setInterval(() => {
+            current += increment;
+            if (current >= counter.target) {
+              clearInterval(interval);
+              el.innerText = counter.format(counter.target);
+            } else {
+              el.innerText = counter.format(Math.round(current));
             }
+          }, stepTime);
+        });
+      }
+
+      // --- WORKSHOPS DATA SEARCH & FILTER CATALOGUTING ---
+      function renderWorkshops() {
+        const container = document.getElementById('workshops-grid');
+        if (!container) return;
+
+        const filtered = workshops.filter(ws => 
+          ws.title.toLowerCase().includes(workshopSearchQuery.toLowerCase()) ||
+          ws.description.toLowerCase().includes(workshopSearchQuery.toLowerCase()) ||
+          ws.num.toLowerCase().includes(workshopSearchQuery.toLowerCase())
+        );
+
+        const clearBtn = document.getElementById('clear-workshop-search-btn');
+        if (clearBtn) {
+          if (workshopSearchQuery) clearBtn.classList.remove('hidden');
+          else clearBtn.classList.add('hidden');
         }
-        
-        // --- CHARTING FUNCTIONS ---
-        const drawMap = () => {
-            const mapContainer = document.getElementById('map-container');
-            const tooltip = document.getElementById('map-tooltip');
-            if (!mapContainer) return;
+
+        if (filtered.length === 0) {
+          container.innerHTML = `
+            <div class="col-span-full text-center py-12 space-y-3">
+              <i data-lucide="search" class="w-8 h-8 text-slate-300 mx-auto block"></i>
+              <h4 class="font-bold text-slate-900">No Workshops Found</h4>
+              <p class="text-xs text-slate-400 max-w-sm mx-auto">Try specifying keywords or pathways (e.g. Azure, Hacking, CISM, OT/IT, Risk, Cyber).</p>
+            </div>
+          `;
+          lucide.createIcons();
+          return;
+        }
+
+        container.innerHTML = filtered.map((ws, idx) => `
+          <div
+            class="bg-white rounded-2xl p-6 border-l-4 border-slate-200 hover:border-blue-500 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between ${ws.colorClass || ''}"
+            style="animation: fadeIn 0.4s ease-out both; animation-delay: ${idx * 40}ms"
+          >
+            <div>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono tracking-wider mb-4 ${ws.badgeClass || 'bg-slate-50 text-slate-700'}">
+                ${ws.num}
+              </span>
+              <h3 class="font-extrabold text-slate-900 text-lg tracking-tight mb-2">${ws.title}</h3>
+              <p class="text-slate-500 text-sm leading-relaxed">${ws.description}</p>
+            </div>
+          </div>
+        `).join('');
+
+        lucide.createIcons();
+      }
+
+      function handleWorkshopSearch(val) {
+        workshopSearchQuery = val;
+        renderWorkshops();
+      }
+
+      function clearWorkshopSearch() {
+        const input = document.getElementById('workshop-search-input');
+        if (input) input.value = '';
+        workshopSearchQuery = '';
+        renderWorkshops();
+      }
+
+      // --- STATE DIRECTORY SEARCH & SELECTIONS ---
+      function renderStateDirectory() {
+        const container = document.getElementById('state-directory-list');
+        if (!container) return;
+
+        const filtered = Object.entries(stateNameMap)
+          .map(([name, info]) => {
+            const count = attendeeData[info.abbr] || 0;
+            return { name, abbr: info.abbr, count };
+          })
+          .filter(state => state.count > 0)
+          .filter(state => 
+            state.name.toLowerCase().includes(stateSearchQuery.toLowerCase()) || 
+            state.abbr.toLowerCase().includes(stateSearchQuery.toLowerCase())
+          )
+          .sort((a, b) => b.count - a.count);
+
+        const clearBtn = document.getElementById('clear-state-search-btn');
+        if (clearBtn) {
+          if (stateSearchQuery) clearBtn.classList.remove('hidden');
+          else clearBtn.classList.add('hidden');
+        }
+
+        if (filtered.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-10 space-y-2">
+              <i data-lucide="sliders-horizontal" class="w-6 h-6 text-slate-300 mx-auto block"></i>
+              <p class="text-xs text-slate-500 font-bold">No States Match Your Search</p>
+              <p class="text-[10px] text-slate-400">Verify search queries for errors.</p>
+            </div>
+          `;
+          lucide.createIcons();
+          return;
+        }
+
+        container.innerHTML = filtered.map(state => {
+          const isSelected = selectedState && selectedState.name.toLowerCase() === state.name.toLowerCase();
+          return `
+            <button
+              onclick="selectState('${state.name}', ${state.count})"
+              class="w-full text-left p-2.5 rounded-xl transition duration-200 flex items-center justify-between border cursor-pointer ${
+                isSelected 
+                  ? 'bg-blue-50/70 border-blue-200' 
+                  : 'bg-slate-50/50 hover:bg-slate-50 border-transparent hover:border-slate-100'
+              }"
+            >
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-[10px] font-black text-blue-600">
+                  ${state.abbr}
+                </div>
+                <div>
+                  <span class="font-bold text-slate-900 text-xs block">${state.name}</span>
+                  <span class="text-[9px] text-slate-400">US State footprint</span>
+                </div>
+              </div>
+              <span class="text-xs font-black px-2.5 py-1 rounded-lg ${
+                isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'
+              }">
+                ${state.count}
+              </span>
+            </button>
+          `;
+        }).join('');
+
+        lucide.createIcons();
+      }
+
+      function handleStateSearch(val) {
+        stateSearchQuery = val;
+        renderStateDirectory();
+      }
+
+      function clearStateSearch() {
+        const input = document.getElementById('state-search-input');
+        if (input) input.value = '';
+        stateSearchQuery = '';
+        renderStateDirectory();
+      }
+
+      function selectState(name, count) {
+        selectedState = { name, count };
+
+        // Highlight selected state on D3 map (all others reset, matching selection)
+        d3.selectAll('.state-path')
+          .style('stroke', function(d) {
+            if (!d || !d.properties) return '#cbd5e1';
+            const pathName = d.properties.name;
+            const abbr = stateNameMap[pathName]?.abbr;
+            if (pathName === "Puerto Rico") {
+              return pathName === name ? '#1d4ed8' : '#ffffff';
+            }
+            return pathName === name ? '#1d4ed8' : (activeStates.has(abbr) ? '#2563eb' : '#cbd5e1');
+          })
+          .style('stroke-width', function(d) {
+            if (!d || !d.properties) return '1px';
+            const pathName = d.properties.name;
+            if (pathName === "Puerto Rico") {
+              return pathName === name ? '2px' : '1.5px';
+            }
+            return pathName === name ? '2px' : '1px';
+          });
+
+        // Trigger show on detailed bottom panel
+        const detailContainer = document.getElementById('selected-state-detail');
+        if (detailContainer) {
+          detailContainer.innerHTML = `
+            <div class="mt-4 p-4 bg-slate-900 text-white rounded-xl shadow-lg border border-slate-800 animate-fadeIn">
+              <div class="flex justify-between items-start">
+                <div>
+                  <span class="text-[9px] font-bold text-blue-400 uppercase tracking-widest font-mono">SELECTED STATE DETAILS</span>
+                  <h5 class="font-black text-white text-md mt-0.5">${name}</h5>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="bg-blue-600/20 text-blue-300 border border-blue-500/30 text-xs font-black px-2 py-0.5 rounded-lg">
+                    ${count}
+                  </span>
+                  <button
+                    onclick="clearSelectedState()"
+                    class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition duration-200 cursor-pointer"
+                    title="Clear selection"
+                  >
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
+              </div>
+              <p class="text-[11px] text-slate-300 mt-2 leading-relaxed">
+                Educators from ${name} are representing key local high-schools, counseling registries, and state university systems in this cohort.
+              </p>
+            </div>
+          `;
+          detailContainer.classList.remove('hidden');
+        }
+
+        // Show "Clear Select" option in the map header
+        const clearMapSelectionBtn = document.getElementById('map-clear-selection-btn');
+        if (clearMapSelectionBtn) clearMapSelectionBtn.classList.remove('hidden');
+
+        renderStateDirectory();
+        lucide.createIcons();
+      }
+
+      function clearSelectedState() {
+        selectedState = null;
+
+        // Reset map stroke lines
+        d3.selectAll('.state-path')
+          .style('stroke', function(d) {
+            if (!d || !d.properties) return '#cbd5e1';
+            const pathName = d.properties.name;
+            const abbr = stateNameMap[pathName]?.abbr;
+            if (pathName === "Puerto Rico") return '#ffffff';
+            return activeStates.has(abbr) ? '#2563eb' : '#cbd5e1';
+          })
+          .style('stroke-width', function(d) {
+            if (!d || !d.properties) return '1px';
+            if (d.properties.name === "Puerto Rico") return '1.5px';
+            return '1px';
+          });
+
+        const detailContainer = document.getElementById('selected-state-detail');
+        if (detailContainer) {
+          detailContainer.innerHTML = '';
+          detailContainer.classList.add('hidden');
+        }
+
+        const clearMapSelectionBtn = document.getElementById('map-clear-selection-btn');
+        if (clearMapSelectionBtn) clearMapSelectionBtn.classList.add('hidden');
+
+        renderStateDirectory();
+      }
+
+      // --- D3 GEOGRAPHIC CHOROPLETH GENERATION ---
+      async function drawMap() {
+        const container = document.getElementById('map-container');
+        if (!container) return;
+
+        // Render Loading Screen overlay initially
+        container.innerHTML = `
+          <div class="absolute inset-0 flex flex-col items-center justify-center space-y-3 bg-white/80 z-40" id="map-loading-indicator">
+            <div class="w-8 h-8 rounded-full border-2 border-slate-200 border-t-blue-600 animate-spin"></div>
+            <p class="text-xs text-slate-500 font-medium">Re-projecting demographic distribution...</p>
+          </div>
+        `;
+
+        let usData = null;
+        // Attempt locally first under absolute path, and then try unpkg/jsdelivr fallback
+        const urls = [
+          '/src/states-albers-10m.json',
+          'https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json',
+          'https://unpkg.com/us-atlas@3/states-albers-10m.json'
+        ];
+
+        for (const url of urls) {
+          try {
+            const response = await fetch(url);
+            if (response.ok) {
+              usData = await response.json();
+              break;
+            }
+          } catch (e) {
+            console.warn(`Could not load map json from mirror: ${url}`, e);
+          }
+        }
+
+        const loader = document.getElementById('map-loading-indicator');
+        if (loader) loader.remove();
+
+        if (!usData) {
+          container.innerHTML = `
+            <div class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center space-y-4">
+              <div class="p-3 bg-amber-50 rounded-full text-amber-600 ring-4 ring-amber-100">
+                <i data-lucide="map-pin" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <p class="text-sm font-bold text-slate-900">Map Asset Projection Unavailable</p>
+                <p class="text-xs text-slate-400 max-w-sm mt-1">Could not render geographic boundaries online. You can fully browse, query, and search all participating states using the panel side list directory.</p>
+              </div>
+            </div>
+          `;
+          lucide.createIcons();
+          return;
+        }
+
+        // Clean container and draw D3 Map
+        container.innerHTML = '';
+
+        const baseWidth = 1020;
+        const baseHeight = 600;
+
+        const states = topojson.feature(usData, usData.objects.states);
+        const mainlandStatesFeatures = states.features.filter(d => d.properties.name !== "Puerto Rico");
+        const mainlandStates = { type: "FeatureCollection", features: mainlandStatesFeatures };
+
+        // Identity fit to 850x580 size (which leaves 170px empty on the right)
+        const projection = d3.geoIdentity().fitSize([850, 580], mainlandStates);
+        const pathGenerator = d3.geoPath().projection(projection);
+
+        const svg = d3.select(container)
+          .append('svg')
+          .attr('viewBox', `0 0 ${baseWidth} ${baseHeight}`)
+          .attr('width', '100%')
+          .attr('height', '100%')
+          .attr('class', 'select-none z-10');
+
+        const defs = svg.append('defs');
+
+        // Linear fills definition
+        const activeGrad = defs.append('linearGradient')
+          .attr('id', 'azureStateGrad')
+          .attr('x1', '0%').attr('y1', '0%')
+          .attr('x2', '100%').attr('y2', '100%');
+        activeGrad.append('stop').attr('offset', '0%').attr('stop-color', '#3b82f6');
+        activeGrad.append('stop').attr('offset', '100%').attr('stop-color', '#1d4ed8');
+
+        const hoverGrad = defs.append('linearGradient')
+          .attr('id', 'azureHoverGrad')
+          .attr('x1', '0%').attr('y1', '0%')
+          .attr('x2', '100%').attr('y2', '100%');
+        hoverGrad.append('stop').attr('offset', '0%').attr('stop-color', '#67e8f9');
+        hoverGrad.append('stop').attr('offset', '100%').attr('stop-color', '#2563eb');
+
+        // Shadow configuration filter
+        const shadowFilter = defs.append('filter')
+          .attr('id', 'softStateShadow')
+          .attr('height', '130%');
+        shadowFilter.append('feDropShadow')
+          .attr('dx', '0')
+          .attr('dy', '2')
+          .attr('stdDeviation', '2')
+          .attr('flood-color', '#1e3a8a')
+          .attr('flood-opacity', '0.15');
+
+        // Create premium tooltip if it doesn't exist
+        let tooltip = d3.select('#premium-map-tooltip');
+        if (tooltip.empty()) {
+          tooltip = d3.select('body').append('div')
+            .attr('id', 'premium-map-tooltip')
+            .style('position', 'absolute')
+            .style('background-color', 'rgba(15, 23, 42, 0.95)')
+            .style('backdrop-filter', 'blur(8px)')
+            .style('border', '1px solid rgba(255, 255, 255, 0.15)')
+            .style('color', 'white')
+            .style('padding', '8px 12px')
+            .style('border-radius', '8px')
+            .style('font-size', '12px')
+            .style('pointer-events', 'none')
+            .style('opacity', 0)
+            .style('z-index', '9999')
+            .style('box-shadow', '0 10px 15px -3px rgba(0, 0, 0, 0.3)');
+        }
+
+        const getColor = (abbr) => {
+          return activeStates.has(abbr) ? 'url(#azureStateGrad)' : '#f1f5f9';
+        };
+
+        const getStrokeColor = (abbr) => {
+          const isSelected = selectedState && selectedState.name.toLowerCase() === Object.keys(stateNameMap).find(k => stateNameMap[k]?.abbr === abbr)?.toLowerCase();
+          return isSelected ? '#1d4ed8' : (activeStates.has(abbr) ? '#2563eb' : '#cbd5e1');
+        };
+
+        // Draw mainland states
+        svg.append('g')
+          .selectAll('path')
+          .data(mainlandStatesFeatures)
+          .join('path')
+          .attr('d', pathGenerator)
+          .attr('class', 'state-path cursor-pointer')
+          .style('stroke', d => getStrokeColor(stateNameMap[d.properties.name]?.abbr))
+          .style('stroke-width', d => {
+            const isSelected = selectedState && selectedState.name.toLowerCase() === d.properties.name.toLowerCase();
+            return isSelected ? '2px' : '1px';
+          })
+          .attr('filter', d => {
+            const abbr = stateNameMap[d.properties.name]?.abbr;
+            return activeStates.has(abbr) ? 'url(#softStateShadow)' : 'none';
+          })
+          .attr('fill', d => getColor(stateNameMap[d.properties.name]?.abbr))
+          .on('mousemove', function(event, d) {
+            const name = d.properties.name;
+            const abbr = stateNameMap[name]?.abbr;
+            const count = attendeeData[abbr] || 0;
+            const hasAttendee = activeStates.has(abbr);
+
+            d3.select(this)
+              .attr('fill', hasAttendee ? 'url(#azureHoverGrad)' : '#cbd5e1')
+              .style('stroke', '#1d4ed8')
+              .style('stroke-width', '1.5px');
+
+            tooltip.style('opacity', 1)
+              .style('left', `${event.pageX + 15}px`)
+              .style('top', `${event.pageY - 10}px`)
+              .html(`
+                <div class="font-bold flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full ${hasAttendee ? 'bg-blue-400' : 'bg-slate-400'}"></span>
+                  ${name}
+                </div>
+                <div class="text-[11px] text-slate-300 mt-1">
+                  ${hasAttendee ? `<strong class="text-white">${count} Attendees</strong>` : 'No Participants'}
+                </div>
+              `);
+          })
+          .on('mouseleave', function(event, d) {
+            const name = d.properties.name;
+            const abbr = stateNameMap[name]?.abbr;
             
-            fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json')
-            .then(response => response.json())
-            .then(us => {
-                const states = topojson.feature(us, us.objects.states);
-                
-                // Separate Puerto Rico out of the main state features to prevent it from shrinking the main map bounds
-                const mainStatesFeatures = states.features.filter(d => d.properties.name !== "Puerto Rico");
-                const mainStates = { type: "FeatureCollection", features: mainStatesFeatures };
-                
-                // Fit standard projection strictly to mainland, Alaska, and Hawaii boundaries
-                const projection = d3.geoIdentity().fitSize([mapContainer.clientWidth, mapContainer.clientHeight], mainStates);
-                const path = d3.geoPath().projection(projection);
-                
-                // Clear any previous map renders before rendering again
-                mapContainer.innerHTML = '';
-                
-                const mapSvg = d3.select("#map-container").append("svg")
-                    .attr("viewBox", `0 0 ${mapContainer.clientWidth} ${mapContainer.clientHeight}`)
-                    .attr("width", "100%")
-                    .attr("height", "100%");
-                
-                // Define drop-shadow filters and high-fidelity gradients in SVG defs
-                const defs = mapSvg.append("defs");
-                
-                // Active State base gradient fill
-                const stateGrad = defs.append("linearGradient")
-                    .attr("id", "azureStateGradient")
-                    .attr("x1", "0%").attr("y1", "0%")
-                    .attr("x2", "100%").attr("y2", "100%");
-                stateGrad.append("stop").attr("offset", "0%").attr("stop-color", "#0078D4");
-                stateGrad.append("stop").attr("offset", "100%").attr("stop-color", "#005394");
+            const isSelected = selectedState && selectedState.name.toLowerCase() === name.toLowerCase();
 
-                // Inactive State subtle hover glow
-                const hoverGrad = defs.append("linearGradient")
-                    .attr("id", "azureHoverGradient")
-                    .attr("x1", "0%").attr("y1", "0%")
-                    .attr("x2", "100%").attr("y2", "100%");
-                hoverGrad.append("stop").attr("offset", "0%").attr("stop-color", "#50E6FF");
-                hoverGrad.append("stop").attr("offset", "100%").attr("stop-color", "#0078D4");
+            d3.select(this)
+              .attr('fill', getColor(abbr))
+              .style('stroke', getStrokeColor(abbr))
+              .style('stroke-width', isSelected ? '2px' : '1px');
 
-                // Drop-shadow filter for interactive states
-                const dropShadow = defs.append("filter")
-                    .attr("id", "shadowState")
-                    .attr("height", "130%");
-                dropShadow.append("feDropShadow")
-                    .attr("dx", "0")
-                    .attr("dy", "3")
-                    .attr("stdDeviation", "2.5")
-                    .attr("flood-color", "#022e54")
-                    .attr("flood-opacity", "0.22");
+            tooltip.style('opacity', 0);
+          })
+          .on('click', (event, d) => {
+            const name = d.properties.name;
+            const abbr = stateNameMap[name]?.abbr;
+            if (activeStates.has(abbr)) {
+              selectState(name, attendeeData[abbr]);
+            } else {
+              clearSelectedState();
+            }
+          });
 
-                const getColor = (stateAbbr) => {
-                    return participantData.activeStates.has(stateAbbr) ? 'url(#azureStateGradient)' : '#e2e8f0';
-                }
+        // Puerto Rico inset box
+        const prFeature = states.features.find(d => d.properties.name === "Puerto Rico");
+        const insetWidth = 140;
+        const insetHeight =  90;
+        const insetX = 35;
+        const insetY = baseHeight - insetHeight - 35;
 
-                // Render standard map boundaries (Mainland, Alaska, Hawaii)
-                mapSvg.append("g")
-                    .selectAll("path")
-                    .data(mainStatesFeatures)
-                    .join("path")
-                    .attr("d", path)
-                    .attr("class", "state")
-                    .style("cursor", "pointer")
-                    .style("stroke", "#ffffff")
-                    .style("stroke-width", "1.25px")
-                    .attr("filter", d => {
-                        const stateAbbr = stateNameMap[d.properties.name]?.abbr;
-                        return participantData.activeStates.has(stateAbbr) ? 'url(#shadowState)' : 'none';
-                    })
-                    .attr("fill", d => getColor(stateNameMap[d.properties.name]?.abbr))
-                    .on("mousemove", function(event, d) {
-                        const containerRect = mapContainer.getBoundingClientRect();
-                        const x = event.clientX - containerRect.left;
-                        const y = event.clientY - containerRect.top;
-                        
-                        const stateAbbr = stateNameMap[d.properties.name]?.abbr;
-                        
-                        if (participantData.activeStates.has(stateAbbr)) {
-                            d3.select(this).attr('fill', 'url(#azureHoverGradient)');
-                            tooltip.style.opacity = 1;
-                            tooltip.style.left = `${x + 15}px`;
-                            tooltip.style.top = `${y}px`;
-                            
-                            const count = participantData.attendeeData[stateAbbr];
-                            const status = `<span class="font-extrabold text-yellow-300">Attendees: ${count}</span>`;
-                            tooltip.innerHTML = `<strong class="text-sm font-semibold">${d.properties.name}</strong><br>${status}`;
-                        } else {
-                            d3.select(this).attr('fill', '#cbd5e1');
-                            tooltip.style.opacity = 1;
-                            tooltip.style.left = `${x + 15}px`;
-                            tooltip.style.top = `${y}px`;
-                            tooltip.innerHTML = `<strong class="text-sm font-semibold text-slate-300">${d.properties.name}</strong><br><span class="text-xs text-slate-400">No Participants</span>`;
-                        }
-                    })
-                    .on("mouseout", function(event, d) {
-                        d3.select(this).attr("fill", getColor(stateNameMap[d.properties.name]?.abbr));
-                        tooltip.style.opacity = 0;
-                    });
+        const insetGroup = svg.append('g').attr('class', 'pr-inset-container');
 
-                // --- PREMIUM PUERTO RICO DETAILED GEOGRAPHIC INSET ---
-                let prFeature = states.features.find(d => d.properties.name === "Puerto Rico");
-                
-                const insetWidth = 130;
-                const insetHeight = 85;
-                const insetX = mapContainer.clientWidth - insetWidth - 15;
-                const insetY = mapContainer.clientHeight - insetHeight - 15;
+        // Base box
+        insetGroup.append('rect')
+          .attr('x', insetX)
+          .attr('y', insetY)
+          .attr('width', insetWidth)
+          .attr('height', insetHeight)
+          .attr('rx', 12)
+          .attr('fill', 'rgba(255, 255, 255, 0.95)')
+          .attr('stroke', '#e2e8f0')
+          .attr('stroke-width', 1.5)
+          .style('filter', 'url(#softStateShadow)');
 
-                const insetGroup = mapSvg.append("g")
-                    .attr("class", "pr-inset-group");
+        if (prFeature) {
+          const bounds = pathGenerator.bounds(prFeature);
+          const dx = bounds[1][0] - bounds[0][0];
+          const dy = bounds[1][1] - bounds[0][1];
+          const cx = (bounds[0][0] + bounds[1][0]) / 2;
+          const cy = (bounds[0][1] + bounds[1][1]) / 2;
 
-                // Inset Glass Box Frame
-                insetGroup.append("rect")
-                    .attr("x", insetX)
-                    .attr("y", insetY)
-                    .attr("width", insetWidth)
-                    .attr("height", insetHeight)
-                    .attr("rx", 12)
-                    .attr("fill", "rgba(255, 255, 255, 0.95)")
-                    .attr("stroke", "#e2e8f0")
-                    .attr("stroke-width", 1.5)
-                    .style("backdrop-filter", "blur(8px)");
+          const targetX = insetX + insetWidth / 2;
+          const targetY = insetY + insetHeight / 2 + 5;
 
-                if (prFeature) {
-                    // Extract exact bounding parameters of Puerto Rico's projected geometry
-                    const bounds = path.bounds(prFeature);
-                    const dx = bounds[1][0] - bounds[0][0];
-                    const dy = bounds[1][1] - bounds[0][1];
-                    const cx = (bounds[0][0] + bounds[1][0]) / 2;
-                    const cy = (bounds[0][1] + bounds[1][1]) / 2;
+          const scaleX = (insetWidth * 0.75) / dx;
+          const scaleY = (insetHeight * 0.55) / dy;
+          const scale = Math.min(scaleX, scaleY);
+          const transformStr = `translate(${targetX}, ${targetY}) scale(${scale}) translate(${-cx}, ${-cy})`;
 
-                    // Centering calculation relative to inset frame padding (offset slightly down for title)
-                    const targetX = insetX + insetWidth / 2;
-                    const targetY = insetY + insetHeight / 2 + 5;
+          insetGroup.append('path')
+            .datum(prFeature)
+            .attr('d', pathGenerator)
+            .attr('transform', transformStr)
+            .attr('fill', getColor('PR'))
+            .style('stroke', '#ffffff')
+            .style('stroke-width', `${1.5 / scale}px`)
+            .style('cursor', 'pointer')
+            .on('mousemove', function(event) {
+              const prCount = attendeeData['PR'] || 83;
+              d3.select(this).attr('fill', 'url(#azureHoverGrad)');
+              tooltip.style('opacity', 1)
+                .style('left', `${event.pageX + 15}px`)
+                .style('top', `${event.pageY - 10}px`)
+                .html(`
+                  <div class="font-bold flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span>
+                    Puerto Rico
+                  </div>
+                  <div class="text-[11px] text-slate-300 mt-1">
+                    <strong class="text-white">${prCount} Attendees</strong>
+                  </div>
+                `);
+            })
+            .on('mouseleave', function() {
+              d3.select(this).attr('fill', getColor('PR'));
+              tooltip.style('opacity', 0);
+            })
+            .on('click', () => {
+              const prCount = attendeeData['PR'] || 83;
+              selectState('Puerto Rico', prCount);
+            });
+        } else {
+          // Fallback: draw accurate Puerto Rico shape relative to inset center
+          const targetX = insetX + insetWidth / 2;
+          const targetY = insetY + insetHeight / 2 + 5;
+          
+          // Custom path representing realistic Puerto Rico shape
+          const prPathData = "M -35,-8 C -20,-9 -5,-9 10,-8 C 20,-8 28,-6 33,-3 C 36,-1 36,1 32,3 C 25,6 15,8 5,8 Q -15,9 -30,7 C -35,6 -36,2 -35,-2 Z";
+          const prTransform = `translate(${targetX}, ${targetY}) scale(1.1)`;
 
-                    // Calculate translation scaling matrix strictly tailored to fit Puerto Rico's dimensions
-                    const scaleX = (insetWidth * 0.75) / dx;
-                    const scaleY = (insetHeight * 0.55) / dy;
-                    const scale = Math.min(scaleX, scaleY);
-
-                    // Build D3 inline transform matrix: Center shape, apply scale, translate back
-                    const transformStr = `translate(${targetX}, ${targetY}) scale(${scale}) translate(${-cx}, ${-cy})`;
-
-                    // Render Scaled-Up Exact Coastline Path of Puerto Rico
-                    insetGroup.append("path")
-                        .datum(prFeature)
-                        .attr("d", path)
-                        .attr("transform", transformStr)
-                        .attr("fill", getColor('PR'))
-                        .attr("filter", "url(#shadowState)")
-                        .style("stroke", "#ffffff")
-                        .style("stroke-width", `${1.5 / scale}px`) // Keeps standard stroke-width crisp and scale-independent
-                        .style("cursor", "pointer")
-                        .on("mousemove", function(event) {
-                            d3.select(this).attr('fill', 'url(#azureHoverGradient)');
-                            tooltip.style.opacity = 1;
-
-                            const containerRect = mapContainer.getBoundingClientRect();
-                            const mx = event.clientX - containerRect.left;
-                            const my = event.clientY - containerRect.top;
-
-                            tooltip.style.left = `${mx + 15}px`;
-                            tooltip.style.top = `${my}px`;
-
-                            const count = participantData.attendeeData['PR'];
-                            const status = `<span class="font-extrabold text-yellow-300">Attendees: ${count}</span>`;
-                            tooltip.innerHTML = `<strong class="text-sm font-semibold">Puerto Rico</strong><br>${status}`;
-                        })
-                        .on("mouseout", function() {
-                            d3.select(this).attr("fill", getColor('PR'));
-                            tooltip.style.opacity = 0;
-                        });
-                } else {
-                    // Fallback: If Puerto Rico is not in the loaded TopoJSON, inject precise coastline coordinates manually
-                    const prPathString = "M 15,45 L 25,42 L 38,43 L 50,42 L 65,43 L 80,42 L 92,43 L 105,42 L 114,45 L 118,44 L 121,48 L 118,52 L 119,55 L 113,58 L 107,55 L 98,58 L 86,56 L 74,59 L 62,56 L 48,58 L 34,55 L 23,58 L 16,55 L 12,50 Z";
-                    
-                    insetGroup.append("path")
-                        .attr("d", prPathString)
-                        .attr("transform", `translate(${insetX}, ${insetY})`)
-                        .attr("fill", getColor('PR'))
-                        .attr("filter", "url(#shadowState)")
-                        .style("stroke", "#ffffff")
-                        .style("stroke-width", "1.25px")
-                        .style("cursor", "pointer")
-                        .on("mousemove", function(event) {
-                            d3.select(this).attr('fill', 'url(#azureHoverGradient)');
-                            tooltip.style.opacity = 1;
-
-                            const containerRect = mapContainer.getBoundingClientRect();
-                            const mx = event.clientX - containerRect.left;
-                            const my = event.clientY - containerRect.top;
-
-                            tooltip.style.left = `${mx + 15}px`;
-                            tooltip.style.top = `${my}px`;
-
-                            const count = participantData.attendeeData['PR'];
-                            const status = `<span class="font-extrabold text-yellow-300">Attendees: ${count}</span>`;
-                            tooltip.innerHTML = `<strong class="text-sm font-semibold">Puerto Rico</strong><br>${status}`;
-                        })
-                        .on("mouseout", function() {
-                            d3.select(this).attr("fill", getColor('PR'));
-                            tooltip.style.opacity = 0;
-                        });
-                }
-
-                // Inset Label Header Text (Present in both live and fallback rendering)
-                insetGroup.append("text")
-                    .attr("x", insetX + insetWidth / 2)
-                    .attr("y", insetY + 16)
-                    .attr("text-anchor", "middle")
-                    .style("font-size", "10px")
-                    .style("font-weight", "800")
-                    .style("fill", "#94a3b8")
-                    .style("letter-spacing", "0.05em")
-                    .style("pointer-events", "none")
-                    .text("PUERTO RICO");
-
-            }).catch(error => {
-                console.error("Map Error:", error);
-                mapContainer.innerHTML = `<p class="text-center text-red-500">Could not load map data.</p>`;
+          insetGroup.append('path')
+            .datum({ properties: { name: "Puerto Rico" } })
+            .attr('d', prPathData)
+            .attr('transform', prTransform)
+            .attr('class', 'state-path cursor-pointer')
+            .attr('fill', getColor('PR'))
+            .style('stroke', '#ffffff')
+            .style('stroke-width', '1.5px')
+            .style('cursor', 'pointer')
+            .style('stroke-linejoin', 'round')
+            .on('mousemove', function(event) {
+              const prCount = attendeeData['PR'] || 83;
+              d3.select(this).attr('fill', 'url(#azureHoverGrad)');
+              tooltip.style('opacity', 1)
+                .style('left', `${event.pageX + 15}px`)
+                .style('top', `${event.pageY - 10}px`)
+                .html(`
+                  <div class="font-bold flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span>
+                    Puerto Rico
+                  </div>
+                  <div class="text-[11px] text-slate-300 mt-1">
+                    <strong class="text-white">${prCount} Attendees</strong>
+                  </div>
+                `);
+            })
+            .on('mouseleave', function() {
+              const isSelected = selectedState && selectedState.name === "Puerto Rico";
+              d3.select(this)
+                .attr('fill', getColor('PR'))
+                .style('stroke', isSelected ? '#1d4ed8' : '#ffffff')
+                .style('stroke-width', isSelected ? '2px' : '1.5px');
+              tooltip.style('opacity', 0);
+            })
+            .on('click', () => {
+              const prCount = attendeeData['PR'] || 83;
+              selectState('Puerto Rico', prCount);
             });
         }
-        
-        // --- RESPONSIVE ADAPTATION ON RESIZE ---
-        let resizeTimer;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(() => {
-                if (document.getElementById('dashboard').classList.contains('active')) {
-                    drawMap();
-                }
-            }, 250);
-        });
-        
-        // --- INITIALIZATION ---
-        triggerSectionAnimations(document.querySelector('.main-content-section.active'));
-    });
+
+        // PR title
+        insetGroup.append('text')
+          .attr('x', insetX + insetWidth / 2)
+          .attr('y', insetY + 18)
+          .attr('text-anchor', 'middle')
+          .style('font-size', '10px')
+          .style('font-weight', '800')
+          .style('fill', '#64748b')
+          .style('letter-spacing', '0.05em')
+          .text('PUERTO RICO');
+      }
     </script>
-</body>
+  </body>
 </html>
