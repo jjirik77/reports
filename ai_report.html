@@ -944,17 +944,11 @@
             if (!d || !d.properties) return '#cbd5e1';
             const pathName = d.properties.name;
             const abbr = stateNameMap[pathName]?.abbr;
-            if (pathName === "Puerto Rico") {
-              return pathName === name ? '#1d4ed8' : '#ffffff';
-            }
             return pathName === name ? '#1d4ed8' : (activeStates.has(abbr) ? '#2563eb' : '#cbd5e1');
           })
           .style('stroke-width', function(d) {
             if (!d || !d.properties) return '1px';
             const pathName = d.properties.name;
-            if (pathName === "Puerto Rico") {
-              return pathName === name ? '2px' : '1.5px';
-            }
             return pathName === name ? '2px' : '1px';
           });
 
@@ -1006,12 +1000,10 @@
             if (!d || !d.properties) return '#cbd5e1';
             const pathName = d.properties.name;
             const abbr = stateNameMap[pathName]?.abbr;
-            if (pathName === "Puerto Rico") return '#ffffff';
             return activeStates.has(abbr) ? '#2563eb' : '#cbd5e1';
           })
           .style('stroke-width', function(d) {
             if (!d || !d.properties) return '1px';
-            if (d.properties.name === "Puerto Rico") return '1.5px';
             return '1px';
           });
 
@@ -1220,93 +1212,37 @@
             }
           });
 
-        // Puerto Rico inset box
-        const prFeature = states.features.find(d => d.properties.name === "Puerto Rico");
-        const insetWidth = 140;
-        const insetHeight =  90;
-        const insetX = 35;
-        const insetY = baseHeight - insetHeight - 35;
+        // Draw Puerto Rico directly on the map relative to Florida's geographic position
+        const flFeature = mainlandStatesFeatures.find(d => d.properties.name === "Florida");
+        if (flFeature) {
+          const bounds = pathGenerator.bounds(flFeature);
+          // bounds[1][0] is Florida's easternmost point (Miami area)
+          // bounds[1][1] is Florida's southernmost point (Keys area)
+          const flExtentX = bounds[1][0];
+          const flExtentY = bounds[1][1];
 
-        const insetGroup = svg.append('g').attr('class', 'pr-inset-container');
-
-        // Base box
-        insetGroup.append('rect')
-          .attr('x', insetX)
-          .attr('y', insetY)
-          .attr('width', insetWidth)
-          .attr('height', insetHeight)
-          .attr('rx', 12)
-          .attr('fill', 'rgba(255, 255, 255, 0.95)')
-          .attr('stroke', '#e2e8f0')
-          .attr('stroke-width', 1.5)
-          .style('filter', 'url(#softStateShadow)');
-
-        if (prFeature) {
-          const bounds = pathGenerator.bounds(prFeature);
-          const dx = bounds[1][0] - bounds[0][0];
-          const dy = bounds[1][1] - bounds[0][1];
-          const cx = (bounds[0][0] + bounds[1][0]) / 2;
-          const cy = (bounds[0][1] + bounds[1][1]) / 2;
-
-          const targetX = insetX + insetWidth / 2;
-          const targetY = insetY + insetHeight / 2 + 5;
-
-          const scaleX = (insetWidth * 0.75) / dx;
-          const scaleY = (insetHeight * 0.55) / dy;
-          const scale = Math.min(scaleX, scaleY);
-          const transformStr = `translate(${targetX}, ${targetY}) scale(${scale}) translate(${-cx}, ${-cy})`;
-
-          insetGroup.append('path')
-            .datum(prFeature)
-            .attr('d', pathGenerator)
-            .attr('transform', transformStr)
-            .attr('fill', getColor('PR'))
-            .style('stroke', '#ffffff')
-            .style('stroke-width', `${1.5 / scale}px`)
-            .style('cursor', 'pointer')
-            .on('mousemove', function(event) {
-              const prCount = attendeeData['PR'] || 83;
-              d3.select(this).attr('fill', 'url(#azureHoverGrad)');
-              tooltip.style('opacity', 1)
-                .style('left', `${event.pageX + 15}px`)
-                .style('top', `${event.pageY - 10}px`)
-                .html(`
-                  <div class="font-bold flex items-center gap-1.5">
-                    <span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span>
-                    Puerto Rico
-                  </div>
-                  <div class="text-[11px] text-slate-300 mt-1">
-                    <strong class="text-white">${prCount} Attendees</strong>
-                  </div>
-                `);
-            })
-            .on('mouseleave', function() {
-              d3.select(this).attr('fill', getColor('PR'));
-              tooltip.style('opacity', 0);
-            })
-            .on('click', () => {
-              const prCount = attendeeData['PR'] || 83;
-              selectState('Puerto Rico', prCount);
-            });
-        } else {
-          // Fallback: draw accurate Puerto Rico shape relative to inset center
-          const targetX = insetX + insetWidth / 2;
-          const targetY = insetY + insetHeight / 2 + 5;
+          // Geographically, Puerto Rico is located to the southeast of Florida.
+          // Placing it ~115px east and ~35px south positions it perfectly inside the Caribbean area
+          // of our map canvas (inside the 170px empty space on the right of the projection).
+          const prX = flExtentX + 115;
+          const prY = flExtentY + 35;
           
-          // Custom path representing realistic Puerto Rico shape
+          const prGroup = svg.append('g').attr('class', 'pr-map-container');
+          
+          // Realistic Puerto Rico shape path
           const prPathData = "M -35,-8 C -20,-9 -5,-9 10,-8 C 20,-8 28,-6 33,-3 C 36,-1 36,1 32,3 C 25,6 15,8 5,8 Q -15,9 -30,7 C -35,6 -36,2 -35,-2 Z";
-          const prTransform = `translate(${targetX}, ${targetY}) scale(1.1)`;
+          const prTransform = `translate(${prX}, ${prY}) scale(0.48)`;
 
-          insetGroup.append('path')
+          prGroup.append('path')
             .datum({ properties: { name: "Puerto Rico" } })
             .attr('d', prPathData)
             .attr('transform', prTransform)
             .attr('class', 'state-path cursor-pointer')
             .attr('fill', getColor('PR'))
-            .style('stroke', '#ffffff')
-            .style('stroke-width', '1.5px')
-            .style('cursor', 'pointer')
+            .style('stroke', getStrokeColor('PR'))
+            .style('stroke-width', '1px')
             .style('stroke-linejoin', 'round')
+            .style('filter', activeStates.has('PR') ? 'url(#softStateShadow)' : 'none')
             .on('mousemove', function(event) {
               const prCount = attendeeData['PR'] || 83;
               d3.select(this).attr('fill', 'url(#azureHoverGrad)');
@@ -1327,26 +1263,27 @@
               const isSelected = selectedState && selectedState.name === "Puerto Rico";
               d3.select(this)
                 .attr('fill', getColor('PR'))
-                .style('stroke', isSelected ? '#1d4ed8' : '#ffffff')
-                .style('stroke-width', isSelected ? '2px' : '1.5px');
+                .style('stroke', isSelected ? '#1d4ed8' : getStrokeColor('PR'))
+                .style('stroke-width', isSelected ? '2px' : '1px');
               tooltip.style('opacity', 0);
             })
             .on('click', () => {
               const prCount = attendeeData['PR'] || 83;
               selectState('Puerto Rico', prCount);
             });
-        }
 
-        // PR title
-        insetGroup.append('text')
-          .attr('x', insetX + insetWidth / 2)
-          .attr('y', insetY + 18)
-          .attr('text-anchor', 'middle')
-          .style('font-size', '10px')
-          .style('font-weight', '800')
-          .style('fill', '#64748b')
-          .style('letter-spacing', '0.05em')
-          .text('PUERTO RICO');
+          // Text label below the island
+          prGroup.append('text')
+            .attr('x', prX)
+            .attr('y', prY + 16)
+            .attr('text-anchor', 'middle')
+            .style('font-size', '9px')
+            .style('font-weight', '700')
+            .style('fill', '#64748b')
+            .style('letter-spacing', '0.04em')
+            .style('pointer-events', 'none')
+            .text('PUERTO RICO');
+        }
       }
     </script>
   </body>
