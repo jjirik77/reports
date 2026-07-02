@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EPNC — AI for Educators Initiative Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0a2540; --blue:#175a9c; --blue-2:#2b7fc4; --teal:#0f9bb0; --sky:#38bdf8; --red:#c8102e;
+    --ink:#0f172a; --muted:#64748b; --bg:#f4f7fc; --surface:#ffffff; --border:#e6eaf2; --gold:#f5b301;
+    --shadow:0 10px 30px -12px rgba(10,37,64,.18); --shadow-sm:0 2px 10px -4px rgba(10,37,64,.14); --radius:16px;
+    --font-body:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; --font-head:'Space Grotesk','Inter',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--font-body);color:var(--ink);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 1.5rem}
+  h1,.section-title,.map-title,.about-col h2,.goals-card h3,.outcomes-block h3,.m-name,.ws h4,.wm-epnc,.f-title,.tst .nm{font-family:var(--font-head)}
+  section{scroll-margin-top:150px}
+
+  /* HEADER — logo above menu */
+  .site-header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+  .brand-bar{display:flex;justify-content:center;align-items:center;padding:.9rem 1rem .55rem}
+  .brand-logo{max-height:84px;width:auto;display:block}
+  .brand-text{display:none;flex-direction:column;align-items:center;line-height:1}
+  .wm-epnc{font-weight:900;font-size:1.75rem;letter-spacing:.02em;color:var(--blue)}
+  .wm-epnc b{color:var(--teal)}
+  .wm-tag{font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:.2rem}
+  .main-nav{display:flex;justify-content:center;flex-wrap:wrap;gap:.35rem;padding:0 1rem .6rem}
+  .main-nav a{position:relative;font-size:.82rem;font-weight:600;color:var(--muted);padding:.5rem .95rem;border-radius:999px;transition:.15s}
+  .main-nav a.active{color:var(--blue)}
+  .main-nav a.active::after{content:"";position:absolute;left:.95rem;right:.95rem;bottom:.1rem;height:2px;background:var(--red);border-radius:2px}
+  .main-nav a:hover{color:var(--blue);background:#eaf1f8}
+
+  /* HERO */
+  .hero{background:linear-gradient(135deg,#0a2540 0%,#124a86 55%,#175a9c 100%);color:#fff;position:relative;overflow:hidden}
+  .hero::after{content:"";position:absolute;inset:0;background:radial-gradient(600px 300px at 85% -10%,rgba(15,155,176,.35),transparent),radial-gradient(500px 300px at 10% 120%,rgba(56,189,248,.22),transparent);pointer-events:none}
+  .hero::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.06) 1px,transparent 1px);background-size:22px 22px;pointer-events:none}
+  .hero-inner{position:relative;padding:3.2rem 0 5.4rem}
+  .eyebrow{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#bfe3f5;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);padding:.35rem .8rem;border-radius:999px;margin-bottom:1.1rem}
+  .hero h1{font-size:clamp(1.9rem,4.2vw,3rem);line-height:1.1;letter-spacing:-.02em;font-weight:700;max-width:20ch}
+  .hero-sub{margin-top:1rem;font-size:1.05rem;color:#cfe0f2;font-weight:500;max-width:58ch}
+  .hero p.lede{margin-top:1.1rem;max-width:65ch;font-size:1.05rem;color:#dbe6f5}
+  .hero .offerings{margin-top:1.4rem;display:flex;flex-wrap:wrap;gap:.5rem}
+  .chip{font-size:.76rem;font-weight:600;color:#e8f0fb;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);padding:.32rem .7rem;border-radius:999px}
+
+  /* KPI */
+  .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;margin-top:-3.6rem;position:relative;z-index:2}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.15rem;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .kpi::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--blue),var(--teal))}
+  .kpi .num{font-family:var(--font-head);font-variant-numeric:tabular-nums;font-size:2rem;font-weight:700;letter-spacing:-.02em;color:var(--navy);line-height:1}
+  .kpi .lbl{margin-top:.35rem;font-size:.78rem;font-weight:600;color:var(--muted);line-height:1.35}
+
+  /* SECTIONS */
+  .section{padding:4.2rem 0}
+  .section-head{margin-bottom:1.7rem}
+  .section-eyebrow{font-size:.74rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue)}
+  .section-title{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;letter-spacing:-.02em;color:var(--navy);margin-top:.25rem}
+  .section-desc{margin-top:.6rem;max-width:74ch;color:var(--muted);font-size:1rem}
+  .alt{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+
+  /* ABOUT / GOALS / OUTCOMES */
+  .about-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:2.4rem;align-items:start}
+  .about-col h2{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;color:var(--navy);letter-spacing:-.02em;margin-bottom:1rem}
+  .about-col p{color:var(--muted);font-size:.97rem;line-height:1.7;margin-bottom:1rem}
+  .goals-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.7rem}
+  .goals-card h3{display:flex;align-items:center;gap:.75rem;font-size:1.18rem;color:var(--navy);font-weight:800;margin-bottom:1.2rem}
+  .goals-card h3 .ico{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--blue-2));color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+  .goals-list{list-style:none;display:grid;gap:.95rem}
+  .goals-list li{position:relative;padding-left:1.5rem;font-size:.92rem;color:var(--muted);line-height:1.55}
+  .goals-list li::before{content:"";position:absolute;left:0;top:.5em;width:8px;height:8px;border-radius:50%;background:var(--teal)}
+  .browse-btn{display:block;text-align:center;margin-top:1.5rem;background:var(--navy);color:#fff;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:.76rem;padding:.9rem;border-radius:11px;transition:.15s}
+  .browse-btn:hover{background:#081c33}
+  .outcomes-block{margin-top:2.6rem;padding-top:2rem;border-top:1px solid var(--border)}
+  .outcomes-block h3{font-size:1.18rem;color:var(--navy);font-weight:800;margin-bottom:1.2rem;display:flex;align-items:center;gap:.6rem}
+  .outcomes-block h3 .ico{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--teal),#0d9488);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:.95rem}
+  .out-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:.9rem 2rem}
+  .out-list li{position:relative;padding-left:1.9rem;font-size:.93rem;color:var(--muted)}
+  .out-list li::before{content:"\2713";position:absolute;left:0;top:-1px;color:var(--teal);font-weight:900;font-size:1.05rem}
+  .out-list li b{color:var(--navy)}
+
+  /* WORKSHOPS */
+  .ws-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.1rem}
+  .ws{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--wa,var(--blue));border-radius:var(--radius);padding:1.35rem;box-shadow:var(--shadow-sm);transition:.18s}
+  .ws:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+  .ws .ws-tag{font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--wa,var(--blue))}
+  .ws h4{color:var(--navy);margin:.45rem 0;font-size:1.05rem;line-height:1.25}
+  .ws p{color:var(--muted);font-size:.9rem}
+
+  /* US MAP */
+  .map-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem;box-shadow:var(--shadow-sm)}
+  .map-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:.4rem}
+  .map-title{font-size:1.05rem;color:var(--navy);font-weight:800}
+  #usmap svg{width:100%;height:auto;display:block}
+  .st{transition:opacity .15s;cursor:pointer}
+  .st:hover{opacity:.8}
+  .map-msg{color:var(--muted);padding:2rem;text-align:center}
+  .map-legend{display:flex;gap:1.4rem;align-items:flex-start;flex-wrap:wrap}
+  .lg-item{display:flex;align-items:center;gap:.5rem;font-size:.74rem;font-weight:600;color:var(--muted)}
+  .lg-grad{display:inline-flex;flex-direction:column;gap:2px}
+  .lg-scale{width:120px;height:10px;border-radius:5px;background:linear-gradient(90deg,#a9cbe6,#175a9c)}
+  .lg-ticks{display:flex;justify-content:space-between;width:120px;font-size:.62rem}
+  .lg-ticks i{font-style:normal}
+  .lg-swatch{width:16px;height:12px;border-radius:3px;background:#e5e9f0;border:1px solid var(--border)}
+  .map-terr{margin-top:.8rem;font-size:.82rem;color:var(--muted);background:#f6f8fc;border:1px solid var(--border);border-radius:8px;padding:.6rem .9rem}
+  #maptip{position:fixed;pointer-events:none;opacity:0;transition:opacity .12s;background:var(--navy);color:#fff;font-size:.78rem;padding:.4rem .6rem;border-radius:8px;box-shadow:var(--shadow);z-index:100;line-height:1.35}
+
+  /* TESTIMONIALS */
+  .tst-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:1.2rem}
+  .tst{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;transition:.18s}
+  .tst:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+  .tst.feat{border:1.5px solid var(--red);box-shadow:0 12px 30px -16px rgba(200,16,46,.32)}
+  .tst .stars{color:var(--gold);font-size:.95rem;letter-spacing:2px;margin-bottom:.7rem}
+  .tst .quote{color:var(--ink);font-size:.94rem;font-style:italic;line-height:1.6;flex:1}
+  .tst .who{display:flex;align-items:center;gap:.7rem;margin-top:1.2rem;padding-top:1rem;border-top:1px solid var(--border)}
+  .tst .av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.76rem;background:var(--ta,var(--blue));flex-shrink:0}
+  .tst .nm{font-weight:800;color:var(--navy);font-size:.9rem;line-height:1.2}
+  .tst .sub{font-size:.76rem;color:var(--muted)}
+
+  /* TEAM */
+  .team-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+  .member{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow-sm);display:flex;gap:1.1rem;transition:.18s}
+  .member:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+  .member.lead{border:1.5px solid var(--blue);box-shadow:0 12px 30px -14px rgba(23,90,156,.4)}
+  .avatar{flex-shrink:0;width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:1.05rem;background:linear-gradient(135deg,var(--blue),var(--teal))}
+  .member.lead .avatar{background:linear-gradient(135deg,var(--navy),var(--blue))}
+  .m-name{font-size:1.12rem;font-weight:800;color:var(--blue)}
+  .m-role{font-size:.82rem;font-weight:700;color:var(--navy);margin:.1rem 0 .5rem}
+  .m-bio{font-size:.9rem;color:var(--muted)}
+
+  /* FOOTER */
+  footer{background:var(--navy);color:#c7d2e8;padding:2rem 0}
+  footer .f-title{font-weight:800;color:#fff;font-size:1.02rem}
+  footer p{font-size:.8rem;margin-top:.4rem;color:#9fb0cf}
+
+  @media(max-width:900px){
+    .kpi-row{grid-template-columns:repeat(2,1fr);margin-top:-2.5rem}
+    .about-grid{grid-template-columns:1fr;gap:2rem}
+    .out-list{grid-template-columns:1fr}
+    .team-grid{grid-template-columns:1fr}
+  }
+  @media(max-width:520px){.kpi-row{grid-template-columns:1fr}.member{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand-bar">
+    <!-- Save the EPNC logo in this folder as logo.png and it appears automatically. -->
+    <img src="logo.png" alt="EPNC — Education Pathway National Center" class="brand-logo"
+         onerror="this.style.display='none';document.getElementById('brandText').style.display='flex'">
+    <span class="brand-text" id="brandText">
+      <span class="wm-epnc">EP<b>NC</b></span>
+      <span class="wm-tag">Education Pathway National Center</span>
+    </span>
+  </div>
+  <nav class="main-nav">
+    <a href="#overview">Overview</a>
+    <a href="#mission">Goals &amp; Outcomes</a>
+    <a href="#team">Team</a>
+    <a href="#workshops">Workshops</a>
+    <a href="#dashboard">Reach</a>
+    <a href="#testimonials">Testimonials</a>
+  </nav>
+</header>
+
+<!-- HERO / OVERVIEW -->
+<section id="overview" class="hero">
+  <div class="wrap hero-inner">
+    <span class="eyebrow">EPNC · National AI-in-Education Initiative</span>
+    <h1>Embedding modern, pedagogically sound AI into teaching &amp; learning.</h1>
+    <p class="hero-sub">An EPNC initiative building AI-ready faculty in every U.S. state and territory &mdash; across cybersecurity and IT pathways.</p>
+    <div class="offerings">
+      <span class="chip">CISM</span><span class="chip">CISA</span><span class="chip">Ethical Hacking with AI</span>
+      <span class="chip">OT/IT with AI</span><span class="chip">Azure Cloud Admin</span><span class="chip">Security+</span>
+      <span class="chip">CMMC</span><span class="chip">C2M2</span><span class="chip">Cybersecurity &amp; AI Systems</span>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="kpi-row">
+    <div class="kpi"><div class="num" data-count="1737">0</div><div class="lbl">Educators Trained</div></div>
+    <div class="kpi"><div class="num" data-count="101">0</div><div class="lbl">Partner Institutions</div></div>
+    <div class="kpi"><div class="num" data-count="23">0</div><div class="lbl">States &amp; Territories</div></div>
+    <div class="kpi"><div class="num" data-count="81">0</div><div class="lbl">Online / Synchronous Cohorts</div></div>
+    <div class="kpi"><div class="num" data-count="250000" data-suffix="+">0</div><div class="lbl">Student Impact (est.)</div></div>
+  </div>
+</div>
+
+<!-- GOALS & OUTCOMES -->
+<section id="mission" class="section">
+  <div class="wrap">
+    <div class="about-grid">
+      <div class="about-col">
+        <h2>About the Initiative</h2>
+        <p>This multi-workshop initiative is designed for educators, staff, advisors, and academic and workforce leaders who are ready to embed robust, modern, and pedagogically sound AI into teaching and learning across disciplines and institutions. Building on NCyTE-aligned offerings such as CISM and Ethical Hacking with AI, OT/IT with AI, Azure cloud administration, Security+, CMMC and C2M2, and Cybersecurity and AI Systems, the initiative develops AI-enabled capacity in both technical content (cloud, security, privacy, governance) and day-to-day educational practice (course design, advising, assessment, and student support).</p>
+        <p>A core aim is to establish a visible presence in every U.S. state and U.S. territory, cultivating local communities of practice where faculty, staff, and industry partners co-develop sharable AI teaching resources, cybersecurity-aligned curricula, and implementation playbooks that can be adapted to regional needs. Through workshops, participants join a growing network of practitioners who learn together, test AI tools in authentic educational contexts, and collectively shape responsible, future-ready AI use in education.</p>
+      </div>
+      <div class="goals-card">
+        <h3><span class="ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/></svg></span> Program Goals</h3>
+        <ul class="goals-list">
+          <li>Build a distributed, national community of practice in which at least one institutional team per state and territory is actively implementing AI-enhanced teaching, learning, and student support aligned with cybersecurity and IT pathways.</li>
+          <li>Equip educators with practical, course-ready skills in areas such as Teaching CISM, Ethical Hacking, and OT/IT Using AI, Azure Cloud Administration with AI services, Security+ and CISA with AI-augmented labs, and CMMC/C2M2-aligned risk and maturity assessments, so they can immediately modernize their curricula.</li>
+          <li>Help institutions design and run AI-infused learning experiences&mdash;Foundations of AI, Applied AI, and integrated Cybersecurity and AI Systems&mdash;that improve student engagement and outcomes while remaining grounded in evidence-based pedagogy and strong academic integrity practices.</li>
+          <li>Support educators in building sustainable, shareable AI implementation artifacts (templates, rubrics, example prompts, lab guides, and policy language) that lower the barrier for colleagues in their state and region to adopt responsible, effective AI in their own courses and services.</li>
+          <li>Foster ethical, transparent AI use by training educators and students to document AI&rsquo;s role in their work, critically evaluate AI-generated outputs, and align AI-supported decisions with institutional, regulatory, and professional standards in cybersecurity, privacy, and compliance.</li>
+        </ul>
+        <a href="#workshops" class="browse-btn">Browse Workshops</a>
+      </div>
+    </div>
+    <div class="outcomes-block">
+      <h3><span class="ico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v4c0 1.1 2.7 2 6 2s6-.9 6-2v-4"/></svg></span> Key Learning Outcomes</h3>
+      <ul class="out-list">
+        <li><b>Cybersecurity &amp; Computing Context</b> &mdash; gain deep functional comprehension of how the workshop topic and related AI capabilities can enhance teaching and learning in their own cybersecurity or computing context.</li>
+        <li><b>Practical AI-Enabled Workflows</b> &mdash; obtain hands-on knowledge of at least one practical AI-enabled workflow, tool, or strategy connected to the workshop focus.</li>
+        <li><b>Skill-Building Student Activities</b> &mdash; guide students to develop skills through an instructional activity, example, or resource that reflects the workshop&rsquo;s concepts and tools.</li>
+        <li><b>Curriculum &amp; Standards Alignment</b> &mdash; develop and refine an idea, assignment, or lab that aligns the workshop content with relevant standards, frameworks, or credentials.</li>
+        <li><b>Implementation &amp; Pilot Planning</b> &mdash; plan concrete next steps to implement and pilot the new practices with students.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section id="team" class="section alt">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow">Who We Are</div>
+      <h2 class="section-title">Project Leadership Team</h2>
+      <p class="section-desc">The team designing, delivering, and assessing the initiative&rsquo;s professional development.</p>
+    </div>
+    <div class="team-grid">
+      <div class="member lead">
+        <div class="avatar">JS</div>
+        <div>
+          <div class="m-name">Dr. John Sands</div>
+          <div class="m-role">Principal Investigator</div>
+          <p class="m-bio">Dr. Sands brings over 35 years of national cybersecurity education and career-pathway experience to the project. As leader of the NCAE Educational Pathways National Center and former director of the Center for System Security and Information Assurance (CSSIA), he has extensive experience identifying and addressing emerging-technology educational needs.</p>
+        </div>
+      </div>
+      <div class="member">
+        <div class="avatar">JJ</div>
+        <div>
+          <div class="m-name">Jiri Jirik</div>
+          <div class="m-role">Co-Principal Investigator &middot; Director of Resource Development</div>
+          <p class="m-bio">Jiri serves as Director of Resource Development, leveraging his vast experience in developing and delivering training focused on industry credentials including CISA, CISM, and CISSP. Jiri is responsible for designing, implementing, and assessing professional development programs for faculty to effectively integrate AI into their teaching.</p>
+        </div>
+      </div>
+      <div class="member">
+        <div class="avatar">SK</div>
+        <div>
+          <div class="m-name">Stanley Kostka</div>
+          <div class="m-role">Senior Personnel</div>
+          <p class="m-bio">Stan brings valuable experience from managing the Midwest NCAE Hub, which encompassed over 110 institutions. He serves as the project&rsquo;s Learning Community Team Leader, managing communication strategies, organizing events, and disseminating information about the project&rsquo;s activities and outcomes.</p>
+        </div>
+      </div>
+      <div class="member">
+        <div class="avatar">MG</div>
+        <div>
+          <div class="m-name">Michael Gonzalez</div>
+          <div class="m-role">Graphic Artist / Publications / Social Media Coordinator</div>
+          <p class="m-bio">Michael serves as the Communication and Events Coordinator, managing the project&rsquo;s communication strategies, organizing events, and disseminating information about its activities and outcomes. In this role Mike develops and implements a comprehensive communication plan and manages the project&rsquo;s website, social media, and other channels.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORKSHOPS -->
+<section id="workshops" class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow">Professional Development</div>
+      <h2 class="section-title">Project Workshops</h2>
+      <p class="section-desc">Professional-development workshops preparing faculty to integrate AI across cybersecurity and IT credentials.</p>
+    </div>
+    <div class="ws-grid">
+      <article class="ws" style="--wa:#143f7a"><div class="ws-tag">Workshop 01</div><h4>Teaching CISM Using AI</h4><p>Prepares faculty to use AI tools to analyze governance and risk case studies, generate draft policies, and help students practice CISM-aligned decision making with AI-supported feedback loops.</p></article>
+      <article class="ws" style="--wa:#175a9c"><div class="ws-tag">Workshop 02</div><h4>Azure Cloud Administration</h4><p>Enables faculty to design labs where students use Azure-native AI and automation services to deploy, monitor, and secure cloud workloads as part of cloud administration outcomes.</p></article>
+      <article class="ws" style="--wa:#1e6bb8"><div class="ws-tag">Workshop 03</div><h4>Security+ for Community College Faculty</h4><p>Equips faculty to embed AI-assisted threat analysis, log review, and control selection into Security+ labs so students practice core objectives with AI as a co-analyst rather than a black box.</p></article>
+      <article class="ws" style="--wa:#2b7fc4"><div class="ws-tag">Workshop 04</div><h4>Ethical Hacking using AI</h4><p>Shows participants how to use AI to accelerate ethical hacking workflows&mdash;such as reconnaissance, vulnerability discovery, exploit testing, and reporting&mdash;while also examining how attackers misuse AI and how defenders can counter AI-driven threats.</p></article>
+      <article class="ws" style="--wa:#0f9bb0"><div class="ws-tag">Workshop 05</div><h4>Cybersecurity and AI Systems</h4><p>Combines system-focused and AI-focused security by having learners both configure and test AI-driven defenses and analyze how to secure AI models themselves, using AI to generate attack scenarios, detect weaknesses, and design layered mitigations.</p></article>
+      <article class="ws" style="--wa:#c8102e"><div class="ws-tag">Workshop 07</div><h4>CISA Using AI</h4><p>Trains faculty to have students use AI to pre-analyze evidence, suggest control gaps, and draft audit narratives while maintaining human oversight for CISA-style governance and assurance work.</p></article>
+      <article class="ws" style="--wa:#0d7d8f"><div class="ws-tag">Workshop 08</div><h4>Teaching CISSP Using AI</h4><p>Enables faculty to structure CISSP courses where students rely on AI to generate architecture options and policy drafts, then critique and refine them against the official domains and best practices.</p></article>
+      <article class="ws" style="--wa:#175a9c"><div class="ws-tag">Workshop 09</div><h4>CMMC</h4><p>Students use AI tools to map organizational practices to CMMC levels, generate draft SSPs and POA&amp;Ms, and iteratively refine.</p></article>
+      <article class="ws" style="--wa:#1e6bb8"><div class="ws-tag">Workshop 10</div><h4>C2M2 Using AI</h4><p>Guides faculty on how to help students use AI to assess cybersecurity maturity levels, analyze capability maturity profiles across domains, and draft remediation recommendations according to the C2M2 framework.</p></article>
+      <article class="ws" style="--wa:#0f9bb0"><div class="ws-tag">Workshop 11</div><h4>Foundations of AI in Cybersecurity</h4><p>Equips instructors to design and implement introductory course content on AI principles, data governance, and the fundamental technical mechanics of machine learning within IT and security paths.</p></article>
+      <article class="ws" style="--wa:#2b7fc4"><div class="ws-tag">Workshop 12</div><h4>Applied AI in IT Systems</h4><p>Focuses on integrating machine learning toolkits directly into educational practice, enabling educators to build custom AI labs and grading rubrics that simulate real-world industry applications.</p></article>
+      <article class="ws" style="--wa:#c8102e"><div class="ws-tag">Workshop 13</div><h4>OT/IT with AI</h4><p>Explores how AI can help secure and monitor converged OT/IT environments by enhancing visibility, anomaly detection, and incident response across industrial control systems and traditional enterprise networks.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- GEOGRAPHIC REACH -->
+<section id="dashboard" class="section alt">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow">Project Reach</div>
+      <h2 class="section-title">Geographic Distribution</h2>
+      <p class="section-desc">Educator participation across the national footprint &mdash; 1,737 educators at 101 institutions spanning 23 states and territories. <span style="font-size:.85em;opacity:.75">(Reported figures with +20 applied to each state/territory.)</span></p>
+    </div>
+    <div class="map-wrap">
+      <div class="map-head">
+        <h3 class="map-title">Interactive Distribution Projection</h3>
+        <div class="map-legend" id="mapLegend"></div>
+      </div>
+      <div id="usmap"></div>
+      <div class="map-terr" id="mapTerr"></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials" class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow">In Their Words</div>
+      <h2 class="section-title">Testimonials</h2>
+      <p class="section-desc">What educators say about the workshops and the initiative.</p>
+    </div>
+    <div class="tst-grid">
+      <article class="tst" style="--ta:#2563eb">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="quote">&ldquo;The workshop was terrific. It provided not only lecture material, but showed us how the presenters use AI in their daily work &mdash; this was instrumental. It also provided content that could be used in our courses as we return back to the semester.&rdquo;</p>
+        <div class="who"><span class="av">AM</span><div><div class="nm">Faculty Member</div><div class="sub">Higher Education &bull; Computer Science</div></div></div>
+      </article>
+      <article class="tst" style="--ta:#0d9488">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="quote">&ldquo;I learned so much about AI and how to incorporate it effectively (and appropriately) into my work. I definitely feel more comfortable with AI and have begun using it intentionally on a daily basis.&rdquo;</p>
+        <div class="who"><span class="av">RD</span><div><div class="nm">Academic Advisor</div><div class="sub">Counseling Services &bull; Student Success</div></div></div>
+      </article>
+      <article class="tst" style="--ta:#c026d3">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="quote">&ldquo;This was one of the best professional development opportunities I have ever experienced. The presenters are experts in this field and have the heart of educators. I highly recommend this workshop for any educator wanting to learn more about AI!&rdquo;</p>
+        <div class="who"><span class="av">KH</span><div><div class="nm">Assistant Professor</div><div class="sub">Liberal Arts &bull; Interdisciplinary Tech</div></div></div>
+      </article>
+      <article class="tst feat" style="--ta:#c8102e">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="quote">&ldquo;This project fundamentally changed how I approach teaching computer science. Integrating AI isn&rsquo;t just about new tools; it&rsquo;s about preparing students for the future.&rdquo;</p>
+        <div class="who"><span class="av">AS</span><div><div class="nm">Dr. Anya Sharma</div><div class="sub">Computer Science &bull; Professor</div></div></div>
+      </article>
+      <article class="tst" style="--ta:#2563eb">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="quote">&ldquo;The inter-disciplinary workshops were fantastic. Collaborating with faculty from manufacturing and health sciences opened my eyes to new applications for AI.&rdquo;</p>
+        <div class="who"><span class="av">MC</span><div><div class="nm">Mark Chen</div><div class="sub">Information Technology &bull; Instructor</div></div></div>
+      </article>
+      <article class="tst" style="--ta:#7c3aed">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="quote">&ldquo;Seeing students from different STEM fields work together on AI projects has been incredibly rewarding. This is the future of technical education.&rdquo;</p>
+        <div class="who"><span class="av">DL</span><div><div class="nm">Prof. David Lee</div><div class="sub">Automotive Technology &bull; Department Chair</div></div></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="f-title">Education Pathway National Center (EPNC) &mdash; AI for Educators Initiative</div>
+    <p>&copy; 2026 Education Pathway National Center.</p>
+  </div>
+</footer>
+
+<div id="maptip"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+<script>
+  const STATE_ROWS = [
+    ["FL","Florida",127],["NY","New York",113],["IL","Illinois",111],["PR","Puerto Rico",103],
+    ["OH","Ohio",87],["TX","Texas",83],["WA","Washington",80],["IN","Indiana",78],["TN","Tennessee",78],
+    ["NJ","New Jersey",74],["CO","Colorado",72],["WY","Wyoming",72],["MN","Minnesota",71],
+    ["NC","North Carolina",68],["AZ","Arizona",66],["CA","California",63],["AL","Alabama",60],
+    ["VA","Virginia",59],["MA","Massachusetts",57],["KY","Kentucky",56],["MD","Maryland",54],
+    ["LA","Louisiana",53],["HI","Hawaii",52]
+  ];
+
+  (function renderMap(){
+    const FIPS={AL:"01",AK:"02",AZ:"04",AR:"05",CA:"06",CO:"08",CT:"09",DE:"10",FL:"12",GA:"13",HI:"15",ID:"16",IL:"17",IN:"18",IA:"19",KS:"20",KY:"21",LA:"22",ME:"23",MD:"24",MA:"25",MI:"26",MN:"27",MS:"28",MO:"29",MT:"30",NE:"31",NV:"32",NH:"33",NJ:"34",NM:"35",NY:"36",NC:"37",ND:"38",OH:"39",OK:"40",OR:"41",PA:"42",RI:"44",SC:"45",SD:"46",TN:"47",TX:"48",UT:"49",VT:"50",VA:"51",WA:"53",WV:"54",WI:"55",WY:"56"};
+    const counts=STATE_ROWS.map(r=>r[2]), cmin=Math.min(...counts), cmax=Math.max(...counts);
+    const byFips={}; STATE_ROWS.forEach(([code,name,cnt])=>{ if(FIPS[code]) byFips[FIPS[code]]={name,cnt}; });
+    const mapEl=document.getElementById('usmap');
+    if(typeof d3==='undefined'||typeof topojson==='undefined'){ mapEl.innerHTML='<p class="map-msg">The map needs an internet connection to load the U.S. geometry.</p>'; return; }
+    const color=d3.scaleLinear().domain([cmin,cmax]).range(["#a9cbe6","#175a9c"]);
+    document.getElementById('mapLegend').innerHTML =
+      '<div class="lg-item"><span>Active State Participants</span>'
+      +'<span class="lg-grad"><span class="lg-scale"></span><span class="lg-ticks"><i>'+cmin+'</i><i>'+cmax+'</i></span></span></div>'
+      +'<div class="lg-item"><span class="lg-swatch"></span><span>Inactive Regions</span></div>';
+    document.getElementById('mapTerr').innerHTML='&#128205; Puerto Rico is shown as an inset at the lower-right of the map.';
+    const W=960,H=560, tip=d3.select('#maptip');
+    const svg=d3.select('#usmap').append('svg').attr('viewBox','0 0 '+W+' '+H).attr('preserveAspectRatio','xMidYMid meet').attr('role','img').attr('aria-label','U.S. map of active state participants');
+    d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json').then(us=>{
+      const states=topojson.feature(us,us.objects.states);
+      const proj=d3.geoAlbersUsa().fitSize([W,H],states);
+      const path=d3.geoPath(proj);
+      svg.append('g').selectAll('path').data(states.features).join('path')
+        .attr('d',path).attr('class','st').attr('stroke','#ffffff').attr('stroke-width',0.75)
+        .attr('fill',d=>{const r=byFips[String(d.id).padStart(2,'0')];return r?color(r.cnt):'#e5e9f0';})
+        .on('mousemove',(ev,d)=>{const r=byFips[String(d.id).padStart(2,'0')];const nm=(d.properties&&d.properties.name)||(r&&r.name)||'';tip.style('opacity',1).style('left',(ev.clientX+14)+'px').style('top',(ev.clientY+14)+'px').html('<b>'+nm+'</b><br>'+(r?r.cnt+' participants':'Inactive region'));})
+        .on('mouseleave',()=>tip.style('opacity',0));
+      // Puerto Rico inset (Albers USA excludes PR)
+      const pr=STATE_ROWS.find(r=>r[0]==='PR');
+      if(pr){
+        const g=svg.append('g').attr('transform','translate(852,470)').style('cursor','pointer')
+          .on('mousemove',(ev)=>{tip.style('opacity',1).style('left',(ev.clientX+14)+'px').style('top',(ev.clientY+14)+'px').html('<b>Puerto Rico</b><br>'+pr[2]+' participants');})
+          .on('mouseleave',()=>tip.style('opacity',0));
+        g.append('rect').attr('class','st').attr('width',48).attr('height',30).attr('rx',5).attr('fill',color(pr[2])).attr('stroke','#ffffff').attr('stroke-width',1);
+        g.append('text').attr('x',24).attr('y',46).attr('text-anchor','middle').attr('font-size','12').attr('font-weight','700').attr('fill','#475569').text('PR');
+      }
+    }).catch(()=>{ mapEl.innerHTML='<p class="map-msg">The map could not load the U.S. geometry (needs internet).</p>'; });
+  })();
+
+  function animateCount(el){
+    const target=+el.dataset.count, suffix=el.dataset.suffix||"", dur=1400, t0=performance.now();
+    (function step(now){ const p=Math.min((now-t0)/dur,1), e=1-Math.pow(1-p,3);
+      el.textContent=Math.round(target*e).toLocaleString()+(p===1?suffix:""); if(p<1)requestAnimationFrame(step); })(t0);
+  }
+  const io=new IntersectionObserver((ents)=>{ents.forEach(en=>{ if(en.isIntersecting){ animateCount(en.target); io.unobserve(en.target); }});},{threshold:.4});
+  document.querySelectorAll('.num').forEach(el=>io.observe(el));
+
+  // scrollspy active nav
+  const navLinks=[...document.querySelectorAll('.main-nav a')];
+  const secObs=new IntersectionObserver((ents)=>{ents.forEach(en=>{ if(en.isIntersecting){ const id=en.target.id; navLinks.forEach(a=>a.classList.toggle('active', a.getAttribute('href')==='#'+id)); }});},{rootMargin:'-45% 0px -50% 0px'});
+  document.querySelectorAll('section[id]').forEach(s=>secObs.observe(s));
+</script>
+</body>
+</html>
