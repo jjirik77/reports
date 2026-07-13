@@ -138,21 +138,6 @@
             transform: scale(1);
         }
 
-        /* Impact Data Modern Cards */
-        .stat-card {
-            background: white;
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            border-radius: 1.25rem;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-        .stat-card:hover {
-            border-color: #3b82f6;
-            box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.1);
-        }
-
         /* Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
@@ -165,12 +150,16 @@
     <div class="flex flex-col md:flex-row min-h-screen">
         <!-- Sidebar Navigation -->
         <nav class="md:w-64 bg-slate-900 text-white p-6 space-y-2 flex-shrink-0 flex flex-col">
+            <!-- Sidebar Logo Header with official image reference from verbatim filename -->
             <div class="mb-10 mt-4 px-2">
-                <div class="flex items-center space-x-3 text-blue-500 mb-2">
-                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0z"></path></svg>
-                    <span class="text-xl font-extrabold tracking-tight text-white">EPNC</span>
+                <img src="logo.png" alt="EPNC Logo" class="w-full h-auto max-h-16 object-contain rounded-lg bg-white p-2 border border-slate-700" onerror="this.style.display='none'; document.getElementById('logo-fallback').classList.remove('hidden')">
+                <div id="logo-fallback" class="hidden">
+                    <div class="flex items-center space-x-3 text-blue-500 mb-2">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0z"></path></svg>
+                        <span class="text-xl font-extrabold tracking-tight text-white">EPNC</span>
+                    </div>
+                    <p class="text-xs text-slate-400 font-medium uppercase tracking-widest">National Center</p>
                 </div>
-                <p class="text-xs text-slate-400 font-medium uppercase tracking-widest">National Center</p>
             </div>
 
             <div class="flex-grow space-y-1">
@@ -194,6 +183,15 @@
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
                     Testimonials
                 </button>
+            </div>
+
+            <div class="pt-6 border-t border-slate-800">
+                <div class="bg-slate-800 rounded-lg p-4">
+                    <p class="text-xs text-slate-400 mb-1">Status</p>
+                    <p class="text-sm font-semibold text-emerald-400 flex items-center">
+                        <span class="w-2 h-2 bg-emerald-400 rounded-full mr-2 animate-pulse"></span> DCWF Aligned
+                    </p>
+                </div>
             </div>
         </nav>
 
@@ -225,19 +223,15 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="card p-8 rounded-2xl fade-in fade-in-delay-1">
-                            <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
-                                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" />
-                                </svg>
+                            <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                             </div>
                             <h3 class="text-2xl font-bold mb-4">Our Purpose</h3>
                             <p class="text-slate-600 leading-relaxed">To build a sustainable and inclusive pipeline of cybersecurity talent by creating robust pathways from high school programs directly to NCAE-C designated institutions.</p>
                         </div>
                         <div class="card p-8 rounded-2xl fade-in fade-in-delay-2">
-                            <div class="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
-                                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z M3.6 9H20.4 M3.6 15H20.4 M12 3V21 M12 3C14.5 3 16.5 7 16.5 12C16.5 17 14.5 21 12 21 M12 3C9.5 3 7.5 7 7.5 12C7.5 17 9.5 21 12 21" />
-                                </svg>
+                            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center mb-6">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 002-2v-1a2 2 0 012-2h1.945M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
                             </div>
                             <h3 class="text-2xl font-bold mb-4">Our Scope</h3>
                             <p class="text-slate-600 leading-relaxed">Delivering an integrated strategy blending open-source curriculum, faculty development, and a national virtual cyber range to empower educators and students nationwide.</p>
@@ -254,21 +248,21 @@
                             <h3 class="text-3xl font-extrabold text-slate-900">Curriculum & Learning</h3>
                             <p class="text-lg text-slate-600 leading-relaxed">The foundation of our impact is a flexible, open-source curriculum aligned with NCAE-C standards. This is enhanced by a rich library of gamified, interactive modules that personalize learning and boost engagement.</p>
                         </div>
-                        <div class="grid grid-cols-2 gap-6">
-                            <div class="stat-card border-t-4 border-blue-500">
-                                <p class="text-4xl font-black text-slate-900 pillar-counter" data-target="1300">0</p>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Active Educators</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="card p-6 text-center bg-white border-t-4 border-blue-600 shadow-md">
+                                <p class="text-4xl font-black text-blue-600 pillar-counter" data-target="1300">0</p>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Educators w/ Access</p>
                             </div>
-                            <div class="stat-card border-t-4 border-blue-500">
-                                <p class="text-4xl font-black text-slate-900 pillar-counter" data-target="3080">0</p>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Virtual Labs</p>
+                            <div class="card p-6 text-center bg-white border-t-4 border-blue-600 shadow-md">
+                                <p class="text-4xl font-black text-blue-600 pillar-counter" data-target="3080">0</p>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Virtual Lab Instances</p>
                             </div>
-                            <div class="stat-card border-t-4 border-blue-500">
-                                <p class="text-4xl font-black text-slate-900 pillar-counter" data-target="1000000">0</p>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Student Interactions</p>
+                            <div class="card p-6 text-center bg-white border-t-4 border-blue-600 shadow-md">
+                                <p class="text-4xl font-black text-blue-600 pillar-counter" data-target="1000000">0</p>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Student Engagements</p>
                             </div>
-                            <div class="stat-card border-t-4 border-blue-500">
-                                <p class="text-4xl font-black text-slate-900 pillar-counter" data-target="193">0</p>
+                            <div class="card p-6 text-center bg-white border-t-4 border-blue-600 shadow-md">
+                                <p class="text-4xl font-black text-blue-600 pillar-counter" data-target="193">0</p>
                                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Student Completions</p>
                             </div>
                         </div>
@@ -320,17 +314,17 @@
                             <p class="text-lg text-slate-600 leading-relaxed">We bridge the gap between education and employment by translating classroom learning into real-world experience through strategic industry onboarding and placed internships.</p>
                         </div>
                         <div class="lg:order-1 grid grid-cols-3 gap-4">
-                            <div class="stat-card border-t-4 border-emerald-500">
-                                <p class="text-3xl font-black text-slate-900 pillar-counter" data-target="31">0</p>
-                                <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mt-2">Employers</p>
+                            <div class="card p-6 text-center bg-white border-t-4 border-emerald-600 shadow-md">
+                                <p class="text-3xl font-black text-emerald-600 pillar-counter" data-target="31">0</p>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Employer Partners</p>
                             </div>
-                            <div class="stat-card border-t-4 border-emerald-500">
-                                <p class="text-3xl font-black text-slate-900 pillar-counter" data-target="61">0</p>
-                                <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mt-2">Placed</p>
+                            <div class="card p-6 text-center bg-white border-t-4 border-emerald-600 shadow-md">
+                                <p class="text-3xl font-black text-emerald-600 pillar-counter" data-target="61">0</p>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Students Placed</p>
                             </div>
-                            <div class="stat-card border-t-4 border-emerald-500">
-                                <p class="text-3xl font-black text-slate-900 pillar-counter" data-target="1700">0</p>
-                                <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mt-2">Ready</p>
+                            <div class="card p-6 text-center bg-white border-t-4 border-emerald-600 shadow-md">
+                                <p class="text-3xl font-black text-emerald-600 pillar-counter" data-target="1700">0</p>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Workforce Ready</p>
                             </div>
                         </div>
                     </div>
@@ -413,7 +407,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 fade-in">
                         <div class="p-6 bg-emerald-50 rounded-2xl border border-emerald-100">
                             <h4 class="font-bold text-emerald-900 mb-4 flex items-center">
-                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                                 Lessons Learned
                             </h4>
                             <ul class="text-sm space-y-3 text-emerald-800 font-medium">
@@ -424,7 +418,7 @@
                         </div>
                         <div class="p-6 bg-amber-50 rounded-2xl border border-amber-100">
                             <h4 class="font-bold text-amber-900 mb-4 flex items-center">
-                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 Key Challenges
                             </h4>
                             <ul class="text-sm space-y-3 text-amber-800 font-medium">
@@ -435,7 +429,7 @@
                         </div>
                         <div class="p-6 bg-blue-50 rounded-2xl border border-blue-100">
                             <h4 class="font-bold text-blue-900 mb-4 flex items-center">
-                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
                                 Recommendations
                             </h4>
                             <ul class="text-sm space-y-3 text-blue-800 font-medium">
@@ -459,7 +453,6 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-                        <!-- Card 1 -->
                         <div class="card p-6 rounded-2xl fade-in flex flex-col items-center text-center">
                             <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-4 shadow-sm">
                                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -469,7 +462,6 @@
                             <h4 class="font-bold mb-2 text-slate-800 text-sm">AI & DCWF Integration</h4>
                             <p class="text-[10px] text-slate-500 leading-relaxed">Integrate AI competencies and map all curriculum modules to DCWF work roles for <b>DoD 8140</b> focus.</p>
                         </div>
-                        <!-- Card 2 -->
                         <div class="card p-6 rounded-2xl fade-in fade-in-delay-1 flex flex-col items-center text-center">
                             <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 shadow-sm">
                                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -479,7 +471,6 @@
                             <h4 class="font-bold mb-2 text-slate-800 text-sm">Role-Focused Labs</h4>
                             <p class="text-[10px] text-slate-500 leading-relaxed">Broaden national range access, matching every lab and challenge to specific DCWF tasks.</p>
                         </div>
-                        <!-- Card 3 -->
                         <div class="card p-6 rounded-2xl fade-in fade-in-delay-2 flex flex-col items-center text-center">
                             <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mb-4 shadow-sm">
                                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -489,7 +480,6 @@
                             <h4 class="font-bold mb-2 text-slate-800 text-sm">Pathway Recognition</h4>
                             <p class="text-[10px] text-slate-500 leading-relaxed">Formal badging for programs demonstrating strong, articulated pathways to NCAE-C institutions.</p>
                         </div>
-                        <!-- Card 4 -->
                         <div class="card p-6 rounded-2xl fade-in fade-in-delay-3 flex flex-col items-center text-center">
                             <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mb-4 shadow-sm">
                                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -499,7 +489,6 @@
                             <h4 class="font-bold mb-2 text-slate-800 text-sm">WBL Scaling</h4>
                             <p class="text-[10px] text-slate-500 leading-relaxed">Invest in industry onboarding to scale internship and apprenticeship occupational blends.</p>
                         </div>
-                        <!-- Card 5 -->
                         <div class="card p-6 rounded-2xl fade-in fade-in-delay-4 flex flex-col items-center text-center">
                             <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center mb-4 shadow-sm">
                                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -509,7 +498,6 @@
                             <h4 class="font-bold mb-2 text-slate-800 text-sm">Sustainable Funding</h4>
                             <p class="text-[10px] text-slate-500 leading-relaxed">Secure multi-year funding to safeguard federal investment in a future-ready workforce.</p>
                         </div>
-                        <!-- Card 6 -->
                         <div class="card p-6 rounded-2xl fade-in fade-in-delay-5 flex flex-col items-center text-center">
                             <div class="w-12 h-12 bg-cyan-50 text-cyan-600 rounded-xl flex items-center justify-center mb-4 shadow-sm">
                                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -519,7 +507,6 @@
                             <h4 class="font-bold mb-2 text-slate-800 text-sm">Digital Divide Bridge</h4>
                             <p class="text-[10px] text-slate-500 leading-relaxed">Targeted programs to address infrastructure disparities for DCWF-aligned training in rural areas.</p>
                         </div>
-                        <!-- Card 7 -->
                         <div class="card p-6 rounded-2xl fade-in fade-in-delay-6 flex flex-col items-center text-center">
                             <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center mb-4 shadow-sm">
                                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -529,7 +516,6 @@
                             <h4 class="font-bold mb-2 text-slate-800 text-sm">Advisor Empowerment</h4>
                             <p class="text-[10px] text-slate-500 leading-relaxed">Enhance training for counselors to advise on DoD cyber workforce roles and certifications.</p>
                         </div>
-                        <!-- Card 8 -->
                         <div class="card p-6 rounded-2xl fade-in fade-in-delay-7 flex flex-col items-center text-center">
                             <div class="w-12 h-12 bg-pink-50 text-pink-600 rounded-xl flex items-center justify-center mb-4 shadow-sm">
                                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -539,7 +525,6 @@
                             <h4 class="font-bold mb-2 text-slate-800 text-sm">Gamified Mastery</h4>
                             <p class="text-[10px] text-slate-500 leading-relaxed">Expand gamified modules and competitions to boost motivation for DCWF-aligned knowledge.</p>
                         </div>
-                        <!-- Card 9 -->
                         <div class="card p-6 rounded-2xl fade-in fade-in-delay-8 flex flex-col items-center text-center">
                             <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-xl flex items-center justify-center mb-4 shadow-sm">
                                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -549,7 +534,6 @@
                             <h4 class="font-bold mb-2 text-slate-800 text-sm">Modular DCWF Curric</h4>
                             <p class="text-[10px] text-slate-500 leading-relaxed">Modular open-source curriculum allowing educators to adapt content while meeting DCWF standards.</p>
                         </div>
-                        <!-- Card 10 -->
                         <div class="card p-6 rounded-2xl fade-in fade-in-delay-9 flex flex-col items-center text-center">
                             <div class="w-12 h-12 bg-gray-50 text-gray-600 rounded-xl flex items-center justify-center mb-4 shadow-sm">
                                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
